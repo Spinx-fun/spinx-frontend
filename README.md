@@ -1,4 +1,4 @@
-# Valhalla Jackpot & Coinflip Game | Solana 
+# SpinX Coinflip Game | Solana 
 
 ## Requirements
 
