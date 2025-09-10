@@ -40,7 +40,7 @@ const Footer: React.FC = () => {
           <div className='flex flex-row w-full gap-8 justify-between md:gap-24 md:w-1/2'>
             <div className='flex flex-col gap-2'>
               <span className='text-white mb-4'>Pages</span>
-              <Link href='/jackpot'><span className='text-[#8B8A8D] cursor-pointer'>Jackpot</span></Link>
+              {/* <Link href='/jackpot'><span className='text-[#8B8A8D] cursor-pointer'>Jackpot</span></Link> */}
               <Link href='/coinflip'><span className='text-[#8B8A8D] cursor-pointer'>Coinflip</span></Link>
               <Link href='/profile'><span className='text-[#8B8A8D] cursor-pointer'>Profile</span></Link>
             </div>
