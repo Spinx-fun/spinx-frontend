@@ -4,6 +4,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { UnknownUserIcon } from "../components/Svglist";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Chat from "../components/Chat";
+import StatusControls from "../components/StatusControls";
 import { PublicKey } from "@solana/web3.js";
 import Head from "next/head";
 import {
@@ -154,10 +155,16 @@ export default function Rooms() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div
-        className={`mt-[80px] flex flex-row justify-end gap-2 xl:gap-6 px-3 lg:px-12 py-12 bg-cover bg-no-repeat w-full flex-wrap bg-[#0D0C0F]`}
+        className={`mt-[80px] flex flex-row justify-end gap-2 xl:gap-6 px-3 lg:px-12 py-12 bg-cover bg-no-repeat w-full flex-wrap bg-[#0a101e]`}
       >
 
         <div className="overflow-y-auto grow mx-auto">
+          <div className="pt-6 table border-separate border-spacing-x-0 border-spacing-y-1 rounded-3xl table-auto w-full text-[#8b8a8d] text-[11px]">
+            <StatusControls />
+          </div>
+        </div>
+
+        <div className="overflow-y-auto grow mx-auto hidden">
           <div className="flex flex-col-reverse lg:flex-row justify-between items-center gap-4">
             <div className="flex flex-row w-full lg:w-fit grow justify-between">
               <div className="flex items-center gap-3">

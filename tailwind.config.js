@@ -140,6 +140,7 @@ module.exports = {
       },
       fontFamily: {
         'font-inter': 'Inter',
+        'font-oswald': 'Oswald',
         'font-mono': 'Roboto Mono'
       },
     }
