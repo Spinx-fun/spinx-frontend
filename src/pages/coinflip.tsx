@@ -156,12 +156,14 @@ export default function Rooms() {
         <link rel="icon" href="/favicon.ico" />
       </Head>*/}
       <div className="flex">
-        {/* Sidebar */}
-        <Sidebar activeItem="home" />
+        {/* Sidebar - Hidden on mobile and tablet (below lg) */}
+        <div className="hidden lg:block">
+          <Sidebar activeItem="home" />
+        </div>
         
         {/* Main Content */}
         <div
-          className={`flex flex-row justify-end gap-2 xl:gap-6 px-3 lg:px-12 pb-12 pt-6 bg-cover bg-no-repeat flex-1 flex-wrap bg-[#0a101e] ml-[248px]`}
+          className={`flex flex-row justify-end gap-2 xl:gap-6 px-3 lg:px-12 pb-12 pt-6 bg-cover bg-no-repeat flex-1 flex-wrap bg-[#0a101e] lg:ml-[248px]`}
         >
 
         <div className="overflow-y-auto grow mx-auto">

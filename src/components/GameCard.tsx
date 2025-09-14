@@ -52,7 +52,7 @@ const GameCard: React.FC<GameCardProps> = ({
           <div className="font-inter font-normal text-sm leading-[114%] text-[#90a2b9] mb-1">
             Stake
           </div>
-          <div className="font-oswald font-medium text-[24px] leading-[133%] text-white">
+          <div className="font-oswald font-medium text-[24px] leading-[133%] text-[#f9c752]">
             {stakeAmount}
           </div>
         </div>

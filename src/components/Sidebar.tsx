@@ -19,7 +19,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = 'home' }) => {
       label: 'Create a challenge',
       icon: activeItem === 'create' ? '/image/create-active.svg' : '/image/create.svg',
       activeIcon: '/image/create-active.svg',
-      href: '/'
+      href: '/create-challenge'
     },
     {
       id: 'documentation',

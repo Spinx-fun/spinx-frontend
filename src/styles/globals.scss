@@ -2,8 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&family=Inter:wght@400;500;700&display=swap');
+
 * {
   font-family: "Golos Text", sans-serif;
+}
+
+/* Custom font classes for Inter and Oswald */
+.font-inter {
+  font-family: 'Inter', sans-serif;
+}
+
+.font-oswald {
+  font-family: 'Oswald', sans-serif;
+}
+
+.font-mono {
+  font-family: 'Roboto Mono', monospace;
 }
 
 .scrollbar::-webkit-scrollbar {

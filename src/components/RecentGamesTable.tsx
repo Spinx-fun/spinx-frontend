@@ -87,8 +87,41 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
         Recent Games
       </h2>
 
-      {/* Table */}
-      <div className="w-full border-collapse">
+      {/* Mobile Sort Bar (visible only on mobile) */}
+      <div className="sm:hidden flex items-center gap-3 mb-4">
+        <span className="font-inter font-normal text-[12px] leading-[167%] text-[#324158]">Sort by:</span>
+        <button
+          onClick={handleDateSortToggle}
+          className={`flex items-center gap-1 px-3 py-1 rounded-md border ${
+            sortBy === 'date' ? 'border-[#90A2B9]' : 'border-[#324158]'
+          }`}
+        >
+          <span className="font-inter font-normal text-[12px] leading-[167%] text-white">Date</span>
+          <img
+            src="/image/sort.svg"
+            alt="Sort"
+            className="w-3 h-3"
+            style={{ transform: sortBy === 'date' && sortAscending ? 'rotate(0deg)' : sortBy === 'date' ? 'rotate(180deg)' : 'rotate(0deg)', opacity: sortBy === 'date' ? 1 : 0.5 }}
+          />
+        </button>
+        <button
+          onClick={handleStakeSortToggle}
+          className={`flex items-center gap-1 px-3 py-1 rounded-md border ${
+            sortBy === 'stake' ? 'border-[#90A2B9]' : 'border-[#324158]'
+          }`}
+        >
+          <span className="font-inter font-normal text-[12px] leading-[167%] text-white">Stake</span>
+          <img
+            src="/image/sort.svg"
+            alt="Sort"
+            className="w-3 h-3"
+            style={{ transform: sortBy === 'stake' && sortAscending ? 'rotate(0deg)' : sortBy === 'stake' ? 'rotate(180deg)' : 'rotate(0deg)', opacity: sortBy === 'stake' ? 1 : 0.5 }}
+          />
+        </button>
+      </div>
+
+      {/* Desktop Table */}
+      <div className="hidden sm:block w-full border-collapse">
         {/* Table Header */}
         <div className="flex w-full">
           {/* Date Header Cell */}
@@ -178,8 +211,8 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
 
         {/* Table Rows */}
         {paginatedGames.map((game, index) => (
-          <div 
-            key={game.id} 
+          <div
+            key={game.id}
             className="flex w-full"
             style={{
               background: index % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.05)'
@@ -313,6 +346,89 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
             disabled={currentPage === totalPages}
             className="flex items-center justify-center disabled:opacity-50 ml-4"
           >
+            <img src="/image/table-right-arrow.svg" alt="Next" className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="sm:hidden space-y-2">
+        {paginatedGames.map((game, index) => (
+          <div
+            key={game.id}
+            className="p-4"
+            style={{
+              background: index % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.05)'
+            }}
+          >
+            {/* Date and Time */}
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <img src="/image/clock.svg" alt="Clock" className="w-4 h-4" />
+                <span className="font-inter font-normal text-[14px] leading-[114%] text-white">
+                  {game.date} {formatTime(game.time)}
+                </span>
+              </div>
+              <div
+                className="flex items-center justify-center"
+                style={{
+                  border: '1px solid',
+                  borderColor: typeof game.pickValue === 'string' && game.pickValue.includes('HEAD') ? '#d45bf8' : '#117af7',
+                  borderRadius: '30px',
+                  paddingBlock: '5px',
+                  paddingInline: '10px',
+                  width: '56px',
+                  height: '26px',
+                  background: typeof game.pickValue === 'string' && game.pickValue.includes('HEAD') ? '#231829' : '#0f1c29'
+                }}
+              >
+                <span className="font-inter font-normal text-[14px] leading-[114%]">
+                  {typeof game.pickValue === 'string' && game.pickValue.includes('HEAD') ? (
+                    <span className="text-[#d45bf8]">Head</span>
+                  ) : (
+                    <span className="text-[#117af7]">Tail</span>
+                  )}
+                </span>
+              </div>
+            </div>
+
+            {/* Challenge */}
+            <div className="mb-3">
+              <span className="font-inter font-normal text-[14px] leading-[114%] text-white">
+                {formatAddress(game.gameName)} <span className="text-[#545454]">Vs</span> {formatAddress('Opponent1234')}
+              </span>
+            </div>
+
+            {/* Stake */}
+            <div className="flex items-center justify-between">
+              <span className="font-inter font-bold text-[14px] leading-[114%] text-[#f9c752] whitespace-nowrap">
+                {game.stakeAmount}
+              </span>
+            </div>
+          </div>
+        ))}
+
+        {/* Mobile Pagination */}
+        <div className="flex items-center justify-between mt-4">
+          <button
+            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+            className="flex items-center gap-2 px-4 py-2 rounded-md bg-[#324158] text-white disabled:opacity-50"
+          >
+            <img src="/image/table-left-arrow.svg" alt="Previous" className="w-4 h-4" />
+            <span className="font-inter font-normal text-[12px]">Previous</span>
+          </button>
+          
+          <span className="font-inter font-medium text-[12px] text-[#929294]">
+            Page {currentPage} of {totalPages}
+          </span>
+          
+          <button
+            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+            disabled={currentPage === totalPages}
+            className="flex items-center gap-2 px-4 py-2 rounded-md bg-[#324158] text-white disabled:opacity-50"
+          >
+            <span className="font-inter font-normal text-[12px]">Next</span>
             <img src="/image/table-right-arrow.svg" alt="Next" className="w-4 h-4" />
           </button>
         </div>

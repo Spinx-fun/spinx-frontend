@@ -163,3 +163,53 @@ export const hasMoreGames = (currentPage: number, pageSize: number = 6): boolean
   const startIndex = currentPage * pageSize;
   return startIndex < sampleGames.length;
 };
+
+// Active Challenge interface
+export interface ActiveChallenge {
+  id: number;
+  gameType: 'coin-flip' | 'slot-machine';
+  stakeAmount: number;
+  pickValue: string | number;
+  date: string;
+  time: string;
+  status: 'active' | 'completed' | 'withdrawn';
+}
+
+// Sample active challenges data
+export const sampleActiveChallenges: ActiveChallenge[] = [
+  {
+    id: 1,
+    gameType: 'coin-flip',
+    stakeAmount: 2000,
+    pickValue: 'HEADS',
+    date: '2025-09-14',
+    time: '14:30:34',
+    status: 'active'
+  },
+  {
+    id: 2,
+    gameType: 'coin-flip',
+    stakeAmount: 1500,
+    pickValue: 'TAILS',
+    date: '2025-09-14',
+    time: '15:45:22',
+    status: 'active'
+  },
+  {
+    id: 3,
+    gameType: 'slot-machine',
+    stakeAmount: 3000,
+    pickValue: 777,
+    date: '2025-09-14',
+    time: '16:20:18',
+    status: 'active'
+  }
+];
+
+// Fetch active challenges for a user
+export const fetchActiveChallenges = async (walletAddress: string): Promise<ActiveChallenge[]> => {
+  // Simulate network delay
+  await new Promise(resolve => setTimeout(resolve, 300));
+  
+  return sampleActiveChallenges;
+};

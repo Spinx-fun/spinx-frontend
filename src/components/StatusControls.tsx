@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import CustomDropdown, { DropdownOption } from './CustomDropdown';
 import GameCard from './GameCard';
 import RecentGamesTable from './RecentGamesTable';
+import Header from './Header';
 import { formatTimeAgo } from '../utils/timeFormatter';
 import { fetchGamesPaginated, hasMoreGames } from '../services/api';
 import { GameData } from '../services/gameData';
@@ -83,8 +84,7 @@ const StatusControls: React.FC = () => {
 
     loadInitialGames();
   }, []);
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value;
+  const handleSearchChange = (query: string) => {
     setSearchQuery(query);
     
     if (query === '') {
@@ -109,32 +109,12 @@ const StatusControls: React.FC = () => {
 
   return (
     <div className="w-full">
-      {/* Search Bar Row */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full mb-6 gap-4">
-        {/* Search Field - Left Aligned */}
-        <div className="flex items-center relative max-w-[400px]">
-          <img src="/image/search.svg" alt="Search" className="w-4 h-4 absolute left-3" />
-          <input
-            type="text"
-            placeholder="Search for Challange"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            className="w-full border border-[#324158] rounded-[5px] py-2 pl-10 pr-3 h-9
-                     font-inter font-normal text-[12px] leading-[167%] text-[#324158]
-                     bg-transparent focus:outline-none focus:border-[#90A2B9]"
-            style={{ maxWidth: '400px' }}
-          />
-        </div>
-
-        {/* User Info - Right Aligned */}
-        <div className="flex items-center gap-2 sm:ml-auto">
-          <img src="/image/user.svg" alt="User" className="w-8 h-8" />
-          <span className="font-inter font-normal text-[14px] leading-[114%] text-white hidden sm:block">
-            {formatAddress('DD320512345678')}
-          </span>
-          <img src="/image/wallet-shevron.svg" alt="Wallet" className="w-4 h-4" />
-        </div>
-      </div>
+      {/* Header with Search and User Info */}
+      <Header
+        showSearch={true}
+        onSearchChange={handleSearchChange}
+        searchPlaceholder="Search for Challenge"
+      />
 
       {/* Controls Row */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between w-full mb-6 gap-4 lg:gap-0">

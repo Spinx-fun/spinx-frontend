@@ -1,0 +1,425 @@
+import React, { useState, useEffect } from 'react';
+import Head from 'next/head';
+import Sidebar from '../components/Sidebar';
+import Header from '../components/Header';
+import RecentGamesTable from '../components/RecentGamesTable';
+import ActiveChallengesPanel from '../components/ActiveChallengesPanel';
+import { fetchUserData, UserData } from '../services/api';
+import { fetchActiveChallenges, ActiveChallenge } from '../services/gameData';
+
+interface AccountCardProps {
+  title: string;
+  value: string;
+  icon: string;
+  trendIcon?: string;
+  trendValue?: string;
+}
+
+interface AmountButtonProps {
+  amount: string;
+  isSelected: boolean;
+  onClick: () => void;
+}
+
+interface AccountConnectedProps {
+  walletAddress: string;
+  username: string;
+  displayName: string;
+  isConnected: boolean;
+}
+
+interface BalanceCardProps {
+  balance: number | null;
+  trend: number;
+}
+
+const AccountConnected: React.FC<AccountConnectedProps> = ({ 
+  walletAddress, 
+  username, 
+  displayName, 
+  isConnected 
+}) => {
+  const [copied, setCopied] = useState(false);
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(walletAddress);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  if (!isConnected) {
+    return (
+      <div className="border border-[#2a2a2a] rounded-[10px] p-4 bg-[#020617]">
+        <h3 className="font-oswald font-bold text-[20px] leading-[160%] text-white mb-4">
+          Account Connected
+        </h3>
+        <div className="rounded-[10px] p-3 bg-[#0e172b]">
+          <p className="font-inter font-medium text-[14px] leading-[114%] text-red-500">
+            Wallet not connected
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="border border-[#2a2a2a] rounded-[10px] p-4 bg-[#020617]">
+      <h3 className="font-oswald font-bold text-[20px] leading-[160%] text-white mb-4">
+        Account Connected
+      </h3>
+      
+      <div className="rounded-[10px] p-3 bg-[#0e172b]">
+        {/* Wallet Info */}
+        <div className="flex items-center gap-2 mb-3">
+          <img src="/image/wallet.svg" alt="Wallet" className="w-5 h-5" />
+          <span className="font-inter font-medium text-[14px] leading-[114%] text-white">
+            Wallet
+          </span>
+        </div>
+
+        {/* Address with Copy Button */}
+        <div className="flex items-center justify-between mb-3">
+          <span className="font-mono text-[12px] text-white break-all flex-1 mr-2">
+            {copied ? 'Copied!' : walletAddress}
+          </span>
+          <button onClick={copyToClipboard} className="flex-shrink-0">
+            <img src="/image/copy.svg" alt="Copy" className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Connection Status */}
+        <p className="font-inter font-medium text-[12px] leading-[133%] text-[#1be088]">
+          Connected as {displayName} ({username})
+        </p>
+      </div>
+    </div>
+  );
+};
+
+const BalanceCard: React.FC<BalanceCardProps> = ({ balance, trend }) => {
+  const displayBalance = balance !== null && balance !== undefined ? balance : 0;
+  const isPositive = trend >= 0;
+  const trendIcon = isPositive ? "/image/upward-trend.svg" : "/image/downward-trend.svg";
+  const trendColor = isPositive ? "text-[#1be088]" : "text-red-500";
+
+  return (
+    <div className="border border-[#2a2a2a] rounded-[10px] p-4 bg-[#020617] h-full flex flex-col">
+      <h3 className="font-oswald font-bold text-[20px] leading-[160%] text-white mb-4">
+        Balance
+      </h3>
+      
+      <div className="rounded-[10px] p-3 bg-[#0e172b] flex-1 flex items-center justify-center">
+        <div className="flex items-center justify-between w-full">
+          {/* Balance Amount with SPX Tokens */}
+          <div className="flex items-end gap-2">
+            <span className="font-oswald font-medium text-[36px] leading-[117%] text-[#f9c752]">
+              {displayBalance}
+            </span>
+            <span className="font-inter font-medium text-[14px] leading-[186%] text-white self-end">
+              SPX Tokens
+            </span>
+          </div>
+
+          {/* Trend Info */}
+          <div className="text-right">
+            <div className="flex items-center justify-end gap-1">
+              <img src={trendIcon} alt="Trend" className="w-4 h-4" />
+              <span className={`font-inter font-normal text-[20px] leading-[160%] ${trendColor}`}>
+                {isPositive ? '+' : ''}{trend.toFixed(1)}%
+              </span>
+            </div>
+            <p className="font-inter font-medium italic text-[12px] leading-[133%] text-[#929294]">
+              From last month
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const AmountButton: React.FC<AmountButtonProps> = ({ amount, isSelected, onClick }) => (
+  <button
+    onClick={onClick}
+    className={`border border-white rounded-[2px_8px] py-2 px-4 h-10 font-oswald font-medium text-[14px] leading-[150%] uppercase ${
+      isSelected ? 'bg-[#1be088] text-black' : 'bg-transparent text-white'
+    }`}
+  >
+    {amount}
+  </button>
+);
+
+export default function CreateChallenge() {
+  const [activeTab, setActiveTab] = useState<'flip' | 'slot'>('flip');
+  const [selectedAmount, setSelectedAmount] = useState<string>('');
+  const [selectedCoin, setSelectedCoin] = useState<'head' | 'tail' | null>(null);
+  const [stakeAmount, setStakeAmount] = useState<string>('');
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [activeChallenges, setActiveChallenges] = useState<ActiveChallenge[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>('');
+
+  const amountOptions = ['500', '1000', '1500', '2000', '2500', '3000', '3500', '4000', 'ALL IN'];
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [userDataResponse, challengesResponse] = await Promise.all([
+          fetchUserData(),
+          fetchActiveChallenges(userData?.account || '')
+        ]);
+        
+        setUserData(userDataResponse);
+        setActiveChallenges(challengesResponse);
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+        // Fallback to mock data
+        setUserData({
+          account: 'dfkvclaedejq0f912321das312',
+          balance: 2000,
+          trend: 16.2
+        });
+        setActiveChallenges([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  const handleAmountSelect = (amount: string) => {
+    setSelectedAmount(amount);
+    if (amount === 'ALL IN' && userData) {
+      setStakeAmount(userData.balance.toString());
+    } else {
+      setStakeAmount(amount);
+    }
+  };
+
+  const handleCoinSelect = (coin: 'head' | 'tail') => {
+    setSelectedCoin(coin);
+    setError('');
+  };
+
+  const handleStakeChange = (amount: string) => {
+    setStakeAmount(amount);
+    setError('');
+    
+    // Deselect button if custom amount doesn't match any preset
+    if (!amountOptions.includes(amount)) {
+      setSelectedAmount('');
+    }
+  };
+
+  const handleCreateChallenge = () => {
+    if (!stakeAmount || !selectedCoin) {
+      setError('Please enter stake amount and make a pick Head or Tail');
+      return;
+    }
+    setError('');
+    // Handle challenge creation logic here
+  };
+
+  return (
+    <>
+      <Head>
+        <title>Create Challenge | SpinX</title>
+        <meta
+          name="description"
+          content="Create a new challenge on SpinX - Best Crypto PvP Gambling Website"
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      
+      <div className="flex">
+        {/* Sidebar - Hidden on mobile and tablet (below lg) */}
+        <div className="hidden lg:block">
+          <Sidebar activeItem="create" />
+        </div>
+        
+        {/* Main Content */}
+        <div className="flex flex-col flex-1 bg-[#0a101e] lg:ml-[248px] min-h-screen">
+          {/* Header */}
+          <div className="px-3 lg:px-12 pt-6">
+            <Header showSearch={false} />
+          </div>
+
+          {/* Main Content Area */}
+          <div className="flex flex-col gap-6 px-3 lg:px-12 pb-12 pt-6 flex-1">
+            {/* Account Connected and Balance Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <AccountConnected
+                walletAddress={userData?.account || ''}
+                username="Ok_2rfr"
+                displayName="Phantom"
+                isConnected={!!userData}
+              />
+              
+              <BalanceCard
+                balance={userData?.balance || 0}
+                trend={userData?.trend || 0}
+              />
+            </div>
+
+            {/* Main Content Grid - Challenge Creation and Active Challenges */}
+            <div className="flex flex-col lg:flex-row gap-6">
+              {/* Left Column - Challenge Creation and Recent Games */}
+              <div className="flex-1 space-y-6 order-1 lg:order-1">
+                {/* Challenge Creation Interface */}
+                <div className="border border-[#2a2a2a] rounded-[10px] p-4 bg-[#020617]">
+                  <h2 className="font-oswald font-bold text-[20px] leading-[160%] text-white mb-4">
+                    Create Challenge
+                  </h2>
+  
+                  {/* Tabs */}
+                  <div className="flex mb-0">
+                    <button
+                      onClick={() => setActiveTab('flip')}
+                      className={`px-4 py-2 h-10 font-oswald font-bold text-[16px] leading-[150%] relative ${
+                        activeTab === 'flip'
+                          ? 'bg-[#0e172b] text-white rounded-tl-[10px]'
+                          : 'bg-[rgba(14,23,43,0.5)] text-white/50 rounded-tr-[10px]'
+                      }`}
+                    >
+                      Flip a coin
+                      {activeTab === 'flip' && (
+                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-0.5 bg-[#1be088] shadow-[0_1px_4px_0_rgba(27,224,136,0.75)]" />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('slot')}
+                      className={`px-4 py-2 h-10 font-oswald font-bold text-[16px] leading-[150%] relative ${
+                        activeTab === 'slot'
+                          ? 'bg-[#0e172b] text-white rounded-tr-[10px]'
+                          : 'bg-[rgba(14,23,43,0.5)] text-white/50 rounded-tr-[10px]'
+                      }`}
+                    >
+                      Slot Machine
+                      {activeTab === 'slot' && (
+                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-0.5 bg-[#1be088] shadow-[0_1px_4px_0_rgba(27,224,136,0.75)]" />
+                      )}
+                    </button>
+                  </div>
+  
+                  {/* Tab Content */}
+                  <div className="rounded-tr-[10px] rounded-b-[10px] p-5 bg-[#0e172b] min-h-[540px]">
+                    {activeTab === 'flip' && (
+                      <div className="space-y-6">
+                        {/* Coin Icon */}
+                        <div className="flex justify-center">
+                          <img
+                            src={selectedCoin === 'tail' ? "/image/sfx-coin-tail.svg" : "/image/sfx-coin.svg"}
+                            alt="Coin"
+                            className="w-[150px] h-[150px]"
+                          />
+                        </div>
+  
+                        {/* Stake and Pick Columns */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          {/* Stake Column */}
+                          <div>
+                            <h3 className="font-oswald font-bold text-[20px] leading-[160%] text-white mb-3">
+                              Stake
+                            </h3>
+                            <input
+                              type="text"
+                              value={stakeAmount}
+                              onChange={(e) => handleStakeChange(e.target.value)}
+                              placeholder="Place your stake here"
+                              className="w-full border border-[#324158] rounded-[5px] py-2 px-3 h-10
+                                       font-inter font-normal text-[12px] leading-[167%] text-white
+                                       bg-transparent placeholder:text-[#324158] focus:outline-none focus:border-[#90A2B9]"
+                            />
+                            
+                            {/* Amount Buttons Grid */}
+                            <div className="grid grid-cols-3 gap-2 mt-3">
+                              {amountOptions.map((amount) => (
+                                <AmountButton
+                                  key={amount}
+                                  amount={amount}
+                                  isSelected={selectedAmount === amount}
+                                  onClick={() => handleAmountSelect(amount)}
+                                />
+                              ))}
+                            </div>
+                          </div>
+  
+                          {/* Your Pick Column */}
+                          <div>
+                            <h3 className="font-oswald font-bold text-[20px] leading-[160%] text-white mb-3">
+                              Your Pick
+                            </h3>
+                            <div className="flex gap-3">
+                              <button
+                                onClick={() => handleCoinSelect('head')}
+                                className={`border border-white rounded-[2px_8px] py-2 px-4 w-[108px] h-10 font-oswald font-medium text-[14px] leading-[150%] uppercase ${
+                                  selectedCoin === 'head'
+                                    ? 'bg-[#1be088] text-black'
+                                    : 'bg-white text-black'
+                                }`}
+                              >
+                                HEAD
+                              </button>
+                              <button
+                                onClick={() => handleCoinSelect('tail')}
+                                className={`border border-white rounded-[2px_8px] py-2 px-4 w-[108px] h-10 font-oswald font-medium text-[14px] leading-[150%] uppercase ${
+                                  selectedCoin === 'tail'
+                                    ? 'bg-[#1be088] text-black'
+                                    : 'bg-white text-black'
+                                }`}
+                              >
+                                TAIL
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+  
+                        {/* Create Button and Error Message */}
+                        <div className="space-y-2">
+                          <button
+                            onClick={handleCreateChallenge}
+                            className="bg-[#1be088] rounded-[2px_8px] py-2 px-4 h-[37px] font-oswald font-medium text-[14px] leading-[150%] uppercase text-black"
+                          >
+                            Create Flip Challenge
+                          </button>
+                          {error && (
+                            <p className="text-red-500 text-sm">{error}</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+  
+                    {activeTab === 'slot' && (
+                      <div className="flex items-center justify-center h-[480px]">
+                        <p className="font-oswald font-bold text-[24px] leading-[160%] text-white/50">
+                          Coming Soon
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+  
+                {/* Active Challenges on mobile (comes after Create Challenge) */}
+                <div className="lg:hidden">
+                  <ActiveChallengesPanel challenges={activeChallenges} />
+                </div>
+  
+                {/* Recent Games in the same column as Create Challenge */}
+                <div className="w-full">
+                  <RecentGamesTable />
+                </div>
+              </div>
+  
+              {/* Right Column - Active Challenges Panel on desktop */}
+              <div className="hidden lg:block lg:w-[366px] order-2 lg:order-2">
+                <ActiveChallengesPanel challenges={activeChallenges} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
