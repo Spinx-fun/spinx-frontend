@@ -5,6 +5,7 @@ import { UnknownUserIcon } from "../components/Svglist";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Chat from "../components/Chat";
 import StatusControls from "../components/StatusControls";
+import Sidebar from "../components/Sidebar";
 import { PublicKey } from "@solana/web3.js";
 import Head from "next/head";
 import {
@@ -145,7 +146,7 @@ export default function Rooms() {
 
   return (
     <>
-      <Head>
+      {/*<Head>
         <title>Coinflip | SpinX</title>
         <meta
           name="description"
@@ -153,15 +154,18 @@ export default function Rooms() {
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <div
-        className={`mt-[80px] flex flex-row justify-end gap-2 xl:gap-6 px-3 lg:px-12 py-12 bg-cover bg-no-repeat w-full flex-wrap bg-[#0a101e]`}
-      >
+      </Head>*/}
+      <div className="flex">
+        {/* Sidebar */}
+        <Sidebar activeItem="home" />
+        
+        {/* Main Content */}
+        <div
+          className={`flex flex-row justify-end gap-2 xl:gap-6 px-3 lg:px-12 pb-12 pt-6 bg-cover bg-no-repeat flex-1 flex-wrap bg-[#0a101e] ml-[248px]`}
+        >
 
         <div className="overflow-y-auto grow mx-auto">
-          <div className="pt-6 table border-separate border-spacing-x-0 border-spacing-y-1 rounded-3xl table-auto w-full text-[#8b8a8d] text-[11px]">
             <StatusControls />
-          </div>
         </div>
 
         <div className="overflow-y-auto grow mx-auto hidden">
@@ -339,7 +343,7 @@ export default function Rooms() {
           </div>
         </div>
 
-        <div className="hidden xl:flex flex-col gap-4 h-[85vh] w-1/6">
+        {/*<div className="hidden xl:flex flex-col gap-4 h-[85vh] w-1/6">
           <Chat className="gap-3 flex-col flex" />
           <div className="flex flex-col items-center gap-2 bg-[#17161B] rounded-[7px] p-4">
             <img src="/img/solana.png" className="h-[82px] w-[82px]" />
@@ -350,8 +354,9 @@ export default function Rooms() {
               <span className="font-[600]">Enter Ends in</span> 5:09:54
             </button>
           </div>
-        </div>
+        </div>*/}
       </div>
+    </div>
       {isOpen && <CreateCoinflipModal referralCode={referralCode} handleCloseModal={handleCloseModal} />}
       {isOpenJoinModal && <JoinCoinflipModal referralCode={referralCode} pda={selectedPda} poolAmount={selectedPoolAmount} setNumber={selectedSetNumber} handleCloseModal={handleCloseJoinModal} />}
       {isOpenRoundModal && <CoinflipModal game={selectedGame} isDrawing={isDrawing} setIsDrawing={setIsDrawing} handleCloseModal={handleCloseRoundModal} handleOpenJoinModal={handleOpenJoinModal} />}

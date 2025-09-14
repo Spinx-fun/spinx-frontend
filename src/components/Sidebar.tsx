@@ -1,127 +1,121 @@
-/* eslint-disable @next/next/link-passhref */
-/* eslint-disable @next/next/no-img-element */
-import Link from "next/link";
-import React, { useState } from "react";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { MobileMenuIcon } from "./Svglist";
+import React from 'react';
+import Link from 'next/link';
 
-export default function Sidebar() {
-  const [mobilMenuState, setMobileMenuState] = useState<boolean>(true);
-  return (
-    <nav
-      className={`${mobilMenuState ? "w-[80px]" : "w-[280px]"
-        } lg:w-[280px] flex-col lg:flex fixed left-0 top-0 h-full z-50 border-r-2 border-[#ffffff32] bg-[#200a6d] md:bg-transparent`}
-    // style={{ background: "linear-gradient(90deg, #05104C 0%, #09185A 100%)" }}
-    >
-      <div
-        className={`flex lg:hidden w-full  ${mobilMenuState ? "justify-center" : "justify-end"
-          } items-center cursor-pointer p-5`}
-        onClick={() => setMobileMenuState(!mobilMenuState)}
-      >
-        <MobileMenuIcon color="white" />
-      </div>
-      <div
-        className={`h-full overflow-y-auto scrollbar overflow-x-hidden ${mobilMenuState ? "space-y-4" : "lg:space-y-0"
-          } `}
-      >
-        <div className={`px-6 lg:block ${mobilMenuState ? "hidden" : "block"}`}>
-          <h1
-            style={{ color: "transparent" }}
-            className="text-[32px] bg-gra_font font-fontInter bg-clip-text pt-[32px] font-[900]"
-          >
-            SlowRUG
-          </h1>
-          <div
-            className={`w-full my-6 lg:block ${mobilMenuState ? "hidden" : "block"
-              }`}
-          >
-            <WalletMultiButton />
-          </div>
-        </div>
-        <p
-          className={` font-normal text-[#ffffff] mt-6 border-[#ffffff32] pb-3 mx-6 lg:block ${mobilMenuState ? "hidden" : "block"
-            }`}
-        >
-          Games
-        </p>
-        <div className="border-[1px] border-[#ffffff32] mx-4" />
-        <Link href="/room/the-tower" passHref>
-          <a>
-            <div className="flex my-4 hover:bg-[#ffffff12] hover:border-r-2 hover:border-[#D9D9D9] px-6 items-center">
-              <img
-                src="/img/tower.png"
-                alt=""
-                className="w-6 h-6 mr-4 object-contain"
-              />
-              <p
-                className={`lg:block cursor-pointer font-bold text-[#ffffff] py-[15px] ${mobilMenuState ? "hidden" : "block"
-                  }`}
-              >
-                The Tower
-              </p>
-            </div>
-          </a>
-        </Link>
-        {/* <Link href="/room/operators-hub" passHref>
-          <a>
-            <div className="flex my-4 hover:bg-[#ffffff12] hover:border-r-2 hover:border-[#D9D9D9] px-6 items-center">
-              <img
-                src="/img/tower.png"
-                alt=""
-                className="w-6 h-6 mr-4 object-contain"
-              />
-              <p
-                className={`lg:block cursor-pointer font-bold text-[#ffffff] py-[15px] ${mobilMenuState ? "hidden" : "block"
-                  }`}
-              >
-                Operators Hub
-              </p>
-            </div>
-          </a>
-        </Link>
-        <Link href="/room/infinite-rug" passHref>
-          <a>
-            <div className="flex my-4 hover:bg-[#ffffff12] hover:border-r-2 hover:border-[#D9D9D9] px-6 items-center">
-              <img
-                src="/img/tower.png"
-                alt=""
-                className="w-6 h-6 mr-4 object-contain"
-              />
-              <p
-                className={`lg:block cursor-pointer font-bold text-[#ffffff] py-[15px] ${mobilMenuState ? "hidden" : "block"
-                  }`}
-              >
-                Infinite Rug
-              </p>
-            </div>
-          </a>
-        </Link> */}
-
-        <p
-          className={`font-normal text-[#ffffff] mt-6 border-[#ffffff32] pb-3 mx-6 lg:block ${mobilMenuState ? "hidden" : "block"
-            }`}
-        >
-          Support
-        </p>
-        <div className="border-[1px] border-[#ffffff32] mx-4" />
-        <Link href="https://discord.gg/aejTFT6hKY" passHref>
-          <a className="">
-            <div className="mt-4 flex hover:bg-[#ffffff12] hover:border-r-2 hover:border-[#D9D9D9] px-6 items-center">
-              <img
-                src="/img/discord.png"
-                alt=""
-                className="w-6 h-6 mr-4 object-contain"
-              />
-              <p
-                className={`lg:block cursor-pointer font-bold text-[#ffffff] py-[15px] ${mobilMenuState ? "hidden" : "block"
-                  }`}
-              >
-                Discord
-              </p>
-            </div>
-          </a>
-        </Link>
-      </div >
-    </nav >
-  );
+interface SidebarProps {
+  activeItem?: string;
 }
+
+const Sidebar: React.FC<SidebarProps> = ({ activeItem = 'home' }) => {
+  const menuItems = [
+    {
+      id: 'home',
+      label: 'Home',
+      icon: activeItem === 'home' ? '/image/home-active.svg' : '/image/home.svg',
+      activeIcon: '/image/home-active.svg',
+      href: '/'
+    },
+    {
+      id: 'create',
+      label: 'Create a challenge',
+      icon: activeItem === 'create' ? '/image/create-active.svg' : '/image/create.svg',
+      activeIcon: '/image/create-active.svg',
+      href: '/'
+    },
+    {
+      id: 'documentation',
+      label: 'Documentation',
+      icon: '/image/documentation.svg',
+      href: '/',
+      external: true
+    },
+    {
+      id: 'support',
+      label: 'Support',
+      icon: '/image/support.svg',
+      href: '/',
+      external: true
+    }
+  ];
+
+  return (
+    <div 
+      className="fixed left-0 top-0 h-screen flex-shrink-0"
+      style={{
+        width: '248px',
+        background: '#0e172b'
+      }}
+    >
+      {/* Logo */}
+      <div className="p-6">
+        <img 
+          src="/image/spinx-78x32.svg" 
+          alt="SpinX Logo" 
+          className="w-[78px] h-[32px]"
+        />
+      </div>
+
+      {/* Divider Line */}
+      <div className="w-full h-px bg-[#324158] mb-4" />
+
+      {/* Menu Items */}
+      <div className="px-4 space-y-2">
+        {menuItems.map((item) => (
+          <Link
+            key={item.id}
+            href={item.href}
+          >
+            <a
+              className={`flex items-center gap-3 px-3 py-2 rounded-[5px] w-[216px] h-[36px] ${
+                activeItem === item.id
+                  ? 'bg-gradient-to-r from-[rgba(61,153,112,0.2)] to-[rgba(14,23,43,0.2)]'
+                  : 'hover:bg-[#1a2439]'
+              }`}
+              target={item.external ? '_blank' : undefined}
+              rel={item.external ? 'noopener noreferrer' : undefined}
+            >
+              <img
+                src={activeItem === item.id ? item.activeIcon : item.icon}
+                alt={item.label}
+                className="w-5 h-5"
+              />
+              <span
+                className={`font-inter text-[14px] leading-[114%] ${
+                  activeItem === item.id ? 'font-medium text-[#1be088]' : 'font-normal text-white'
+                }`}
+              >
+                {item.label}
+              </span>
+            </a>
+          </Link>
+        ))}
+      </div>
+
+      {/* Footer Links */}
+      <div className="absolute bottom-4 left-4 right-4">
+        {/* Banner */}
+        <div className="px-4 mt-8 mb-4">
+          <img 
+            src="/image/banner-216x90.svg" 
+            alt="Banner"
+            className="w-[216px] h-[90px] rounded-md"
+          />
+        </div>
+        <div className="flex justify-center gap-4">
+          <Link href="/#">
+            <a className="font-inter font-normal text-[12px] leading-[133%] text-[rgba(255,255,255,0.4)] hover:text-[rgba(255,255,255,0.6)]">
+              Terms
+            </a>
+          </Link>
+          <span className="font-inter font-normal text-[12px] leading-[133%] text-[rgba(255,255,255,0.4)]">-</span>
+          <Link href="/#">
+            <a className="font-inter font-normal text-[12px] leading-[133%] text-[rgba(255,255,255,0.4)] hover:text-[rgba(255,255,255,0.6)]">
+              Privacy Policy
+            </a>
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Sidebar;

@@ -17,9 +17,9 @@ export default function App({ Component, pageProps }: AppProps) {
       <Wallet>
         <SocketProvider>
           <WalletModalProvider>
-            <Header />
+            {/* <Header /> */}
             <Component {...pageProps} />
-            <Footer />
+            {/* <Footer /> */}
             <ToastContainer
               style={{ fontSize: 15 }}
               pauseOnFocusLoss={false}

@@ -46,23 +46,23 @@ const GameCard: React.FC<GameCardProps> = ({
       </h3>
 
       {/* Stake and Pick Columns */}
-      <div className="flex justify-between mb-4">
+      <div className="flex flex-col sm:flex-row sm:justify-between gap-4 sm:gap-0 mb-4">
         {/* Stake Column */}
-        <div>
+        <div className="flex-1">
           <div className="font-inter font-normal text-sm leading-[114%] text-[#90a2b9] mb-1">
             Stake
           </div>
-          <div className="font-oswald font-medium text-[32px] leading-[100%] text-[#f9c752]">
+          <div className="font-oswald font-medium text-[24px] leading-[133%] text-white">
             {stakeAmount}
           </div>
         </div>
 
         {/* Pick Column */}
-        <div>
+        <div className="flex-1">
           <div className="font-inter font-normal text-sm leading-[114%] text-[#90a2b9] mb-1">
             Pick
           </div>
-          <div className="font-oswald font-medium text-[32px] leading-[100%] text-[#f9c752]">
+          <div className="font-oswald font-medium text-[24px] leading-[133%] text-white">
             {pickValue}
           </div>
         </div>
