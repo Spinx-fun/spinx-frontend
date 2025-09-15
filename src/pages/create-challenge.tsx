@@ -7,6 +7,7 @@ import ActiveChallengesPanel from "../components/ActiveChallengesPanel";
 import { fetchUserData, UserData } from "../services/api";
 import { fetchActiveChallenges, ActiveChallenge } from "../services/gameData";
 import Footer from "../components/Footer";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 interface AccountCardProps {
   title: string;
@@ -22,12 +23,7 @@ interface AmountButtonProps {
   onClick: () => void;
 }
 
-interface AccountConnectedProps {
-  walletAddress: string;
-  username: string;
-  displayName: string;
-  isConnected: boolean;
-}
+interface AccountConnectedProps {}
 
 interface BalanceCardProps {
   balance: number | null;
@@ -35,20 +31,23 @@ interface BalanceCardProps {
 }
 
 const AccountConnected: React.FC<AccountConnectedProps> = ({
-  walletAddress,
-  username,
-  displayName,
-  isConnected,
 }) => {
   const [copied, setCopied] = useState(false);
-
+  const { connected, publicKey, wallet } = useWallet();
+  console.log('debug->publicKey', wallet?.adapter.name)
+  const publicAddress = publicKey?.toBase58().toString();
+  const displayName = wallet?.adapter.name;
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(walletAddress);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    if (publicAddress) {
+      navigator.clipboard.writeText(publicAddress);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
-  if (!isConnected) {
+
+
+  if (!connected) {
     return (
       <div className="border border-[#2a2a2a] rounded-[10px] p-4 bg-[#020617]">
         <h3 className="font-oswald font-bold text-[20px] leading-[160%] text-white mb-4">
@@ -81,7 +80,7 @@ const AccountConnected: React.FC<AccountConnectedProps> = ({
         {/* Address with Copy Button */}
         <div className="flex items-center justify-between mb-3">
           <span className="font-mono text-[12px] text-white break-all flex-1 mr-2">
-            {copied ? "Copied!" : walletAddress}
+            {copied ? "Copied!" : publicAddress}
           </span>
           <button onClick={copyToClipboard} className="flex-shrink-0">
             <img src="/image/copy.svg" alt="Copy" className="w-5 h-5" />
@@ -90,7 +89,7 @@ const AccountConnected: React.FC<AccountConnectedProps> = ({
 
         {/* Connection Status */}
         <p className="font-inter font-medium text-[12px] leading-[133%] text-[#1be088]">
-          Connected as {displayName} ({username})
+          Connected as {displayName}
         </p>
       </div>
     </div>
@@ -152,9 +151,8 @@ const AmountButton: React.FC<AmountButtonProps> = ({
 }) => (
   <button
     onClick={onClick}
-    className={`border border-white rounded-[2px_8px] py-2 px-4 h-10 font-oswald font-medium text-[14px] leading-[150%] uppercase ${
-      isSelected ? "bg-[#1be088] text-black" : "bg-transparent text-white"
-    }`}
+    className={`border border-white rounded-[2px_8px] py-2 px-4 h-10 font-oswald font-medium text-[14px] leading-[150%] uppercase ${isSelected ? "bg-[#1be088] text-black" : "bg-transparent text-white"
+      }`}
   >
     {amount}
   </button>
@@ -164,7 +162,7 @@ export default function CreateChallenge() {
   const [activeTab, setActiveTab] = useState<"flip" | "slot">("flip");
   const [selectedAmount, setSelectedAmount] = useState<string>("");
   const [selectedCoin, setSelectedCoin] = useState<"head" | "tail" | null>(
-    null
+    "head"
   );
   const [stakeAmount, setStakeAmount] = useState<string>("");
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -275,12 +273,7 @@ export default function CreateChallenge() {
           <div className="flex flex-col gap-6 px-3 lg:px-12 pb-12 pt-6 flex-1">
             {/* Account Connected and Balance Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <AccountConnected
-                walletAddress={userData?.account || ""}
-                username="Ok_2rfr"
-                displayName="Phantom"
-                isConnected={!!userData}
-              />
+              <AccountConnected />
 
               <BalanceCard
                 balance={userData?.balance || 0}
@@ -302,11 +295,10 @@ export default function CreateChallenge() {
                   <div className="flex mb-0">
                     <button
                       onClick={() => setActiveTab("flip")}
-                      className={`px-4 py-2 h-10 font-oswald font-bold text-[16px] leading-[150%] relative ${
-                        activeTab === "flip"
-                          ? "bg-[#0e172b] text-white rounded-tl-[10px]"
-                          : "bg-[rgba(14,23,43,0.5)] text-white/50 rounded-tr-[10px]"
-                      }`}
+                      className={`px-4 py-2 h-10 font-oswald font-bold text-[16px] leading-[150%] relative ${activeTab === "flip"
+                        ? "bg-[#0e172b] text-white rounded-tl-[10px]"
+                        : "bg-[rgba(14,23,43,0.5)] text-white/50 rounded-tr-[10px]"
+                        }`}
                     >
                       Flip a coin
                       {activeTab === "flip" && (
@@ -315,11 +307,10 @@ export default function CreateChallenge() {
                     </button>
                     <button
                       onClick={() => setActiveTab("slot")}
-                      className={`px-4 py-2 h-10 font-oswald font-bold text-[16px] leading-[150%] relative ${
-                        activeTab === "slot"
-                          ? "bg-[#0e172b] text-white rounded-tr-[10px]"
-                          : "bg-[rgba(14,23,43,0.5)] text-white/50 rounded-tr-[10px]"
-                      }`}
+                      className={`px-4 py-2 h-10 font-oswald font-bold text-[16px] leading-[150%] relative ${activeTab === "slot"
+                        ? "bg-[#0e172b] text-white rounded-tr-[10px]"
+                        : "bg-[rgba(14,23,43,0.5)] text-white/50 rounded-tr-[10px]"
+                        }`}
                     >
                       Slot Machine
                       {activeTab === "slot" && (
@@ -385,21 +376,19 @@ export default function CreateChallenge() {
                             <div className="flex gap-3">
                               <button
                                 onClick={() => handleCoinSelect("head")}
-                                className={`border border-white rounded-[2px_8px] py-2 px-4 w-[108px] h-10 font-oswald font-medium text-[14px] leading-[150%] uppercase ${
-                                  selectedCoin === "head"
-                                    ? "bg-[#1be088] text-black"
-                                    : "bg-white text-black"
-                                }`}
+                                className={`border border-white rounded-[2px_8px] py-2 px-4 w-[108px] h-10 font-oswald font-medium text-[14px] leading-[150%] uppercase ${selectedCoin === "head"
+                                  ? "bg-[#1be088] text-black"
+                                  : "bg-white text-black"
+                                  }`}
                               >
                                 HEAD
                               </button>
                               <button
                                 onClick={() => handleCoinSelect("tail")}
-                                className={`border border-white rounded-[2px_8px] py-2 px-4 w-[108px] h-10 font-oswald font-medium text-[14px] leading-[150%] uppercase ${
-                                  selectedCoin === "tail"
-                                    ? "bg-[#1be088] text-black"
-                                    : "bg-white text-black"
-                                }`}
+                                className={`border border-white rounded-[2px_8px] py-2 px-4 w-[108px] h-10 font-oswald font-medium text-[14px] leading-[150%] uppercase ${selectedCoin === "tail"
+                                  ? "bg-[#1be088] text-black"
+                                  : "bg-white text-black"
+                                  }`}
                               >
                                 TAIL
                               </button>

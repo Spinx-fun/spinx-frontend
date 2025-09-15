@@ -146,7 +146,7 @@ export default function Rooms() {
 
   return (
     <>
-      {/*<Head>
+      <Head>
         <title>Coinflip | SpinX</title>
         <meta
           name="description"
@@ -154,7 +154,7 @@ export default function Rooms() {
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
-      </Head>*/}
+      </Head>
       <div className="flex">
         {/* Sidebar - Hidden on mobile and tablet (below lg) */}
         <div className="hidden lg:block">

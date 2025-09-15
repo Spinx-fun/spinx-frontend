@@ -115,7 +115,7 @@ const TokenRangeDropdown: React.FC<TokenRangeDropdownProps> = ({ onApply }) => {
       </button>
       
       {isOpen && (
-        <div className="absolute top-full mt-1 right-0 border border-[#2a2a2a] rounded-[10px] p-[14px] w-[252px] 
+        <div className="absolute top-full mt-1 right-0 border border-[#2a2a2a] rounded-[10px] p-[14px] 
                       shadow-[0_4px_24px_0_rgba(255,255,255,0.06)] bg-[#020617] z-50">
           {/* Title */}
           <h3 className="font-oswald font-semibold text-[16px] leading-[120%] text-white mb-1">

@@ -195,15 +195,6 @@ export const sampleActiveChallenges: ActiveChallenge[] = [
     time: '15:45:22',
     status: 'active'
   },
-  {
-    id: 3,
-    gameType: 'slot-machine',
-    stakeAmount: 3000,
-    pickValue: 777,
-    date: '2025-09-14',
-    time: '16:20:18',
-    status: 'active'
-  }
 ];
 
 // Player History interface
@@ -240,15 +231,6 @@ export const samplePlayerHistory: PlayerHistory[] = [
   {
     id: 3,
     date: '2025-09-13',
-    time: '16:20:18',
-    game: 'Slot Machine',
-    challenge: 'Slot_001',
-    stakeAmount: 3000,
-    result: 'Win'
-  },
-  {
-    id: 4,
-    date: '2025-09-13',
     time: '17:05:42',
     game: 'Coin Flip',
     challenge: 'Alice_567',
@@ -256,16 +238,7 @@ export const samplePlayerHistory: PlayerHistory[] = [
     result: 'Win'
   },
   {
-    id: 5,
-    date: '2025-09-12',
-    time: '18:30:15',
-    game: 'Slot Machine',
-    challenge: 'Slot_002',
-    stakeAmount: 1800,
-    result: 'Loss'
-  },
-  {
-    id: 6,
+    id: 4,
     date: '2025-09-12',
     time: '19:45:30',
     game: 'Coin Flip',
@@ -274,7 +247,7 @@ export const samplePlayerHistory: PlayerHistory[] = [
     result: 'Win'
   },
   {
-    id: 7,
+    id: 5,
     date: '2025-09-11',
     time: '10:15:22',
     game: 'Coin Flip',
@@ -283,16 +256,7 @@ export const samplePlayerHistory: PlayerHistory[] = [
     result: 'Loss'
   },
   {
-    id: 8,
-    date: '2025-09-11',
-    time: '11:30:45',
-    game: 'Slot Machine',
-    challenge: 'Slot_003',
-    stakeAmount: 2800,
-    result: 'Win'
-  },
-  {
-    id: 9,
+    id: 6,
     date: '2025-09-10',
     time: '12:45:18',
     game: 'Coin Flip',
@@ -301,7 +265,7 @@ export const samplePlayerHistory: PlayerHistory[] = [
     result: 'Win'
   },
   {
-    id: 10,
+    id: 7,
     date: '2025-09-10',
     time: '14:20:33',
     game: 'Coin Flip',

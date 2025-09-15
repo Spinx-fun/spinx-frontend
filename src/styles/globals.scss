@@ -37,8 +37,9 @@
 .wallet-adapter-button.wallet-adapter-button-trigger {
   white-space: nowrap !important;
   justify-content: center !important;
-  background: #fff !important;
-  color: #000000;
+  background: transparent;
+  border: 1px solid white;
+  color: #fff7f7;
   height: 32px;
   padding: 0px 16px;
   font-size: 16px;
@@ -84,6 +85,7 @@
   border-radius: 50px 50px 0 50px;
   transform: rotate(-45deg);
 }
+
 .infinity:after {
   left: auto;
   right: 0;
@@ -233,6 +235,7 @@
   0% {
     transform: rotate(-45deg);
   }
+
   100% {
     transform: rotate(315deg);
   }
@@ -242,6 +245,7 @@
   0% {
     transform: rotate(45deg);
   }
+
   100% {
     transform: rotate(-315deg);
   }
@@ -251,18 +255,23 @@
   0% {
     opacity: 1;
   }
+
   25% {
     opacity: 1;
   }
+
   26% {
     opacity: 0;
   }
+
   75% {
     opacity: 0;
   }
+
   76% {
     opacity: 1;
   }
+
   100% {
     opacity: 1;
   }
@@ -276,42 +285,42 @@
   .chartContainer {
     width: 300px;
     height: 300px
-  }  
+  }
 }
 
 @media (min-width: 450px) {
   .chartContainer {
     width: 400px;
     height: 400px
-  }  
+  }
 }
 
 @media (min-width: 550px) {
   .chartContainer {
     width: 500px;
     height: 500px
-  }  
+  }
 }
 
 @media (min-width: 1280px) {
   .chartContainer {
     width: 300px;
     height: 300px
-  }  
+  }
 }
 
 @media (min-width: 1360px) {
   .chartContainer {
     width: 400px;
     height: 400px
-  }  
+  }
 }
 
 @media (min-width: 1520px) {
   .chartContainer {
     width: 500px;
     height: 500px
-  }  
+  }
 }
 
 // @media (max-width: 1451px) {
