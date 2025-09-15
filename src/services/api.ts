@@ -75,3 +75,33 @@ export const fetchUserTrend = async (): Promise<number> => {
   
   return -2.5;
 };
+
+// Token range API functions
+export interface TokenRange {
+  min: number;
+  max: number;
+}
+
+export const fetchMaxStake = async (): Promise<number> => {
+  // Simulate network delay
+  await new Promise(resolve => setTimeout(resolve, 200));
+  
+  // Calculate max stake from sample games
+  const coinFlipGames = sampleGames.filter((game: GameData) => game.gameType === 'coin-flip');
+  const maxStake = Math.max(...coinFlipGames.map(game => game.stakeAmount), 0);
+  
+  return maxStake > 0 ? maxStake : 5000; // Default to 5000 if no games
+};
+
+export const fetchTokenRangeData = async (): Promise<TokenRange> => {
+  // Simulate network delay
+  await new Promise(resolve => setTimeout(resolve, 300));
+  
+  const coinFlipGames = sampleGames.filter((game: GameData) => game.gameType === 'coin-flip');
+  const stakes = coinFlipGames.map(game => game.stakeAmount);
+  
+  return {
+    min: Math.min(...stakes, 0),
+    max: Math.max(...stakes, 5000)
+  };
+};

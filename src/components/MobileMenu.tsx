@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Sidebar from './Sidebar';
 
-const MobileMenu: React.FC = () => {
+interface MobileMenuProps {
+  useXlBreakpoint?: boolean;
+}
+
+const MobileMenu: React.FC<MobileMenuProps> = ({ useXlBreakpoint = false }) => {
+  const mobileBreakpoint = useXlBreakpoint ? 'xl' : 'sm';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -40,7 +45,7 @@ const MobileMenu: React.FC = () => {
       {/* Hamburger Menu Button */}
       <button
         onClick={toggleMenu}
-        className="sm:hidden p-2 rounded-md hover:bg-[#1a2439] transition-colors"
+        className={`${mobileBreakpoint}:hidden p-2 rounded-md hover:bg-[#1a2439] transition-colors`}
         aria-label="Toggle menu"
       >
         <svg
@@ -71,7 +76,7 @@ const MobileMenu: React.FC = () => {
 
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (
-        <div className="fixed inset-0 z-50 sm:hidden">
+        <div className={`fixed inset-0 z-50 ${mobileBreakpoint}:hidden`}>
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black bg-opacity-50" onClick={closeMenu} />
           

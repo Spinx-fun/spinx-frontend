@@ -32,7 +32,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
     <div className={`relative ${className}`}>
       <button
         className={`
-          w-[153px] h-8 border border-opacity-50 border-[#90A2B9] rounded-md 
+          w-[166px] border border-opacity-50 border-[#90A2B9] rounded-md 
           py-2 px-3 flex items-center justify-between transition-all duration-200
           ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-opacity-70'}
           ${isOpen ? 
