@@ -38,7 +38,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = 'home' }) => {
   ];
 
   return (
-    <div 
+    <div
       className="fixed left-0 top-0 h-screen flex-shrink-0"
       style={{
         width: '248px',
@@ -47,9 +47,9 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = 'home' }) => {
     >
       {/* Logo */}
       <div className="p-6">
-        <img 
-          src="/image/spinx-78x32.svg" 
-          alt="SpinX Logo" 
+        <img
+          src="/logo.png"
+          alt="SpinX Logo"
           className="w-[78px] h-[32px]"
         />
       </div>
@@ -65,11 +65,10 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = 'home' }) => {
             href={item.href}
           >
             <a
-              className={`flex items-center gap-3 px-3 py-2 rounded-[5px] w-[216px] h-[36px] ${
-                activeItem === item.id
+              className={`flex items-center gap-3 px-3 py-2 rounded-[5px] w-[216px] h-[36px] ${activeItem === item.id
                   ? 'bg-gradient-to-r from-[rgba(61,153,112,0.2)] to-[rgba(14,23,43,0.2)]'
                   : 'hover:bg-[#1a2439]'
-              }`}
+                }`}
               target={item.external ? '_blank' : undefined}
               rel={item.external ? 'noopener noreferrer' : undefined}
             >
@@ -79,9 +78,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = 'home' }) => {
                 className="w-5 h-5"
               />
               <span
-                className={`font-inter text-[14px] leading-[114%] ${
-                  activeItem === item.id ? 'font-medium text-[#1be088]' : 'font-normal text-white'
-                }`}
+                className={`font-inter text-[14px] leading-[114%] ${activeItem === item.id ? 'font-medium text-[#1be088]' : 'font-normal text-white'
+                  }`}
               >
                 {item.label}
               </span>
@@ -94,8 +92,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = 'home' }) => {
       <div className="absolute bottom-4 left-4 right-4">
         {/* Banner */}
         <div className="px-4 mt-8 mb-4">
-          <img 
-            src="/image/banner-216x90.svg" 
+          <img
+            src="/image/banner-216x90.svg"
             alt="Banner"
             className="w-[216px] h-[90px] rounded-md"
           />

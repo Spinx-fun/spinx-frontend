@@ -89,7 +89,7 @@ const Header: React.FC<HeaderProps> = ({
         {/* Mobile Logo - Left Aligned */}
         <div className="flex items-center">
           <img
-            src="/image/spinx-78x32.svg"
+            src="/logo.png"
             alt="SpinX Logo"
             className="w-[78px] h-[32px]"
           />

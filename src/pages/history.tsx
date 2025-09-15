@@ -10,6 +10,7 @@ import CustomDropdown, { DropdownOption } from '../components/CustomDropdown';
 import { fetchUserData, UserData } from '../services/api';
 import { fetchPlayerHistory, PlayerHistory } from '../services/gameData';
 import Footer from '../components/Footer'
+import { useWallet } from "@solana/wallet-adapter-react";
 
 export default function History() {
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -24,6 +25,10 @@ export default function History() {
   const [historyLoading, setHistoryLoading] = useState(true);
   const [timeRange, setTimeRange] = useState('last-30-days');
 
+  const { connected, publicKey, wallet } = useWallet();
+  const publicAddress = publicKey?.toBase58().toString();
+  const displayName = wallet?.adapter.name;
+
   const timeRangeOptions: DropdownOption[] = [
     { value: 'today', label: 'Today', leftIcon: '/image/calendar.svg' },
     { value: 'last-3-days', label: 'Last 3 Days', leftIcon: '/image/calendar.svg' },
@@ -37,13 +42,13 @@ export default function History() {
   // Filter player history based on selected time range
   const filteredPlayerHistory = useMemo(() => {
     if (!playerHistory.length) return [];
-    
+
     const now = new Date();
     return playerHistory.filter(item => {
       const itemDate = new Date(`${item.date}T${item.time}`);
       const diffTime = Math.abs(now.getTime() - itemDate.getTime());
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      
+
       switch (timeRange) {
         case 'today':
           return diffDays <= 1;
@@ -89,7 +94,7 @@ export default function History() {
           fetchUserData(),
           fetchPlayerHistory(userData?.account || '')
         ]);
-        
+
         setUserData(userDataResponse);
         setPlayerHistory(historyResponse);
       } catch (error) {
@@ -128,13 +133,13 @@ export default function History() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      
+
       <div className="flex overflow-x-hidden">
         {/* Sidebar - Hidden on mobile and tablet (below lg) */}
         <div className="hidden lg:block">
           <Sidebar activeItem="history" />
         </div>
-        
+
         {/* Main Content */}
         <div className="flex flex-col flex-1 bg-[#0a101e] lg:ml-[248px] min-h-screen">
           {/* Header */}
@@ -154,7 +159,7 @@ export default function History() {
                   View your wallet balance, revenue statistics, and transaction history
                 </p>
               </div>
-              
+
               {/* Controls - Refresh Button and Time Range Dropdown */}
               <div className="flex items-center gap-3">
                 {/* Refresh Button */}
@@ -165,7 +170,7 @@ export default function History() {
                 >
                   <img src="/image/refresh.svg" alt="Refresh" className="w-4 h-4" />
                 </button>
-                
+
                 {/* Time Range Dropdown */}
                 <CustomDropdown
                   options={timeRangeOptions}
@@ -179,18 +184,31 @@ export default function History() {
             {/* Stats Cards Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
               <div className="md:col-span-2">
-                <WalletBalanceCard
-                  walletAddress={userData?.account || ''}
-                  balance={userData?.balance || 0}
-                  trend={userData?.trend || 0}
-                />
+
+                {!connected ?
+                  <div className="border border-[#2a2a2a] rounded-[10px] p-4 bg-[#020617]">
+                    <h3 className="font-oswald font-bold text-[20px] leading-[160%] text-white mb-4">
+                      Account Disconnected
+                    </h3>
+                    <div className="rounded-[10px] p-3 bg-[#0e172b]">
+                      <p className="font-inter font-medium text-[14px] leading-[114%] text-red-500">
+                        Wallet not connected
+                      </p>
+                    </div>
+                  </div> :
+                  <WalletBalanceCard
+                    walletAddress={publicAddress || ''}
+                    balance={userData?.balance || 0}
+                    trend={userData?.trend || 0}
+                  />
+                }
               </div>
-              
+
               <RevenueCard
                 revenue={statsData.revenue}
                 trend={statsData.revenueTrend}
               />
-              
+
               <ChallengesTakenCard
                 challengesCount={statsData.challengesTaken}
                 trend={statsData.challengesTrend}
@@ -201,7 +219,7 @@ export default function History() {
             <h2 className="font-oswald font-bold text-[20px] leading-[160%] text-white">
               Player History
             </h2>
-            
+
             {/* Player History Table */}
             {historyLoading ? (
               <div className="text-center py-8 text-[#929294]">

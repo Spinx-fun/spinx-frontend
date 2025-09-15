@@ -34,7 +34,6 @@ const AccountConnected: React.FC<AccountConnectedProps> = ({
 }) => {
   const [copied, setCopied] = useState(false);
   const { connected, publicKey, wallet } = useWallet();
-  console.log('debug->publicKey', wallet?.adapter.name)
   const publicAddress = publicKey?.toBase58().toString();
   const displayName = wallet?.adapter.name;
   const copyToClipboard = () => {
@@ -44,8 +43,6 @@ const AccountConnected: React.FC<AccountConnectedProps> = ({
       setTimeout(() => setCopied(false), 2000);
     }
   };
-
-
 
   if (!connected) {
     return (
