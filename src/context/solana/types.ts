@@ -9,8 +9,8 @@ export const SPL_ESCROW_SEED = "spl-escrow";
 export const REFERRAL_SEED = "referral";
 export const RANDOM_SEED = "random";
 
-export const JACKPOT_PROGRAM_ID = new PublicKey(
-  "A6wKXJrYufyJNRqBfcUVnS7PG5ZuMkiJwKFCm9s9DDrW"
+export const COINFLIP_PROGRAM_ID = new PublicKey(
+  "GjbMbmaKX8jB5TrH91AZ6xZwFPeq7fgPkZVDhjGcBUdd"
 );
 
 export const FEE_WALLET = new PublicKey(

@@ -6,7 +6,7 @@ import {
 } from "@solana/spl-token"
 import { bs58 } from "@project-serum/anchor/dist/cjs/utils/bytes";
 import axios from "axios";
-import { IDL, Jackpot } from "./jackpot";
+import { IDL, SpinX } from "./coinflip";
 import {
   PublicKey,
   SystemProgram,
@@ -18,7 +18,7 @@ import {
 import {
   GamePool,
   GAME_SEED,
-  JACKPOT_PROGRAM_ID,
+  COINFLIP_PROGRAM_ID,
   VAULT_SEED,
   GLOBAL_AUTHORITY_SEED,
   SPL_ESCROW_SEED,
@@ -51,7 +51,7 @@ export const playGame = async (
 ) => {
   if (wallet.publicKey === null) return;
 
-  let programId = new anchor.web3.PublicKey(JACKPOT_PROGRAM_ID);
+  let programId = new anchor.web3.PublicKey(COINFLIP_PROGRAM_ID);
 
   const cloneWindow: any = window;
   const userAddress = wallet.publicKey;
@@ -67,7 +67,7 @@ export const playGame = async (
   );
   try {
     setLoading(true);
-    const tx = await createPlayGameTx(userAddress, mint, amount, referrer, program);
+    const tx = await createCoinflip(userAddress, mint, amount, referrer, program);
     const { blockhash } = await solConnection.getLatestBlockhash();
     tx.feePayer = userAddress;
     tx.recentBlockhash = blockhash;
@@ -127,7 +127,7 @@ export const enterGame = async (
   /// Comment this because backend is processed such conflict
   // console.log(endTimestamp - now, "(endTimestamp - now)", endTimestamp);
 
-  let programId = new anchor.web3.PublicKey(JACKPOT_PROGRAM_ID);
+  let programId = new anchor.web3.PublicKey(COINFLIP_PROGRAM_ID);
 
   const cloneWindow: any = window;
   const userAddress = wallet.publicKey;
@@ -623,9 +623,9 @@ async function getPriorityFeeEstimate(transaction: any) {
 }
 
 export const getCoinflipAccounts = async () => {
-  type CoinflipDataRaw = anchor.IdlAccounts<Jackpot>['CoinflipPool'];
+  type CoinflipDataRaw = anchor.IdlAccounts<SpinX>['CoinflipPool'];
   let accounts: anchor.ProgramAccount<CoinflipDataRaw>[] = []
-  let programId = new anchor.web3.PublicKey(JACKPOT_PROGRAM_ID);
+  let programId = new anchor.web3.PublicKey(COINFLIP_PROGRAM_ID);
 
   const cloneWindow: any = window;
   const provider = new anchor.AnchorProvider(
@@ -673,7 +673,7 @@ export const createCoinflip = async (
 ) => {
   if (wallet.publicKey === null) return;
 
-  let programId = new anchor.web3.PublicKey(JACKPOT_PROGRAM_ID);
+  let programId = new anchor.web3.PublicKey(COINFLIP_PROGRAM_ID);
 
   const cloneWindow: any = window;
   const userAddress = wallet.publicKey;
@@ -888,7 +888,7 @@ export const joinCoinflip = async (
 ) => {
   if (wallet.publicKey === null) return;
 
-  let programId = new anchor.web3.PublicKey(JACKPOT_PROGRAM_ID);
+  let programId = new anchor.web3.PublicKey(COINFLIP_PROGRAM_ID);
 
   const cloneWindow: any = window;
   const userAddress = wallet.publicKey;
@@ -1094,7 +1094,7 @@ export const claimCoinflip = async (
 ) => {
   if (wallet.publicKey === null) return;
 
-  let programId = new anchor.web3.PublicKey(JACKPOT_PROGRAM_ID);
+  let programId = new anchor.web3.PublicKey(COINFLIP_PROGRAM_ID);
 
   const cloneWindow: any = window;
   const userAddress = wallet.publicKey;
@@ -1331,7 +1331,7 @@ const getReferralStateByKey = async (
 //   );
 //   const program = new anchor.Program(
 //     IDL as anchor.Idl,
-//     JACKPOT_PROGRAM_ID,
+//     COINFLIP_PROGRAM_ID,
 //     provider
 //   );
 //   try {
