@@ -25,9 +25,9 @@ export default function History() {
   const [historyLoading, setHistoryLoading] = useState(true);
   const [timeRange, setTimeRange] = useState('last-30-days');
 
-  const { connected, publicKey, wallet } = useWallet();
+  const { connected, publicKey } = useWallet();
+  const wallet = useWallet();
   const publicAddress = publicKey?.toBase58().toString();
-  const displayName = wallet?.adapter.name;
 
   const timeRangeOptions: DropdownOption[] = [
     { value: 'today', label: 'Today', leftIcon: '/image/calendar.svg' },
@@ -73,7 +73,7 @@ export default function History() {
   useEffect(() => {
     const loadUserData = async () => {
       try {
-        const data = await fetchUserData();
+        const data = await fetchUserData(wallet);
         setUserData(data);
       } catch (error) {
         console.error('Failed to fetch user data:', error);
@@ -91,7 +91,7 @@ export default function History() {
     const loadAllData = async () => {
       try {
         const [userDataResponse, historyResponse] = await Promise.all([
-          fetchUserData(),
+          fetchUserData(wallet),
           fetchPlayerHistory(userData?.account || '')
         ]);
 

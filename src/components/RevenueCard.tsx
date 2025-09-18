@@ -34,17 +34,16 @@ const RevenueCard: React.FC<RevenueCardProps> = ({ revenue, trend }) => {
         </div>
 
         {/* Trend Info */}
-        <div className="flex items-center gap-1">
+        {/* <div className="flex items-center gap-1">
           <img src={trendIcon} alt="Trend" className="w-4 h-4" />
           <span className={`font-inter font-normal text-[20px] leading-[160%] ${trendColor}`}>
             {isPositive ? '+' : ''}{trend.toFixed(1)}%
           </span>
         </div>
 
-        {/* From last month text */}
         <p className="font-inter font-medium italic text-[12px] leading-[133%] text-[#929294] mt-1">
           From last month
-        </p>
+        </p> */}
       </div>
     </div>
   );

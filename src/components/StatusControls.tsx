@@ -82,7 +82,7 @@ const StatusControls: React.FC = () => {
       setGames((prevGames) => [...prevGames, ...filteredNewGames]);
       setAllGames((prevGames) => [...prevGames, ...newGames]);
       setCurrentPage(nextPage);
-      setHasMore(hasMoreGames(nextPage));
+      setHasMore(await hasMoreGames(nextPage));
     } catch (error) {
       console.error("Error loading more games:", error);
     } finally {
@@ -98,7 +98,7 @@ const StatusControls: React.FC = () => {
         const initialGames = await fetchGamesPaginated(1);
         setGames(initialGames);
         setAllGames(initialGames);
-        setHasMore(hasMoreGames(1));
+        setHasMore(await hasMoreGames(1));
       } catch (error) {
         console.error("Error loading initial games:", error);
       } finally {
@@ -200,12 +200,15 @@ const StatusControls: React.FC = () => {
         {games.map((game) => (
           <GameCard
             key={game.id}
+            poolId={game.id}
             gameType={game.gameType}
             gameName={game.gameName}
             stakeAmount={game.stakeAmount}
             pickValue={game.pickValue}
             date={game.date}
             time={game.time}
+            joinerPlayer={game.joinerPlayer}
+            creatorAta={game.creatorAta}
           />
         ))}
       </div>

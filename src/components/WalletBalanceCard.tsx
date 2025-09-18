@@ -58,7 +58,7 @@ const WalletBalanceCard: React.FC<WalletBalanceCardProps> = ({
 
           {/* Trend Info */}
           <div className="text-right">
-            <div className="flex items-center justify-end gap-1">
+            {/* <div className="flex items-center justify-end gap-1">
               <img src={trendIcon} alt="Trend" className="w-4 h-4" />
               <span className={`font-inter font-normal text-[20px] leading-[160%] ${trendColor}`}>
                 {isPositive ? '+' : ''}{trend.toFixed(1)}%
@@ -66,7 +66,7 @@ const WalletBalanceCard: React.FC<WalletBalanceCardProps> = ({
             </div>
             <p className="font-inter font-medium italic text-[12px] leading-[133%] text-[#929294]">
               From last month
-            </p>
+            </p> */}
           </div>
         </div>
       </div>

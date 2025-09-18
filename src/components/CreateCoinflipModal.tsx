@@ -43,7 +43,7 @@ export default function CreateCoinflipModal(props: {
                 amount = betAmount * 10 ** activeAsset.decimals;
             }
             console.log('create coinflip', betNumber, amount, activeAsset.symbol);
-            await createCoinflip(wallet, betNumber, new PublicKey(activeAsset.address), amount, referrer, setIsBetLoading)
+            await createCoinflip(wallet, betNumber, new PublicKey(activeAsset.address), amount, setIsBetLoading)
             props.handleCloseModal()
         } catch (error) {
             console.log(error);

@@ -1,529 +1,36 @@
+import { getAllChallenges } from "../context/solana/transaction";
+import { assets } from '../utils/constants'
+import { format } from 'date-fns';
+
 export interface GameData {
   id: number;
-  gameType: 'coin-flip' | 'slot-machine';
-  gameName: string;
+  gameType: string;
+  gameName: any;
   stakeAmount: number;
-  pickValue: string | number;
+  pickValue: string;
   date: string;
   time: string;
+  joinerPlayer: string;
+  creatorAta: string;
 }
 
-// Sample game data with 15 items for demonstration
-export const sampleGames: GameData[] = [
-  {
-    id: 1,
-    gameType: 'coin-flip',
-    gameName: 'Duu__2411',
-    stakeAmount: 2000,
-    pickValue: 'HEADS',
-    date: '2025-09-03',
-    time: '14:30:34'
-  },
-  {
-    id: 2,
-    gameType: 'coin-flip',
-    gameName: 'John_1234',
-    stakeAmount: 1500,
-    pickValue: 'TAILS',
-    date: '2025-09-03',
-    time: '15:45:22'
-  },
-  {
-    id: 3,
-    gameType: 'slot-machine',
-    gameName: 'Slot_001',
-    stakeAmount: 500,
-    pickValue: 100,
-    date: '2025-09-03',
-    time: '16:20:18'
-  },
-  {
-    id: 4,
-    gameType: 'slot-machine',
-    gameName: 'Slot_002',
-    stakeAmount: 750,
-    pickValue: 200,
-    date: '2025-09-03',
-    time: '17:05:42'
-  },
-  {
-    id: 5,
-    gameType: 'coin-flip',
-    gameName: 'Alice_567',
-    stakeAmount: 3000,
-    pickValue: 'HEADS',
-    date: '2025-09-03',
-    time: '18:30:15'
-  },
-  {
-    id: 6,
-    gameType: 'slot-machine',
-    gameName: 'Slot_003',
-    stakeAmount: 1000,
-    pickValue: 150,
-    date: '2025-09-03',
-    time: '19:45:30'
-  },
-  {
-    id: 7,
-    gameType: 'coin-flip',
-    gameName: 'Bob_789',
-    stakeAmount: 2500,
-    pickValue: 'TAILS',
-    date: '2025-09-04',
-    time: '10:15:22'
-  },
-  {
-    id: 8,
-    gameType: 'slot-machine',
-    gameName: 'Slot_004',
-    stakeAmount: 1200,
-    pickValue: 180,
-    date: '2025-09-04',
-    time: '11:30:45'
-  },
-  {
-    id: 9,
-    gameType: 'coin-flip',
-    gameName: 'Charlie_101',
-    stakeAmount: 1800,
-    pickValue: 'HEADS',
-    date: '2025-09-04',
-    time: '12:45:18'
-  },
-  {
-    id: 10,
-    gameType: 'slot-machine',
-    gameName: 'Slot_005',
-    stakeAmount: 900,
-    pickValue: 220,
-    date: '2025-09-04',
-    time: '14:20:33'
-  },
-  {
-    id: 11,
-    gameType: 'coin-flip',
-    gameName: 'Diana_202',
-    stakeAmount: 3500,
-    pickValue: 'TAILS',
-    date: '2025-09-04',
-    time: '15:35:47'
-  },
-  {
-    id: 12,
-    gameType: 'slot-machine',
-    gameName: 'Slot_006',
-    stakeAmount: 800,
-    pickValue: 190,
-    date: '2025-09-04',
-    time: '16:50:12'
-  },
-  {
-    id: 13,
-    gameType: 'coin-flip',
-    gameName: 'Eve_303',
-    stakeAmount: 2200,
-    pickValue: 'HEADS',
-    date: '2025-09-04',
-    time: '18:05:28'
-  },
-  {
-    id: 14,
-    gameType: 'slot-machine',
-    gameName: 'Slot_007',
-    stakeAmount: 1100,
-    pickValue: 210,
-    date: '2025-09-04',
-    time: '19:20:42'
-  },
-  {
-    id: 15,
-    gameType: 'coin-flip',
-    gameName: 'Frank_404',
-    stakeAmount: 2800,
-    pickValue: 'TAILS',
-    date: '2025-09-04',
-    time: '20:35:57'
-  },
-  // Additional games for pagination testing
-  {
-    id: 16,
-    gameType: 'coin-flip',
-    gameName: 'Gamer_505',
-    stakeAmount: 4200,
-    pickValue: 'HEADS',
-    date: '2025-09-05',
-    time: '09:15:22'
-  },
-  {
-    id: 17,
-    gameType: 'coin-flip',
-    gameName: 'Player_606',
-    stakeAmount: 3800,
-    pickValue: 'TAILS',
-    date: '2025-09-05',
-    time: '10:30:45'
-  },
-  {
-    id: 18,
-    gameType: 'slot-machine',
-    gameName: 'Slot_008',
-    stakeAmount: 1500,
-    pickValue: 250,
-    date: '2025-09-05',
-    time: '11:45:18'
-  },
-  {
-    id: 19,
-    gameType: 'coin-flip',
-    gameName: 'Gamer_707',
-    stakeAmount: 3200,
-    pickValue: 'HEADS',
-    date: '2025-09-05',
-    time: '13:20:33'
-  },
-  {
-    id: 20,
-    gameType: 'slot-machine',
-    gameName: 'Slot_009',
-    stakeAmount: 2800,
-    pickValue: 190,
-    date: '2025-09-05',
-    time: '14:35:47'
-  },
-  {
-    id: 21,
-    gameType: 'coin-flip',
-    gameName: 'Player_808',
-    stakeAmount: 4500,
-    pickValue: 'TAILS',
-    date: '2025-09-06',
-    time: '15:50:12'
-  },
-  {
-    id: 22,
-    gameType: 'coin-flip',
-    gameName: 'Gamer_909',
-    stakeAmount: 3700,
-    pickValue: 'HEADS',
-    date: '2025-09-06',
-    time: '17:05:28'
-  },
-  {
-    id: 23,
-    gameType: 'slot-machine',
-    gameName: 'Slot_010',
-    stakeAmount: 2200,
-    pickValue: 210,
-    date: '2025-09-06',
-    time: '18:20:42'
-  },
-  {
-    id: 24,
-    gameType: 'coin-flip',
-    gameName: 'Player_1010',
-    stakeAmount: 3900,
-    pickValue: 'TAILS',
-    date: '2025-09-06',
-    time: '19:35:57'
-  },
-  {
-    id: 25,
-    gameType: 'coin-flip',
-    gameName: 'Gamer_1111',
-    stakeAmount: 4100,
-    pickValue: 'HEADS',
-    date: '2025-09-07',
-    time: '20:50:22'
-  },
-  {
-    id: 26,
-    gameType: 'slot-machine',
-    gameName: 'Slot_011',
-    stakeAmount: 1800,
-    pickValue: 230,
-    date: '2025-09-07',
-    time: '21:05:38'
-  },
-  {
-    id: 27,
-    gameType: 'coin-flip',
-    gameName: 'Player_1212',
-    stakeAmount: 3300,
-    pickValue: 'TAILS',
-    date: '2025-09-07',
-    time: '22:20:53'
-  },
-  {
-    id: 28,
-    gameType: 'coin-flip',
-    gameName: 'Gamer_1313',
-    stakeAmount: 4600,
-    pickValue: 'HEADS',
-    date: '2025-09-08',
-    time: '23:35:18'
-  },
-  {
-    id: 29,
-    gameType: 'slot-machine',
-    gameName: 'Slot_012',
-    stakeAmount: 2700,
-    pickValue: 195,
-    date: '2025-09-08',
-    time: '00:50:33'
-  },
-  {
-    id: 30,
-    gameType: 'coin-flip',
-    gameName: 'Player_1414',
-    stakeAmount: 3400,
-    pickValue: 'TAILS',
-    date: '2025-09-08',
-    time: '02:05:48'
-  },
-  {
-    id: 31,
-    gameType: 'coin-flip',
-    gameName: 'Gamer_1515',
-    stakeAmount: 4800,
-    pickValue: 'HEADS',
-    date: '2025-09-09',
-    time: '03:20:03'
-  },
-  {
-    id: 32,
-    gameType: 'slot-machine',
-    gameName: 'Slot_013',
-    stakeAmount: 2100,
-    pickValue: 220,
-    date: '2025-09-09',
-    time: '04:35:18'
-  },
-  {
-    id: 33,
-    gameType: 'coin-flip',
-    gameName: 'Player_1616',
-    stakeAmount: 3600,
-    pickValue: 'TAILS',
-    date: '2025-09-09',
-    time: '05:50:33'
-  },
-  {
-    id: 34,
-    gameType: 'coin-flip',
-    gameName: 'Gamer_1717',
-    stakeAmount: 4900,
-    pickValue: 'HEADS',
-    date: '2025-09-10',
-    time: '06:05:48'
-  },
-  {
-    id: 35,
-    gameType: 'slot-machine',
-    gameName: 'Slot_014',
-    stakeAmount: 2400,
-    pickValue: 205,
-    date: '2025-09-10',
-    time: '07:20:03'
-  },
-  // Additional games for pagination testing (continuing from id 36)
-  {
-    id: 36,
-    gameType: 'coin-flip',
-    gameName: 'Player_1818',
-    stakeAmount: 5200,
-    pickValue: 'TAILS',
-    date: '2025-09-10',
-    time: '08:35:18'
-  },
-  {
-    id: 37,
-    gameType: 'slot-machine',
-    gameName: 'Slot_015',
-    stakeAmount: 1900,
-    pickValue: 215,
-    date: '2025-09-10',
-    time: '09:50:33'
-  },
-  {
-    id: 38,
-    gameType: 'coin-flip',
-    gameName: 'Gamer_1919',
-    stakeAmount: 4300,
-    pickValue: 'HEADS',
-    date: '2025-09-11',
-    time: '10:05:48'
-  },
-  {
-    id: 39,
-    gameType: 'coin-flip',
-    gameName: 'Player_2020',
-    stakeAmount: 3800,
-    pickValue: 'TAILS',
-    date: '2025-09-11',
-    time: '11:20:03'
-  },
-  {
-    id: 40,
-    gameType: 'slot-machine',
-    gameName: 'Slot_016',
-    stakeAmount: 2600,
-    pickValue: 195,
-    date: '2025-09-11',
-    time: '12:35:18'
-  },
-  {
-    id: 41,
-    gameType: 'coin-flip',
-    gameName: 'Gamer_2121',
-    stakeAmount: 4700,
-    pickValue: 'HEADS',
-    date: '2025-09-12',
-    time: '13:50:33'
-  },
-  {
-    id: 42,
-    gameType: 'coin-flip',
-    gameName: 'Player_2222',
-    stakeAmount: 3400,
-    pickValue: 'TAILS',
-    date: '2025-09-12',
-    time: '14:05:48'
-  },
-  {
-    id: 43,
-    gameType: 'slot-machine',
-    gameName: 'Slot_017',
-    stakeAmount: 2300,
-    pickValue: 225,
-    date: '2025-09-12',
-    time: '15:20:03'
-  },
-  {
-    id: 44,
-    gameType: 'coin-flip',
-    gameName: 'Gamer_2323',
-    stakeAmount: 5100,
-    pickValue: 'HEADS',
-    date: '2025-09-13',
-    time: '16:35:18'
-  },
-  {
-    id: 45,
-    gameType: 'coin-flip',
-    gameName: 'Player_2424',
-    stakeAmount: 3700,
-    pickValue: 'TAILS',
-    date: '2025-09-13',
-    time: '17:50:33'
-  },
-  {
-    id: 46,
-    gameType: 'slot-machine',
-    gameName: 'Slot_018',
-    stakeAmount: 2900,
-    pickValue: 205,
-    date: '2025-09-13',
-    time: '18:05:48'
-  },
-  {
-    id: 47,
-    gameType: 'coin-flip',
-    gameName: 'Gamer_2525',
-    stakeAmount: 5400,
-    pickValue: 'HEADS',
-    date: '2025-09-14',
-    time: '19:20:03'
-  },
-  {
-    id: 48,
-    gameType: 'coin-flip',
-    gameName: 'Player_2626',
-    stakeAmount: 4000,
-    pickValue: 'TAILS',
-    date: '2025-09-14',
-    time: '20:35:18'
-  },
-  {
-    id: 49,
-    gameType: 'slot-machine',
-    gameName: 'Slot_019',
-    stakeAmount: 2700,
-    pickValue: 235,
-    date: '2025-09-14',
-    time: '21:50:33'
-  },
-  {
-    id: 50,
-    gameType: 'coin-flip',
-    gameName: 'Gamer_2727',
-    stakeAmount: 5600,
-    pickValue: 'HEADS',
-    date: '2025-09-15',
-    time: '22:05:48'
-  },
-  {
-    id: 51,
-    gameType: 'coin-flip',
-    gameName: 'Player_2828',
-    stakeAmount: 4200,
-    pickValue: 'TAILS',
-    date: '2025-09-15',
-    time: '23:20:03'
-  },
-  {
-    id: 52,
-    gameType: 'slot-machine',
-    gameName: 'Slot_020',
-    stakeAmount: 3100,
-    pickValue: 195,
-    date: '2025-09-15',
-    time: '00:35:18'
-  },
-  {
-    id: 53,
-    gameType: 'coin-flip',
-    gameName: 'Gamer_2929',
-    stakeAmount: 5800,
-    pickValue: 'HEADS',
-    date: '2025-09-16',
-    time: '01:50:33'
-  },
-  {
-    id: 54,
-    gameType: 'coin-flip',
-    gameName: 'Player_3030',
-    stakeAmount: 4400,
-    pickValue: 'TAILS',
-    date: '2025-09-16',
-    time: '02:05:48'
-  },
-  {
-    id: 55,
-    gameType: 'slot-machine',
-    gameName: 'Slot_021',
-    stakeAmount: 3300,
-    pickValue: 245,
-    date: '2025-09-16',
-    time: '03:20:03'
-  }
-];
 
 // Simulate API call to fetch games with pagination
 export const fetchGames = async (page: number, pageSize: number = 6): Promise<GameData[]> => {
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 300));
-  
+  let data = await fetchAllChallenges();
   const startIndex = (page - 1) * pageSize;
   const endIndex = startIndex + pageSize;
-  
-  return sampleGames.slice(startIndex, endIndex);
+
+  return data.slice(startIndex, endIndex);
 };
 
 // Check if there are more games to load
-export const hasMoreGames = (currentPage: number, pageSize: number = 6): boolean => {
+export const hasMoreGames = async (currentPage: number, pageSize: number = 6) => {
   const startIndex = currentPage * pageSize;
-  return startIndex < sampleGames.length;
+  let datas = await fetchAllChallenges();
+  return startIndex < datas.length;
 };
 
 // Active Challenge interface
@@ -913,14 +420,49 @@ export const samplePlayerHistory: PlayerHistory[] = [
 export const fetchActiveChallenges = async (walletAddress: string): Promise<ActiveChallenge[]> => {
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 300));
-  
   return sampleActiveChallenges;
+};
+
+export const fetchAllChallenges = async (): Promise<GameData[]> => {
+  let datas = await getAllChallenges()
+  let activeAsset = assets[0]
+  let newDatas = [];
+  console.log('debug->datas', datas)
+  if (datas && activeAsset.decimals) {
+    for (let i = 0; i < (datas as any).length; i++) {
+      let accountData = (datas as any)[i].account
+      let pickValues;
+      if (Number(accountData.creatorSetNumber) == 1) {
+        pickValues = "HEADS"
+      } else {
+        pickValues = "TAILS"
+      }
+      let timestamp = Number(accountData.startTs) * 1000;
+      let date = new Date(timestamp);
+      const formattedDate = format(date, 'yyyy-MM-dd')
+      const formattedTimes = format(date, 'hh:mm:ss')
+      const gameData = {
+        id: Number(accountData.poolId),
+        gameType: 'coin-flip',
+        gameName: accountData.creatorPlayer.toBase58(),
+        stakeAmount: Number(accountData.poolAmount) / (10 ** activeAsset.decimals),
+        pickValue: pickValues,
+        date: formattedDate,
+        time: formattedTimes,
+        joinerPlayer: accountData.joinerPlayer.toBase58(),
+        creatorAta: accountData.creatorAta.toBase58()
+      }
+      newDatas.push(gameData)
+    }
+  }
+  newDatas.sort((a, b) => b.id - a.id)
+  return newDatas;
 };
 
 // Fetch player history for a user
 export const fetchPlayerHistory = async (walletAddress: string): Promise<PlayerHistory[]> => {
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 300));
-  
+
   return samplePlayerHistory;
 };

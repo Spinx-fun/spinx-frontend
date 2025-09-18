@@ -21,7 +21,7 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
       try {
         const gamesData = await fetchRecentGames(currentPage, itemsPerPage);
         setGames(gamesData);
-        setTotalGames(getTotalGamesCount());
+        setTotalGames(await getTotalGamesCount());
       } catch (error) {
         console.error('Error loading recent games:', error);
       } finally {

@@ -8,6 +8,10 @@ import { fetchUserData, UserData } from "../services/api";
 import { fetchActiveChallenges, ActiveChallenge } from "../services/gameData";
 import Footer from "../components/Footer";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { createCoinflip } from "../context/solana/transaction";
+import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
+import { Asset, assets } from '../utils/constants'
+import BeatLoader from 'react-spinners/BeatLoader';
 
 interface AccountCardProps {
   title: string;
@@ -23,7 +27,7 @@ interface AmountButtonProps {
   onClick: () => void;
 }
 
-interface AccountConnectedProps {}
+interface AccountConnectedProps { }
 
 interface BalanceCardProps {
   balance: number | null;
@@ -122,7 +126,7 @@ const BalanceCard: React.FC<BalanceCardProps> = ({ balance, trend }) => {
 
           {/* Trend Info */}
           <div className="text-right">
-            <div className="flex items-center justify-end gap-1">
+            {/* <div className="flex items-center justify-end gap-1">
               <img src={trendIcon} alt="Trend" className="w-4 h-4" />
               <span
                 className={`font-inter font-normal text-[20px] leading-[160%] ${trendColor}`}
@@ -133,7 +137,7 @@ const BalanceCard: React.FC<BalanceCardProps> = ({ balance, trend }) => {
             </div>
             <p className="font-inter font-medium italic text-[12px] leading-[133%] text-[#929294]">
               From last month
-            </p>
+            </p> */}
           </div>
         </div>
       </div>
@@ -156,6 +160,9 @@ const AmountButton: React.FC<AmountButtonProps> = ({
 );
 
 export default function CreateChallenge() {
+  const wallet = useWallet();
+  const [activeAsset] = useState(assets[0])
+  const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"flip" | "slot">("flip");
   const [selectedAmount, setSelectedAmount] = useState<string>("");
   const [selectedCoin, setSelectedCoin] = useState<"head" | "tail" | null>(
@@ -185,7 +192,7 @@ export default function CreateChallenge() {
     const loadData = async () => {
       try {
         const [userDataResponse, challengesResponse] = await Promise.all([
-          fetchUserData(),
+          fetchUserData(wallet),
           fetchActiveChallenges(userData?.account || ""),
         ]);
 
@@ -206,7 +213,7 @@ export default function CreateChallenge() {
     };
 
     loadData();
-  }, []);
+  }, [isLoading]);
 
   const handleAmountSelect = (amount: string) => {
     setSelectedAmount(amount);
@@ -232,13 +239,30 @@ export default function CreateChallenge() {
     }
   };
 
-  const handleCreateChallenge = () => {
-    if (!stakeAmount || !selectedCoin) {
-      setError("Please enter stake amount and make a pick Head or Tail");
-      return;
+  const handleCreateChallenge = async () => {
+    try {
+      setIsLoading(true);
+      if (!stakeAmount || !selectedCoin) {
+        setError("Please enter stake amount and make a pick Head or Tail");
+        return;
+      }
+      setError("");
+      let coinId;
+      if (selectedCoin == "head") {
+        coinId = 1;
+      } else {
+        coinId = 2;
+      }
+      // Handle challenge creation logic here
+      let amount;
+      let betAmount = Number(stakeAmount);
+      amount = betAmount * 10 ** 9;
+      await createCoinflip(wallet, coinId, new PublicKey(activeAsset.address), amount, setIsLoading)
+      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
     }
-    setError("");
-    // Handle challenge creation logic here
+
   };
 
   return (
@@ -399,7 +423,17 @@ export default function CreateChallenge() {
                             onClick={handleCreateChallenge}
                             className="bg-[#1be088] rounded-[2px_8px] py-2 px-4 h-[37px] font-oswald font-medium text-[14px] leading-[150%] uppercase text-black"
                           >
-                            Create Flip Challenge
+                            {isLoading ?
+                              <BeatLoader
+                                color={'#000'}
+                                loading={isLoading}
+                                size={10}
+                                aria-label="Loading Spinner"
+                                data-testid="loader"
+                              /> :
+                              "Create Flip Challenge"
+                            }
+
                           </button>
                           {error && (
                             <p className="text-red-500 text-sm">{error}</p>

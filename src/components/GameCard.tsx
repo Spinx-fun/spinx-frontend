@@ -1,32 +1,65 @@
 import React, { useState } from 'react';
 import JoinCoinflipModal from "../components/JoinCoinflipModal";
+import { useWallet } from '@solana/wallet-adapter-react';
+import { joinCoinflip } from "../context/solana/transaction";
+import { PublicKey } from '@solana/web3.js';
+import { assets } from '../utils/constants';
+import { errorAlert } from './ToastGroup';
 
 export interface GameCardProps {
-  gameType: 'coin-flip' | 'slot-machine';
+  poolId: number;
+  gameType: string;
   gameName: string;
   stakeAmount: number;
   pickValue: string | number;
   date: string;
   time: string;
+  joinerPlayer: string;
+  creatorAta: string;
 }
 
 const GameCard: React.FC<GameCardProps> = ({
+  poolId,
   gameType,
   gameName,
   stakeAmount,
   pickValue,
   date,
-  time
+  time,
+  joinerPlayer,
+  creatorAta
 }) => {
   const [isOpenJoinModal, setIsOpenJoinModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string>("");
+  const wallet = useWallet();
   const handleCloseJoinModal = () => {
     setIsOpenJoinModal(false);
   };
-  const handleOpenJoinModal = (pda: string, poolAmount: number, setNumber: number) => {
-    // setSelectedPda(pda);
-    // setSelectedPoolAmount(poolAmount);
-    // setSelectedSetNumber(setNumber);
-    setIsOpenJoinModal(true);
+  console.log('debug->stakeAmount', stakeAmount)
+  const handleJoin = async () => {
+    try {
+      setIsLoading(true);
+      const activeAsset = assets[0];
+      let coinId;
+      if (pickValue == "HEADS") {
+        coinId = 2;
+      } else {
+        coinId = 1;
+      }
+      if (wallet.publicKey?.toBase58() == gameName) {
+        errorAlert("You are creator of this pool already");
+        return;
+      }
+      let amount;
+      let betAmount = Number(stakeAmount);
+      amount = betAmount * 10 ** (activeAsset.decimals ?? 9);
+      await joinCoinflip(wallet, coinId, new PublicKey(activeAsset.address), amount, new PublicKey(creatorAta), poolId, setIsLoading)
+      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
+
   };
 
   return (
@@ -55,7 +88,10 @@ const GameCard: React.FC<GameCardProps> = ({
 
         {/* Game Name */}
         <h3 className="font-oswald font-medium text-lg leading-[111%] text-white mb-4">
-          {gameName}
+          {joinerPlayer == "11111111111111111111111111111111" ?
+            gameName.slice(0, 5) + "... ..." + gameName.slice(-5) :
+            gameName.slice(0, 5) + "... ..." + gameName.slice(-5) + " VS " + joinerPlayer.slice(0, 5) + "... ..." + joinerPlayer.slice(-5)
+          }
         </h3>
 
         {/* Stake and Pick Columns */}
@@ -82,16 +118,33 @@ const GameCard: React.FC<GameCardProps> = ({
         </div>
 
         {/* Action Button */}
-        <button className={`
-        rounded-[2px_8px] py-2 px-4 w-[160px] h-[37px] mb-4
-        shadow-[0_4px_14px_0_rgba(27,224,136,0.45)] bg-[#1be088]
-        flex items-center justify-center
-      `}
-          onClick={() => handleOpenJoinModal("game.pda", 0, 0)}>
-          <span className="font-oswald font-medium text-sm leading-[150%] uppercase text-[#1b2235]">
-            {gameType === 'coin-flip' ? 'TAKE CHALLENGE' : 'PLAY GAME'}
-          </span>
-        </button>
+        {joinerPlayer == "11111111111111111111111111111111" ?
+          <button className={`
+                  rounded-[2px_8px] py-2 px-4 w-[160px] h-[37px] mb-4
+                  shadow-[0_4px_14px_0_rgba(27,224,136,0.45)] bg-[#1be088]
+                  flex items-center justify-center
+                `}
+            onClick={handleJoin}>
+            <span className="font-oswald font-medium text-sm leading-[150%] uppercase text-[#1b2235]">
+              {gameType === 'coin-flip' ? 'TAKE CHALLENGE' : 'PLAY GAME'}
+              {error && (
+                <p className="text-red-500 text-sm">{error}</p>
+              )}
+            </span>
+          </button>
+          :
+          <button className={`
+            rounded-[2px_8px] py-2 px-4 w-[160px] h-[37px] mb-4
+            shadow-[0_4px_14px_0_rgba(27,224,136,0.45)] bg-[#1be088]
+            flex items-center justify-center
+          `}
+            disabled>
+            <span className="font-oswald font-medium text-sm leading-[150%] uppercase text-[#1b2235]">
+              Completed
+            </span>
+          </button>
+        }
+
 
         {/* Date and Time */}
         <div className="flex items-center gap-4 text-[#90a2b9] text-sm">
