@@ -97,7 +97,7 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
               style={{ transform: sortBy === 'date' && sortAscending ? 'rotate(0deg)' : sortBy === 'date' ? 'rotate(180deg)' : 'rotate(0deg)', opacity: sortBy === 'date' ? 1 : 0.5 }}
             />
           </div>
-  
+
           {/* Game Header Cell */}
           <div
             className="flex items-center flex-shrink-0"
@@ -114,7 +114,7 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
           >
             <span className="font-inter font-bold text-[16px] leading-[100%] text-white">Game</span>
           </div>
-  
+
           {/* Challenge Header Cell */}
           <div
             className="flex items-center flex-grow"
@@ -129,7 +129,7 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
           >
             <span className="font-inter font-bold text-[16px] leading-[100%] text-white">Challenger</span>
           </div>
-  
+
           {/* Stake Header Cell */}
           <div
             className="flex items-center flex-shrink-0 cursor-pointer"
@@ -153,7 +153,7 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
               style={{ transform: sortBy === 'stakeAmount' && sortAscending ? 'rotate(0deg)' : sortBy === 'stakeAmount' ? 'rotate(180deg)' : 'rotate(0deg)', opacity: sortBy === 'stakeAmount' ? 1 : 0.5 }}
             />
           </div>
-  
+
           {/* Result Header Cell */}
           <div
             className="flex items-center flex-shrink-0 cursor-pointer"
@@ -244,7 +244,7 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
               }}
             >
               <span className="font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap">
-                {formatAddress(item.challenge.split('Vs')[0]?.trim())} <span className="text-[#545454]">Vs</span> {formatAddress(item.challenge.split('Vs')[1]?.trim() || 'Opponent')}
+              {formatAddress(item.challenge.split('Vs')[0]?.trim())} <span className="text-[#545454]">Vs</span> {item.joinerPlayer != "11111111111111111111111111111111" ? formatAddress(item.joinerPlayer) : "Not Joined"}
               </span>
             </div>
 
@@ -284,18 +284,20 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
                 className="flex items-center justify-center"
                 style={{
                   border: '1px solid',
-                  borderColor: item.result === 'Win' ? '#1be088' : '#ff4757',
+                  borderColor: item.result === 'Win' ? '#1be088' : item.result === 'Pending' ? '#e0b415' : '#ff4757',
                   borderRadius: '30px',
                   paddingBlock: '5px',
                   paddingInline: '10px',
-                  width: '56px',
+                  width: '75px',
                   height: '26px',
-                  background: item.result === 'Win' ? '#112520' : '#281213'
+                  background: item.result === 'Win' ? '#112520' : item.result === 'Pending' ? '#b5970d24' : '#281213'
                 }}
               >
                 <span className="font-inter font-normal text-[14px] leading-[114%]">
                   {item.result === 'Win' ? (
                     <span className="text-[#1be088]">Win</span>
+                  ) : item.result === 'Pending' ? (
+                    <span className="text-[#fff347]">Pending</span>
                   ) : (
                     <span className="text-[#ff4757]">Loss</span>
                   )}
@@ -326,11 +328,11 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
           >
             <img src="/image/table-left-arrow.svg" alt="Previous" className="w-4 h-4" />
           </button>
-          
+
           <span className="font-inter font-medium text-[12px] leading-[133%] text-[#929294]">
             {startIndex + 1}-{Math.min(startIndex + itemsPerPage, data.length)} of {data.length}
           </span>
-          
+
           <button
             onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
             disabled={currentPage === totalPages}
@@ -388,7 +390,7 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
                 {item.game}
               </div>
               <span className="font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap">
-                {formatAddress(item.challenge.split('Vs')[0]?.trim())} <span className="text-[#545454]">Vs</span> {formatAddress(item.challenge.split('Vs')[1]?.trim() || 'Opponent')}
+                {formatAddress(item.challenge.split('Vs')[0]?.trim())} <span className="text-[#545454]">Vs</span> {formatAddress(item.joinerPlayer.split('Vs')[0]?.trim())}
               </span>
             </div>
 

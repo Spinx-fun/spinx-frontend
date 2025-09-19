@@ -50,11 +50,11 @@ const AccountConnected: React.FC<AccountConnectedProps> = ({
 
   if (!connected) {
     return (
-      <div className="border border-[#2a2a2a] rounded-[10px] p-4 bg-[#020617]">
+      <div className="border border-[#2a2a2a] rounded-[10px] p-4 bg-[#020617] overflow-x-hidden">
         <h3 className="font-oswald font-bold text-[20px] leading-[160%] text-white mb-4">
-          Account Connected
+          Account Not Connected
         </h3>
-        <div className="rounded-[10px] p-3 bg-[#0e172b]">
+        <div className="rounded-[10px] p-6 bg-[#0e172b]">
           <p className="font-inter font-medium text-[14px] leading-[114%] text-red-500">
             Wallet not connected
           </p>
@@ -242,7 +242,7 @@ export default function CreateChallenge() {
   const handleCreateChallenge = async () => {
     try {
       setIsLoading(true);
-      if (!stakeAmount || !selectedCoin) {
+      if (!stakeAmount || !selectedCoin || Number(stakeAmount) == 0) {
         setError("Please enter stake amount and make a pick Head or Tail");
         return;
       }
@@ -453,9 +453,9 @@ export default function CreateChallenge() {
                 </div>
 
                 {/* Active Challenges on mobile (comes after Create Challenge) */}
-                <div className="lg:hidden">
+                {/* <div className="lg:hidden">
                   <ActiveChallengesPanel challenges={activeChallenges} />
-                </div>
+                </div> */}
 
                 {/* Recent Games in the same column as Create Challenge */}
                 <div className="w-full">
@@ -464,9 +464,9 @@ export default function CreateChallenge() {
               </div>
 
               {/* Right Column - Active Challenges Panel on desktop */}
-              <div className="hidden xl:block lg:w-[366px] order-2 lg:order-2">
+              {/* <div className="hidden xl:block lg:w-[366px] order-2 lg:order-2">
                 <ActiveChallengesPanel challenges={activeChallenges} />
-              </div>
+              </div> */}
             </div>
           </div>
           <Footer />

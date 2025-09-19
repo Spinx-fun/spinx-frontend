@@ -5,8 +5,6 @@ import { WalletContextState } from '@solana/wallet-adapter-react';
 
 // Mock API calls
 export const fetchAllGames = async (): Promise<GameData[]> => {
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 300));
   let datas = await fetchAllChallenges()
 
   // Filter to only coin-flip games for consistency

@@ -1,0 +1,86 @@
+import { useState, useEffect, SetStateAction } from 'react'
+import { Asset, assets } from '../utils/constants'
+import { useSocket } from "../context/SocketContext";
+import { joinCoinflip } from "../context/solana/transaction";
+import { useWallet, WalletContextState } from "@solana/wallet-adapter-react";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
+
+export default function JoinCoinflipModal(props: {
+    coinId: number,
+    amount: number,
+    creatorAta: string,
+    poolId: number,
+    handleCloseModal: Function
+}) {
+    const [activeAsset, setActiveAsset] = useState(assets[0])
+    const wallet = useWallet();
+    const [isTokenSelectModalOpened, setIsTokenSelectModalOpened] = useState(false);
+    const [isBetLoading, setIsBetLoading] = useState(false);
+    let [winner, setWinner] = useState();
+
+    const handleDeposit = async () => {
+        try {
+            winner = await joinCoinflip(wallet, props.coinId, new PublicKey(activeAsset.address), props.amount, new PublicKey(props.creatorAta), props.poolId, setIsBetLoading)
+            setWinner(winner);
+            console.log('debug->winner', winner);
+            // window.location.reload();
+        } catch (error) {
+            setIsBetLoading(false)
+            console.log(error);
+        }
+    };
+
+    const closeDropdown = (symbol: string) => {
+        setActiveAsset(assets.find(asset => asset.symbol === symbol) as SetStateAction<Asset>)
+        setIsTokenSelectModalOpened(false)
+    }
+    return (
+        <div
+            className="fixed left-0 top-0 w-full h-[100vh] backdrop-blur-sm z-[40] flex-col bg-[#00000050] grid place-content-center"
+        >
+            <div className="flex flex-col m-6 bg-[#10152b] w-[380px] rounded-[5px]">
+                <div className="flex flex-row items-center justify-between py-4 px-6 border-b border-[#ffffff10]">
+                    <span className="text-[12px] text-[#8B8A8D] font-[500]">Join Coinflip</span>
+                    <button onClick={() => props.handleCloseModal()}>
+                        <svg width="12" height="12" viewBox="0 0 7 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0.382578 7L2.67458 3.688L0.502578 0.64H1.99058L3.53858 2.776L5.06258 0.64H6.50258L4.35458 3.64L6.62258 7H5.11058L3.49058 4.528L1.84658 7H0.382578Z" fill="#8B8A8D" />
+                        </svg>
+                    </button>
+                </div>
+                <div className='flex flex-row justify-between border-b border-[#ffffff10] '>
+                    <div className="px-6 py-12 flex flex-col gap-2 w-full">
+                        <div className='relative'>
+                        </div>
+                    </div>
+                </div>
+                {winner ?
+                    winner == wallet.publicKey?.toBase58() ?
+                        <h3 className='class="font-oswald font-medium text-lg leading-[111%] text-white mb-4 mt-4 m-auto'>You are win!</h3> :
+                        <h3 className='class="font-oswald font-medium text-lg leading-[111%] text-white mb-4 mt-4 m-auto'>You are loss!</h3>
+                    :
+                    ''
+                }
+                <div className="flex justify-center p-6 gap-4">
+                    {wallet.publicKey ? (
+                        <button
+                            className="rounded-[2px_8px] py-2 px-4 w-[160px] h-[37px] mb-4 shadow-[0_4px_14px_0_rgba(27,224,136,0.45)] bg-[#1be088] flex items-center justify-center"
+                            onClick={handleDeposit}
+                            disabled={isBetLoading || winner}
+                        >
+                            {isBetLoading ? (
+                                <>Waiting...</>
+                            ) : (
+                                <>Join</>
+                            )}
+                        </button>
+                    ) : (
+                        <div className="bg-[#F7B831] hover:opacity-90 text-[#17161B] text-[12px] font-[500] rounded-[4px]">
+                            <WalletMultiButton />
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    )
+}

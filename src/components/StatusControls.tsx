@@ -8,6 +8,7 @@ import { formatTimeAgo } from "../utils/timeFormatter";
 import { fetchGamesPaginated, hasMoreGames } from "../services/api";
 import { GameData } from "../services/gameData";
 import Footer from "../components/Footer";
+import BeatLoader from 'react-spinners/BeatLoader';
 
 const StatusControls: React.FC = () => {
   const [isOnline, setIsOnline] = useState(false);
@@ -21,6 +22,7 @@ const StatusControls: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFirstLoading, setIsFirstLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
   const sortOptions: DropdownOption[] = [
@@ -93,7 +95,7 @@ const StatusControls: React.FC = () => {
   // Load initial games on component mount
   useEffect(() => {
     const loadInitialGames = async () => {
-      setIsLoading(true);
+      setIsFirstLoading(true);
       try {
         const initialGames = await fetchGamesPaginated(1);
         setGames(initialGames);
@@ -102,7 +104,7 @@ const StatusControls: React.FC = () => {
       } catch (error) {
         console.error("Error loading initial games:", error);
       } finally {
-        setIsLoading(false);
+        setIsFirstLoading(false);
       }
     };
 
@@ -125,10 +127,6 @@ const StatusControls: React.FC = () => {
       );
       setGames(filtered);
     }
-  };
-
-  const formatAddress = (address: string) => {
-    return `${address.slice(0, 2)}...${address.slice(-4)}`;
   };
 
   return (
@@ -196,6 +194,17 @@ const StatusControls: React.FC = () => {
       </div>
 
       {/* Game Cards Grid */}
+      <div className="flex gap-4 my-6 m-auto mt-6 w-max">
+        {isFirstLoading == true &&
+          <BeatLoader
+            color={'#fff'}
+            loading={isFirstLoading}
+            size={30}
+            aria-label="Loading Spinner"
+            data-testid="loader"
+          />
+        }
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-4 my-6">
         {games.map((game) => (
           <GameCard
@@ -209,6 +218,7 @@ const StatusControls: React.FC = () => {
             time={game.time}
             joinerPlayer={game.joinerPlayer}
             creatorAta={game.creatorAta}
+            winner={game.winner}
           />
         ))}
       </div>

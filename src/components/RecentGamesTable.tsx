@@ -79,7 +79,7 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
     const formattedHour = hourNum % 12 || 12;
     return `${formattedHour}:${minutes}:${seconds} ${ampm}`;
   };
-
+  console.log('debug->paginatedGames', paginatedGames)
   return (
     <div className="w-full mt-8">
       {/* Table Title */}
@@ -92,9 +92,8 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
         <span className="font-inter font-normal text-[12px] leading-[167%] text-[#324158]">Sort by:</span>
         <button
           onClick={handleDateSortToggle}
-          className={`flex items-center gap-1 px-3 py-1 rounded-md border ${
-            sortBy === 'date' ? 'border-[#90A2B9]' : 'border-[#324158]'
-          }`}
+          className={`flex items-center gap-1 px-3 py-1 rounded-md border ${sortBy === 'date' ? 'border-[#90A2B9]' : 'border-[#324158]'
+            }`}
         >
           <span className="font-inter font-normal text-[12px] leading-[167%] text-white">Date</span>
           <img
@@ -106,9 +105,8 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
         </button>
         <button
           onClick={handleStakeSortToggle}
-          className={`flex items-center gap-1 px-3 py-1 rounded-md border ${
-            sortBy === 'stake' ? 'border-[#90A2B9]' : 'border-[#324158]'
-          }`}
+          className={`flex items-center gap-1 px-3 py-1 rounded-md border ${sortBy === 'stake' ? 'border-[#90A2B9]' : 'border-[#324158]'
+            }`}
         >
           <span className="font-inter font-normal text-[12px] leading-[167%] text-white">Stake</span>
           <img
@@ -149,7 +147,7 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
               style={{ transform: sortBy === 'date' && sortAscending ? 'rotate(0deg)' : sortBy === 'date' ? 'rotate(180deg)' : 'rotate(0deg)', opacity: sortBy === 'date' ? 1 : 0.5 }}
             />
           </div>
-  
+
           {/* Challenge Header Cell */}
           <div
             className="flex items-center flex-grow"
@@ -164,22 +162,22 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
           >
             <span className="font-inter font-bold text-[16px] leading-[100%] text-white">Challenge</span>
           </div>
-  
+
           {/* Stake Header Cell */}
-         <div
-           className="flex items-center flex-shrink-0 cursor-pointer"
-           style={{
-             borderBottom: '1px solid #324158',
-             borderTop: '1px solid #324158',
-             borderLeft: '1px solid #324158',
-             paddingBlock: '4px',
-             paddingInline: '16px',
-             width: '140px',
-             height: '48px',
-             background: 'transparent'
-           }}
-           onClick={handleStakeSortToggle}
-         >
+          <div
+            className="flex items-center flex-shrink-0 cursor-pointer"
+            style={{
+              borderBottom: '1px solid #324158',
+              borderTop: '1px solid #324158',
+              borderLeft: '1px solid #324158',
+              paddingBlock: '4px',
+              paddingInline: '16px',
+              width: '140px',
+              height: '48px',
+              background: 'transparent'
+            }}
+            onClick={handleStakeSortToggle}
+          >
             <span className="font-inter font-bold text-[16px] leading-[100%] text-white mr-auto">Stake</span>
             <img
               src="/image/sort.svg"
@@ -188,23 +186,23 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
               style={{ transform: sortBy === 'stake' && sortAscending ? 'rotate(0deg)' : sortBy === 'stake' ? 'rotate(180deg)' : 'rotate(0deg)', opacity: sortBy === 'stake' ? 1 : 0.5 }}
             />
           </div>
-  
+
           {/* Result Header Cell */}
-         <div
-           className="flex items-center flex-shrink-0"
-           style={{
-             borderBottom: '1px solid #324158',
-             borderRight: '1px solid #324158',
-             borderTop: '1px solid #324158',
-             borderLeft: '1px solid #324158',
-             borderRadius: '0 10px 0 0',
-             paddingBlock: '4px',
-             paddingInline: '16px',
-             width: '140px',
-             height: '48px',
-             background: 'transparent'
-           }}
-         >
+          <div
+            className="flex items-center flex-shrink-0"
+            style={{
+              borderBottom: '1px solid #324158',
+              borderRight: '1px solid #324158',
+              borderTop: '1px solid #324158',
+              borderLeft: '1px solid #324158',
+              borderRadius: '0 10px 0 0',
+              paddingBlock: '4px',
+              paddingInline: '16px',
+              width: '140px',
+              height: '48px',
+              background: 'transparent'
+            }}
+          >
             <span className="font-inter font-bold text-[16px] leading-[100%] text-white">Result</span>
           </div>
         </div>
@@ -253,13 +251,22 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
                 background: 'transparent'
               }}
             >
-              <span className="font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap">
-                {formatAddress(game.gameName)} <span className="text-[#545454]">Vs</span> {formatAddress('Opponent1234')}
+              <span className={(game.winner == game.gameName && game.winner != "11111111111111111111111111111111") ? "font-inter italic font-medium text-[14px] leading-[133%] text-[#f9c752]" : "font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap"}>
+                {formatAddress(game.gameName)}
+              </span>
+              <span className="text-[#545454]">&nbsp;Vs&nbsp;</span>
+              <span className={(game.winner == game.joinerPlayer && game.winner != "11111111111111111111111111111111") ? "font-inter italic font-medium text-[14px] leading-[133%] text-[#f9c752]" : "font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap"}>
+                {
+                  game.joinerPlayer != "11111111111111111111111111111111"
+                    ?
+                    formatAddress(game.joinerPlayer)
+                    : "Not joined"
+                }
               </span>
             </div>
 
             {/* Stake Cell */}
-            <div
+            < div
               className="flex items-center flex-shrink-0"
               style={{
                 borderBottom: '1px solid #324158',
@@ -313,7 +320,8 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
               </div>
             </div>
           </div>
-        ))}
+        ))
+        }
 
         {/* Pagination Footer */}
         <div
@@ -336,11 +344,11 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
           >
             <img src="/image/table-left-arrow.svg" alt="Previous" className="w-4 h-4" />
           </button>
-          
+
           <span className="font-inter font-medium text-[12px] leading-[133%] text-[#929294]">
             {startIndex + 1}-{Math.min(startIndex + itemsPerPage, totalGames)} of {totalGames}
           </span>
-          
+
           <button
             onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
             disabled={currentPage === totalPages}
@@ -349,64 +357,66 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
             <img src="/image/table-right-arrow.svg" alt="Next" className="w-4 h-4" />
           </button>
         </div>
-      </div>
+      </div >
 
       {/* Mobile Card View */}
-      <div className="sm:hidden space-y-2">
-        {paginatedGames.map((game, index) => (
-          <div
-            key={game.id}
-            className="p-4"
-            style={{
-              background: index % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.05)'
-            }}
-          >
-            {/* Date and Time */}
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <img src="/image/clock.svg" alt="Clock" className="w-4 h-4" />
+      < div className="sm:hidden space-y-2" >
+        {
+          paginatedGames.map((game, index) => (
+            <div
+              key={game.id}
+              className="p-4"
+              style={{
+                background: index % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.05)'
+              }}
+            >
+              {/* Date and Time */}
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <img src="/image/clock.svg" alt="Clock" className="w-4 h-4" />
+                  <span className="font-inter font-normal text-[14px] leading-[114%] text-white">
+                    {game.date} {formatTime(game.time)}
+                  </span>
+                </div>
+                <div
+                  className="flex items-center justify-center"
+                  style={{
+                    border: '1px solid',
+                    borderColor: typeof game.pickValue === 'string' && game.pickValue.includes('HEAD') ? '#d45bf8' : '#117af7',
+                    borderRadius: '30px',
+                    paddingBlock: '5px',
+                    paddingInline: '10px',
+                    width: '56px',
+                    height: '26px',
+                    background: typeof game.pickValue === 'string' && game.pickValue.includes('HEAD') ? '#231829' : '#0f1c29'
+                  }}
+                >
+                  <span className="font-inter font-normal text-[14px] leading-[114%]">
+                    {typeof game.pickValue === 'string' && game.pickValue.includes('HEAD') ? (
+                      <span className="text-[#d45bf8]">Head</span>
+                    ) : (
+                      <span className="text-[#117af7]">Tail</span>
+                    )}
+                  </span>
+                </div>
+              </div>
+
+              {/* Challenge */}
+              <div className="mb-3">
                 <span className="font-inter font-normal text-[14px] leading-[114%] text-white">
-                  {game.date} {formatTime(game.time)}
+                  {formatAddress(game.gameName)} <span className="text-[#545454]">Vs</span> {formatAddress('Opponent1234')}
                 </span>
               </div>
-              <div
-                className="flex items-center justify-center"
-                style={{
-                  border: '1px solid',
-                  borderColor: typeof game.pickValue === 'string' && game.pickValue.includes('HEAD') ? '#d45bf8' : '#117af7',
-                  borderRadius: '30px',
-                  paddingBlock: '5px',
-                  paddingInline: '10px',
-                  width: '56px',
-                  height: '26px',
-                  background: typeof game.pickValue === 'string' && game.pickValue.includes('HEAD') ? '#231829' : '#0f1c29'
-                }}
-              >
-                <span className="font-inter font-normal text-[14px] leading-[114%]">
-                  {typeof game.pickValue === 'string' && game.pickValue.includes('HEAD') ? (
-                    <span className="text-[#d45bf8]">Head</span>
-                  ) : (
-                    <span className="text-[#117af7]">Tail</span>
-                  )}
+
+              {/* Stake */}
+              <div className="flex items-center justify-between">
+                <span className="font-inter font-bold text-[14px] leading-[114%] text-[#f9c752] whitespace-nowrap">
+                  {game.stakeAmount}
                 </span>
               </div>
             </div>
-
-            {/* Challenge */}
-            <div className="mb-3">
-              <span className="font-inter font-normal text-[14px] leading-[114%] text-white">
-                {formatAddress(game.gameName)} <span className="text-[#545454]">Vs</span> {formatAddress('Opponent1234')}
-              </span>
-            </div>
-
-            {/* Stake */}
-            <div className="flex items-center justify-between">
-              <span className="font-inter font-bold text-[14px] leading-[114%] text-[#f9c752] whitespace-nowrap">
-                {game.stakeAmount}
-              </span>
-            </div>
-          </div>
-        ))}
+          ))
+        }
 
         {/* Mobile Pagination */}
         <div className="flex items-center justify-between mt-4">
@@ -418,11 +428,11 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
             <img src="/image/table-left-arrow.svg" alt="Previous" className="w-4 h-4" />
             <span className="font-inter font-normal text-[12px]">Previous</span>
           </button>
-          
+
           <span className="font-inter font-medium text-[12px] text-[#929294]">
             Page {currentPage} of {totalPages}
           </span>
-          
+
           <button
             onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
             disabled={currentPage === totalPages}
@@ -432,8 +442,8 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
             <img src="/image/table-right-arrow.svg" alt="Next" className="w-4 h-4" />
           </button>
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 

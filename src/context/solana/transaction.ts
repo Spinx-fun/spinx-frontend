@@ -46,152 +46,6 @@ import { errorAlert, successAlert } from "../../components/ToastGroup";
 
 export const solConnection = new web3.Connection(RPC_URL);
 
-export const playGame = async (
-  wallet: WalletContextState,
-  mint: PublicKey,
-  amount: number,
-  referrer: PublicKey | null,
-  setLoading: Function,
-) => {
-  if (wallet.publicKey === null) return;
-
-  let programId = new anchor.web3.PublicKey(COINFLIP_PROGRAM_ID);
-
-  const cloneWindow: any = window;
-  const userAddress = wallet.publicKey;
-  const provider = new anchor.AnchorProvider(
-    solConnection,
-    cloneWindow["solana"],
-    anchor.AnchorProvider.defaultOptions()
-  );
-  const program = new anchor.Program(
-    IDL as unknown as anchor.Idl,
-    provider
-  );
-  try {
-    setLoading(true);
-    const tx = await createPlayGameTx(userAddress, mint, amount, referrer, program);
-    const { blockhash } = await solConnection.getLatestBlockhash();
-    tx.feePayer = userAddress;
-    tx.recentBlockhash = blockhash;
-    if (wallet.signTransaction) {
-      // check if creating room conflicts
-      try {
-        await axios.post(`${API_URL}requestCreate/`);
-      } catch (e) {
-        console.error(" --> playGame: Failed due to creating conflict");
-        errorAlert("Something went wrong. Please try again!");
-        setLoading(false);
-        return;
-      }
-
-      const signedTx = await wallet.signTransaction(tx);
-      const encodedTx = Buffer.from(signedTx.serialize()).toString("base64");
-      const txId = await provider.connection.sendRawTransaction(
-        signedTx.serialize(),
-        {
-          skipPreflight: true,
-          maxRetries: 3,
-          preflightCommitment: "confirmed",
-        }
-      );
-      await solConnection.confirmTransaction(txId, "confirmed");
-      await axios.post(`${API_URL}createGame/`, {
-        txId: txId,
-        encodedTx: encodedTx
-      });
-
-      console.log("Signature:", encodedTx);
-      // release mutex for processing request if success
-      await axios.post(`${API_URL}endRequest/`);
-      setLoading(false);
-      successAlert('Bet successfully!');
-    }
-  } catch (error) {
-    console.log(" --> playGame:", error);
-    errorAlert("Something went wrong. Please try again!");
-    // release mutex for processing request if failed
-    await axios.post(`${API_URL}endRequest/`);
-    setLoading(false);
-  }
-};
-
-export const enterGame = async (
-  wallet: WalletContextState,
-  mint: PublicKey,
-  pda: PublicKey,
-  amount: number,
-  referrer: PublicKey | null,
-  setLoading: Function,
-  endTimestamp: number
-) => {
-  if (wallet.publicKey === null) return;
-
-  /// Comment this because backend is processed such conflict
-  // console.log(endTimestamp - now, "(endTimestamp - now)", endTimestamp);
-
-  let programId = new anchor.web3.PublicKey(COINFLIP_PROGRAM_ID);
-
-  const cloneWindow: any = window;
-  const userAddress = wallet.publicKey;
-  const provider = new anchor.AnchorProvider(
-    solConnection,
-    cloneWindow["solana"],
-    anchor.AnchorProvider.defaultOptions()
-  );
-  const program = new anchor.Program(
-    IDL as unknown as anchor.Idl,
-    provider
-  );
-  try {
-    setLoading(true);
-    const tx = await createEnterGameTx(userAddress, mint, pda, amount, referrer, program);
-    const { blockhash } = await solConnection.getLatestBlockhash();
-    tx.feePayer = userAddress;
-    tx.recentBlockhash = blockhash;
-    if (wallet.signTransaction) {
-      // check if creating room conflicts
-      try {
-        await axios.post(`${API_URL}requestEnter/`);
-      } catch (e) {
-        console.error(
-          " --> enterGame: Failed due to entering and setting winner conflict"
-        );
-        errorAlert("Something went wrong. Please try again!");
-        setLoading(false);
-        return;
-      }
-      const signedTx = await wallet.signTransaction(tx);
-      const encodedTx = Buffer.from(signedTx.serialize()).toString("base64");
-      const txId = await provider.connection.sendRawTransaction(
-        signedTx.serialize(),
-        {
-          skipPreflight: true,
-          maxRetries: 3,
-          preflightCommitment: "confirmed",
-        }
-      );
-      await solConnection.confirmTransaction(txId, "confirmed");
-      await axios.post(`${API_URL}enterGame/`, {
-        txId: txId,
-        encodedTx: encodedTx
-      });
-      console.log("Signature:", txId);
-      // release mutex for processing request if success
-      await axios.post(`${API_URL}endEnterRequest/`);
-      setLoading(false);
-    }
-    setLoading(false);
-    successAlert('Bet successfully!');
-  } catch (error) {
-    console.error(" --> enterGame:", error);
-    errorAlert("Something went wrong. Please try again!");
-    // release mutex for processing request if failed
-    await axios.post(`${API_URL}endEnterRequest/`);
-    setLoading(false);
-  }
-};
-
 export const getPriceFeed = (mint: PublicKey) => {
   switch (mint.toBase58()) {
     case "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN":
@@ -807,17 +661,21 @@ export const joinCoinflip = async (
         }
       );
       await solConnection.confirmTransaction(txId, "confirmed");
-      // await axios.post(`${API_URL}joinCoinflip/`, {
-      //   txId: txId,
-      //   encodedTx: encodedTx,
-      //   player: wallet.publicKey.toBase58(),
-      //   number: setNumber,
-      //   mint: mint.toBase58(),
-      //   amount: amount
-      // });
+      console.log('debug->txId', txId)
+      let winner;
+      setTimeout(async () => {
+        const response = await axios.post(`${API_URL}result-game/`, {
+          poolId: poolId,
+        })
+        if (response.status === 200) {
+          winner = response.data.winner;
+        }
+      }, 2000);
+
       console.log("Signature:", txId);
       setLoading(false);
       successAlert('Bet successfully!');
+      return winner;
     }
   } catch (error) {
     console.log(" --> joinCoinflip:", error);
@@ -936,7 +794,7 @@ export const claimCoinflip = async (
     tx.recentBlockhash = blockhash;
     if (wallet.signTransaction) {
       const signedTx = await wallet.signTransaction(tx);
-      const encodedTx = Buffer.from(signedTx.serialize()).toString("base64");
+      // const encodedTx = Buffer.from(signedTx.serialize()).toString("base64");
       const txId = await provider.connection.sendRawTransaction(
         signedTx.serialize(),
         {
@@ -946,10 +804,10 @@ export const claimCoinflip = async (
         }
       );
       await solConnection.confirmTransaction(txId, "confirmed");
-      await axios.post(`${API_URL}coinflip/`, {
-        txId: txId,
-        encodedTx: encodedTx
-      });
+      // await axios.post(`${API_URL}coinflip/`, {
+      //   txId: txId,
+      //   encodedTx: encodedTx
+      // });
       console.log("Signature:", txId);
       setLoading(false);
       successAlert('Claimed successfully!')
@@ -1095,7 +953,7 @@ const getGlobalStateByKey = async (
       continue;
     }
   }
-  console.log('debug->globalAccounts', Number(globalAccounts[0].account.nextPoolId), )
+  console.log('debug->globalAccounts', Number(globalAccounts[0].account.nextPoolId),)
   let globalDataAccount = globalAccounts[0].account.nextPoolId
   return globalDataAccount as GlobalData;
 };
@@ -1140,6 +998,7 @@ export const getAllChallenges = async (
       continue;
     }
   }
+  console.log('debug->coinflipAccounts', coinflipAccounts)
   return coinflipAccounts as unknown as PoolData;
 };
 

@@ -12,8 +12,20 @@ export interface GameData {
   time: string;
   joinerPlayer: string;
   creatorAta: string;
+  winner: string;
 }
 
+// Player History interface
+export interface PlayerHistory {
+  [x: string]: any;
+  id: number;
+  date: string;
+  time: string;
+  game: string;
+  challenge: any;
+  stakeAmount: number;
+  result: string;
+}
 
 // Simulate API call to fetch games with pagination
 export const fetchGames = async (page: number, pageSize: number = 6): Promise<GameData[]> => {
@@ -66,16 +78,7 @@ export const sampleActiveChallenges: ActiveChallenge[] = [
   },
 ];
 
-// Player History interface
-export interface PlayerHistory {
-  id: number;
-  date: string;
-  time: string;
-  game: 'Coin Flip' | 'Slot Machine';
-  challenge: string;
-  stakeAmount: number;
-  result: 'Win' | 'Loss';
-}
+
 
 // Sample player history data
 export const samplePlayerHistory: PlayerHistory[] = [
@@ -432,7 +435,7 @@ export const fetchAllChallenges = async (): Promise<GameData[]> => {
     for (let i = 0; i < (datas as any).length; i++) {
       let accountData = (datas as any)[i].account
       let pickValues;
-      if (Number(accountData.creatorSetNumber) == 1) {
+      if (Number(accountData.creatorSetNumber) == 0) {
         pickValues = "HEADS"
       } else {
         pickValues = "TAILS"
@@ -441,7 +444,7 @@ export const fetchAllChallenges = async (): Promise<GameData[]> => {
       let date = new Date(timestamp);
       let formattedDate = ''
       let formattedTimes = ''
-      if(date){
+      if (date) {
         formattedDate = format(date, 'yyyy-MM-dd')
         formattedTimes = format(date, 'hh:mm:ss')
       }
@@ -454,7 +457,8 @@ export const fetchAllChallenges = async (): Promise<GameData[]> => {
         date: formattedDate,
         time: formattedTimes,
         joinerPlayer: accountData.joinerPlayer.toBase58(),
-        creatorAta: accountData.creatorAta.toBase58()
+        creatorAta: accountData.creatorAta.toBase58(),
+        winner: accountData.winner.toBase58()
       }
       newDatas.push(gameData)
     }
