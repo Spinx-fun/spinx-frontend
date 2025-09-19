@@ -1,5 +1,5 @@
 export type SpinX = {
-    "address": "GjbMbmaKX8jB5TrH91AZ6xZwFPeq7fgPkZVDhjGcBUdd",
+    "address": "51vHCxjNc4Dd3jXqvZb6PZ3XugjqJjtBVCHnEFHFU3vc",
     "metadata": {
         "name": "spinx",
         "version": "0.1.0",
@@ -1817,7 +1817,7 @@ export type SpinX = {
 };
 
 export const IDL: SpinX = {
-    "address": "GjbMbmaKX8jB5TrH91AZ6xZwFPeq7fgPkZVDhjGcBUdd",
+    "address": "51vHCxjNc4Dd3jXqvZb6PZ3XugjqJjtBVCHnEFHFU3vc",
     "metadata": {
         "name": "spinx",
         "version": "0.1.0",

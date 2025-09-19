@@ -249,14 +249,14 @@ export default function CreateChallenge() {
       setError("");
       let coinId;
       if (selectedCoin == "head") {
-        coinId = 1;
+        coinId = 0;
       } else {
-        coinId = 2;
+        coinId = 1;
       }
       // Handle challenge creation logic here
       let amount;
       let betAmount = Number(stakeAmount);
-      amount = betAmount * 10 ** 9;
+      amount = betAmount * 10 ** (activeAsset.decimals ?? 9);
       await createCoinflip(wallet, coinId, new PublicKey(activeAsset.address), amount, setIsLoading)
       setIsLoading(false);
     } catch (error) {

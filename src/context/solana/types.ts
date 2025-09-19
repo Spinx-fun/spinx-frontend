@@ -7,10 +7,10 @@ export const GAME_SEED = "game-authority";
 export const COINFLIP_SEED = "coinflip-authority";
 export const SPL_ESCROW_SEED = "spl-escrow";
 export const REFERRAL_SEED = "referral";
-export const RANDOM_SEED = "random";
+export const RANDOM_SEED = "random-seed";
 
 export const COINFLIP_PROGRAM_ID = new PublicKey(
-  "GjbMbmaKX8jB5TrH91AZ6xZwFPeq7fgPkZVDhjGcBUdd"
+  "51vHCxjNc4Dd3jXqvZb6PZ3XugjqJjtBVCHnEFHFU3vc"
 );
 
 export const FEE_WALLET = new PublicKey(

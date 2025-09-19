@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import JoinCoinflipModal from "../components/JoinCoinflipModal";
 import { useWallet } from '@solana/wallet-adapter-react';
 import { joinCoinflip } from "../context/solana/transaction";
 import { PublicKey } from '@solana/web3.js';
@@ -29,13 +28,10 @@ const GameCard: React.FC<GameCardProps> = ({
   joinerPlayer,
   creatorAta
 }) => {
-  const [isOpenJoinModal, setIsOpenJoinModal] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
   const wallet = useWallet();
-  const handleCloseJoinModal = () => {
-    setIsOpenJoinModal(false);
-  };
   console.log('debug->stakeAmount', stakeAmount)
   const handleJoin = async () => {
     try {
@@ -43,9 +39,9 @@ const GameCard: React.FC<GameCardProps> = ({
       const activeAsset = assets[0];
       let coinId;
       if (pickValue == "HEADS") {
-        coinId = 2;
-      } else {
         coinId = 1;
+      } else {
+        coinId = 0;
       }
       if (wallet.publicKey?.toBase58() == gameName) {
         errorAlert("You are creator of this pool already");
@@ -54,6 +50,7 @@ const GameCard: React.FC<GameCardProps> = ({
       let amount;
       let betAmount = Number(stakeAmount);
       amount = betAmount * 10 ** (activeAsset.decimals ?? 9);
+      console.log('debug->amount', amount)
       await joinCoinflip(wallet, coinId, new PublicKey(activeAsset.address), amount, new PublicKey(creatorAta), poolId, setIsLoading)
       setIsLoading(false);
     } catch (error) {
@@ -158,7 +155,6 @@ const GameCard: React.FC<GameCardProps> = ({
           </div>
         </div>
       </div>
-      {isOpenJoinModal && <JoinCoinflipModal referralCode={""} pda={""} poolAmount={0} setNumber={0} handleCloseModal={handleCloseJoinModal} />}
     </>
   );
 };

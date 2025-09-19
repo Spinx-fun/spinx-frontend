@@ -439,8 +439,12 @@ export const fetchAllChallenges = async (): Promise<GameData[]> => {
       }
       let timestamp = Number(accountData.startTs) * 1000;
       let date = new Date(timestamp);
-      const formattedDate = format(date, 'yyyy-MM-dd')
-      const formattedTimes = format(date, 'hh:mm:ss')
+      let formattedDate = ''
+      let formattedTimes = ''
+      if(date){
+        formattedDate = format(date, 'yyyy-MM-dd')
+        formattedTimes = format(date, 'hh:mm:ss')
+      }
       const gameData = {
         id: Number(accountData.poolId),
         gameType: 'coin-flip',

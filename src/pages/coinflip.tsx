@@ -14,7 +14,6 @@ import {
 import { useRouter } from "next/router";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import CreateCoinflipModal from "../components/CreateCoinflipModal";
-import JoinCoinflipModal from "../components/JoinCoinflipModal";
 import CoinflipModal from "../components/CoinflipModal";
 import { claimCoinflip } from "../context/solana/transaction";
 import { useSocket } from "../context/SocketContext";
@@ -163,7 +162,7 @@ export default function Rooms() {
         
         {/* Main Content */}
         <div
-          className={`flex flex-row justify-end gap-2 xl:gap-6 px-3 lg:px-12 pb-12 pt-6 bg-cover bg-no-repeat flex-1 flex-wrap bg-[#0a101e] lg:ml-[248px]`}
+          className={`flex flex-row justify-end gap-2 xl:gap-6 px-3 lg:px-12 pb-12 pt-6 bg-cover bg-no-repeat flex-1 flex-wrap bg-[#0a101e] lg:ml-[248px] min-h-screen`}
         >
 
         <div className="overflow-y-auto grow mx-auto">
@@ -360,7 +359,7 @@ export default function Rooms() {
       </div>
     </div>
       {isOpen && <CreateCoinflipModal referralCode={referralCode} handleCloseModal={handleCloseModal} />}
-      {isOpenJoinModal && <JoinCoinflipModal referralCode={referralCode} pda={selectedPda} poolAmount={selectedPoolAmount} setNumber={selectedSetNumber} handleCloseModal={handleCloseJoinModal} />}
+      
       {isOpenRoundModal && <CoinflipModal game={selectedGame} isDrawing={isDrawing} setIsDrawing={setIsDrawing} handleCloseModal={handleCloseRoundModal} handleOpenJoinModal={handleOpenJoinModal} />}
     </>
   );

@@ -66,7 +66,6 @@ export const playGame = async (
   );
   const program = new anchor.Program(
     IDL as unknown as anchor.Idl,
-    programId,
     provider
   );
   try {
@@ -142,7 +141,6 @@ export const enterGame = async (
   );
   const program = new anchor.Program(
     IDL as unknown as anchor.Idl,
-    programId,
     provider
   );
   try {
@@ -626,47 +624,6 @@ async function getPriorityFeeEstimate(transaction: any) {
   return data.result;
 }
 
-export const getCoinflipAccounts = async () => {
-  type CoinflipDataRaw = anchor.IdlAccounts<SpinX>['CoinflipPool'];
-  let accounts: anchor.ProgramAccount<CoinflipDataRaw>[] = []
-  let programId = new anchor.web3.PublicKey(COINFLIP_PROGRAM_ID);
-
-  const cloneWindow: any = window;
-  const provider = new anchor.AnchorProvider(
-    solConnection,
-    cloneWindow["solana"],
-    anchor.AnchorProvider.defaultOptions()
-  );
-  const program = new anchor.Program(
-    IDL as unknown as anchor.Idl,
-    programId,
-    provider
-  );
-  try {
-    const result = await provider.connection.getProgramAccounts(programId);
-    const coinflipDiscriminator = anchor.BorshAccountsCoder.accountDiscriminator('CoinflipPool');
-    result.forEach(({ pubkey, account }) => {
-      const discriminator = account.data.slice(0, 8);
-
-      if (coinflipDiscriminator.compare(discriminator) === 0) {
-
-        accounts.push({
-          publicKey: pubkey,
-          account: program.coder.accounts.decode<CoinflipDataRaw>(
-            'CoinflipPool',
-            account.data
-          ),
-        });
-      }
-    });
-    return accounts;
-  } catch (error) {
-    console.log(error);
-    return accounts;
-  }
-
-}
-
 export const createCoinflip = async (
   wallet: WalletContextState,
   setNumber: number,
@@ -689,6 +646,7 @@ export const createCoinflip = async (
   );
   try {
     setLoading(true);
+    console.log('debug->amount', amount)
     const tx = await createCoinflipTx(userAddress, setNumber, mint, amount, program);
     const { blockhash } = await solConnection.getLatestBlockhash();
     tx.feePayer = userAddress;
@@ -743,7 +701,7 @@ export const createCoinflipTx = async (
     program.programId
   );
   const globalState = await getGlobalStateByKey(program);
-  let pool_id = new anchor.BN(globalState.nextPoolId.toNumber());
+  let pool_id = new anchor.BN(Number(globalState));
   const [coinflipPool] = await PublicKey.findProgramAddress(
     [
       Buffer.from(COINFLIP_SEED),
@@ -754,7 +712,7 @@ export const createCoinflipTx = async (
 
   let tokenAccount, splEscrow
 
-  tokenAccount = await associatedAddress({ mint, owner: userAddress });
+  tokenAccount = await getAssociatedTokenAddress(mint, userAddress);
 
   splEscrow = await getAssociatedTokenAddress(
     mint,
@@ -772,6 +730,8 @@ export const createCoinflipTx = async (
     splEscrow.toBase58(),
     getPriceFeed(mint).toBase58(),
   );
+
+  console.log('debug->test', new anchor.BN(amount), amount)
 
   const tx = new Transaction();
   const computePriceIx = ComputeBudgetProgram.setComputeUnitPrice({
@@ -897,7 +857,7 @@ export const joinCoinflipTx = async (
   );
 
   let tokenAccount, splEscrow
-  tokenAccount = await associatedAddress({ mint, owner: userAddress });
+  tokenAccount = await getAssociatedTokenAddress(mint, userAddress);
   splEscrow = await getAssociatedTokenAddress(
     mint,
     coinflipPool,
@@ -912,12 +872,11 @@ export const joinCoinflipTx = async (
   const vrf = new Orao(provider);
   let force = Keypair.generate().publicKey;
   const random = randomnessAccountAddress(force.toBuffer(), vrf.programId);
-  console.log('debug->', poolId, setNumber, amount, userAddress.toBase58(), globalData.toBase58(), tokenAccount.toBase58(), mint.toBase58()
-    , coinflipPool.toBase58(), creatorAta.toBase58(), solVault.toBase58(), splEscrow.toBase58())
   tx.add(computePriceIx);
   tx.add(
     program.instruction.joinCoinflip(
       new anchor.BN(poolId),
+      [...force.toBuffer()],
       new anchor.BN(setNumber),
       new anchor.BN(amount),
       {
@@ -967,7 +926,6 @@ export const claimCoinflip = async (
   );
   const program = new anchor.Program(
     IDL as anchor.Idl,
-    programId,
     provider
   );
   try {
@@ -1028,30 +986,20 @@ export const claimCoinflipTx = async (
     program.programId
   );
 
-  const referralState = await getReferralStateByKey(referralData, program);
-  const players = referralState.players;
-  const referrers = referralState.referrers;
 
-  let j = 0;
-  for (let i = 0; i < players.length; i++) {
-    if (players[i].toBase58() === userAddress.toBase58()) {
-      j = i;
-      break;
-    }
-  }
 
   let winnerSplA, winnerSplB, splEscrowA, splEscrowB, referrerSplA, referrerSplB
 
   if (mintA.toBase58() === SOL.toBase58()) {
     winnerSplA = await associatedAddress({ mint: JUP, owner: userAddress });
-    referrerSplA = await associatedAddress({ mint: JUP, owner: referrers[j] });
+
     [splEscrowA] = await PublicKey.findProgramAddress(
       [Buffer.from(SPL_ESCROW_SEED), JUP.toBuffer()],
       program.programId
     );
   } else {
     winnerSplA = await associatedAddress({ mint: mintA, owner: userAddress });
-    referrerSplA = await associatedAddress({ mint: mintA, owner: referrers[j] });
+
     [splEscrowA] = await PublicKey.findProgramAddress(
       [Buffer.from(SPL_ESCROW_SEED), mintA.toBuffer()],
       program.programId
@@ -1060,14 +1008,12 @@ export const claimCoinflipTx = async (
 
   if (mintB.toBase58() === SOL.toBase58()) {
     winnerSplB = await associatedAddress({ mint: JUP, owner: userAddress });
-    referrerSplB = await associatedAddress({ mint: JUP, owner: referrers[j] });
     [splEscrowB] = await PublicKey.findProgramAddress(
       [Buffer.from(SPL_ESCROW_SEED), JUP.toBuffer()],
       program.programId
     );
   } else {
     winnerSplB = await associatedAddress({ mint: mintB, owner: userAddress });
-    referrerSplB = await associatedAddress({ mint: mintB, owner: referrers[j] });
     [splEscrowB] = await PublicKey.findProgramAddress(
       [Buffer.from(SPL_ESCROW_SEED), mintB.toBuffer()],
       program.programId
@@ -1080,95 +1026,37 @@ export const claimCoinflipTx = async (
   });
   tx.add(computePriceIx);
 
-  const tokenAAccount = await associatedAddress({ mint: JUP, owner: referrers[j] });
-  const tokenBAccount = await associatedAddress({ mint: USDC, owner: referrers[j] });
-  const tokenCAccount = await associatedAddress({ mint: WIF, owner: referrers[j] });
-  const tokenDAccount = await associatedAddress({ mint: JTO, owner: referrers[j] });
 
-  const accountAInfo = await program.provider.connection.getAccountInfo(tokenAAccount, "confirmed");
-  const accountBInfo = await program.provider.connection.getAccountInfo(tokenBAccount, "confirmed");
-  const accountCInfo = await program.provider.connection.getAccountInfo(tokenCAccount, "confirmed");
-  const accountDInfo = await program.provider.connection.getAccountInfo(tokenDAccount, "confirmed");
-  if (!accountAInfo) {
-    // create the token account if it doesn't exist
-    tx.add(
-      createAssociatedTokenAccountInstruction(
-        userAddress,
-        tokenAAccount,
-        referrers[j],
-        JUP
-      )
-    )
-  }
-  if (!accountBInfo) {
-    // create the token account if it doesn't exist
-    tx.add(
-      createAssociatedTokenAccountInstruction(
-        userAddress,
-        tokenBAccount,
-        referrers[j],
-        USDC
-      )
-    )
-  }
-  if (!accountCInfo) {
-    // create the token account if it doesn't exist
-    tx.add(
-      createAssociatedTokenAccountInstruction(
-        userAddress,
-        tokenCAccount,
-        referrers[j],
-        WIF
-      )
-    )
-  }
-  if (!accountDInfo) {
-    // create the token account if it doesn't exist
-    tx.add(
-      createAssociatedTokenAccountInstruction(
-        userAddress,
-        tokenDAccount,
-        referrers[j],
-        JTO
-      )
-    )
-  }
-
-  tx.add(
-    program.instruction.claimCoinflip(
-      bump,
-      {
-        accounts: {
-          admin: userAddress,
-          globalData,
-          coinflipPool: pda,
-          mintA,
-          mintB,
-          winnerSplA,
-          winnerSplB,
-          referrer: referrers[j],
-          referrerSplA,
-          referrerSplB,
-          solVault,
-          splEscrowA,
-          splEscrowB,
-          referralData,
-          systemProgram: SystemProgram.programId,
-          tokenProgram: TOKEN_PROGRAM_ID
-        },
-        instructions: [],
-        signers: [],
-      }
-    )
-  );
+  // tx.add(
+  //   program.instruction.claimCoinflip(
+  //     bump,
+  //     {
+  //       accounts: {
+  //         admin: userAddress,
+  //         globalData,
+  //         coinflipPool: pda,
+  //         mintA,
+  //         mintB,
+  //         winnerSplA,
+  //         winnerSplB,
+  //         referrer: referrers[j],
+  //         referrerSplA,
+  //         referrerSplB,
+  //         solVault,
+  //         splEscrowA,
+  //         splEscrowB,
+  //         referralData,
+  //         systemProgram: SystemProgram.programId,
+  //         tokenProgram: TOKEN_PROGRAM_ID
+  //       },
+  //       instructions: [],
+  //       signers: [],
+  //     }
+  //   )
+  // );
 
   return tx;
 };
-
-interface ReferralData {
-  players: PublicKey[];
-  referrers: PublicKey[];
-}
 
 
 interface GlobalData {
@@ -1188,28 +1076,29 @@ interface PoolData {
   joinerSetNumber: anchor.BN;
 }
 
-const getReferralStateByKey = async (
-  referralKey: PublicKey,
-  program: anchor.Program
-): Promise<ReferralData> => {
-  const referralState = await program.account.referralData.fetch(referralKey);
-  return referralState as unknown as ReferralData;
-};
 
 const getGlobalStateByKey = async (
   program: anchor.Program
 ): Promise<GlobalData> => {
-  const [globalData] = await PublicKey.findProgramAddress(
-    [
-      Buffer.from(GLOBAL_AUTHORITY_SEED)
-    ],
-    program.programId
-  );
-  let globalDataAccount;
-  globalDataAccount = await program.account.globalData.fetch(globalData);
-  return globalDataAccount as unknown as GlobalData;
+  const allAccounts = await solConnection.getProgramAccounts(program.programId);
+  const globalAccounts = [];
+  const accountsCoder = program.coder.accounts;
+  for (const { pubkey, account } of allAccounts) {
+    try {
+      const decoded = accountsCoder.decode('globalData', account.data);
+      globalAccounts.push({
+        publicKey: pubkey,
+        account: decoded
+      });
+    } catch (error) {
+      // Skip accounts that can't be decoded
+      continue;
+    }
+  }
+  console.log('debug->globalAccounts', Number(globalAccounts[0].account.nextPoolId), )
+  let globalDataAccount = globalAccounts[0].account.nextPoolId
+  return globalDataAccount as GlobalData;
 };
-
 
 export const getAccountTokenBlanace = async (
   tokenAddress: string,
@@ -1219,7 +1108,6 @@ export const getAccountTokenBlanace = async (
   let tokenBalance
   tokenBalance = await solConnection.getParsedTokenAccountsByOwner(new PublicKey(userAddress), { mint: new PublicKey(tokenAddress) }, "processed")
   const balance = tokenBalance.value[0].account.data.parsed.info.tokenAmount.amount / 10 ** (decimals);
-  console.log('debug->tokenBalance', tokenBalance.value[0].account.data.parsed.info.tokenAmount.amount, Number(tokenBalance))
   return balance;
 };
 
