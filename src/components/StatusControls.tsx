@@ -9,6 +9,7 @@ import { fetchGamesPaginated, hasMoreGames } from "../services/api";
 import { GameData } from "../services/gameData";
 import Footer from "../components/Footer";
 import BeatLoader from 'react-spinners/BeatLoader';
+import { parseISO, isAfter, subDays, startOfDay } from "date-fns";
 
 const StatusControls: React.FC = () => {
   const [isOnline, setIsOnline] = useState(false);
@@ -24,6 +25,7 @@ const StatusControls: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isFirstLoading, setIsFirstLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [tokenRange, setTokenRange] = useState({ min: 0, max: 5000 });
 
   const sortOptions: DropdownOption[] = [
     { value: "newest-first", label: "Newest First" },
@@ -66,6 +68,101 @@ const StatusControls: React.FC = () => {
     { value: "all", label: "Token Range" },
   ];
 
+  // Utility function to filter games by time range
+  const filterGamesByTimeRange = (games: GameData[], range: string): GameData[] => {
+    const now = new Date();
+    let cutoffDate: Date;
+
+    switch (range) {
+      case "today":
+        cutoffDate = startOfDay(now);
+        break;
+      case "last-3-days":
+        cutoffDate = subDays(now, 3);
+        break;
+      case "last-7-days":
+        cutoffDate = subDays(now, 7);
+        break;
+      case "last-14-days":
+        cutoffDate = subDays(now, 14);
+        break;
+      case "last-30-days":
+        cutoffDate = subDays(now, 30);
+        break;
+      case "last-6-months":
+        cutoffDate = subDays(now, 180);
+        break;
+      case "all-time":
+        return games; // No filtering needed
+      default:
+        return games;
+    }
+
+    return games.filter(game => {
+      const gameDate = parseISO(game.date);
+      return isAfter(gameDate, cutoffDate);
+    });
+  };
+
+  // Utility function to filter games by token range
+  const filterGamesByTokenRange = (games: GameData[], min: number, max: number): GameData[] => {
+    return games.filter(game =>
+      game.stakeAmount >= min && game.stakeAmount <= max
+    );
+  };
+
+  // Utility function to sort games
+  const sortGames = (games: GameData[], sortBy: string): GameData[] => {
+    const sortedGames = [...games];
+    
+    switch (sortBy) {
+      case "running-longest":
+        // Sort by date (oldest first) to show games that have been running longest
+        return sortedGames.sort((a, b) => {
+          const dateA = parseISO(a.date);
+          const dateB = parseISO(b.date);
+          return dateA.getTime() - dateB.getTime();
+        });
+      case "oldest-first":
+        return sortedGames.sort((a, b) => b.id - a.id);
+      case "newest-first":
+        return sortedGames.sort((a, b) => a.id - b.id);
+      case "highest-tokens":
+        return sortedGames.sort((a, b) => b.stakeAmount - a.stakeAmount);
+      case "lowest-tokens":
+        return sortedGames.sort((a, b) => a.stakeAmount - b.stakeAmount);
+      default:
+        return sortedGames;
+    }
+  };
+
+  // Main filtering and sorting function
+  const applyFiltersAndSorting = (gamesToFilter: GameData[]): GameData[] => {
+    let filteredGames = [...gamesToFilter];
+    
+    // Apply time range filter
+    filteredGames = filterGamesByTimeRange(filteredGames, timeRange);
+    
+    // Apply token range filter
+    filteredGames = filterGamesByTokenRange(filteredGames, tokenRange.min, tokenRange.max);
+    
+    // Apply search filter
+    if (searchQuery) {
+      filteredGames = filteredGames.filter(game =>
+        game.gameName.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    // Apply sorting
+    filteredGames = sortGames(filteredGames, sortBy);
+    
+    return filteredGames;
+  };
+
+  const handleTokenRangeApply = (min: number, max: number) => {
+    setTokenRange({ min, max });
+  };
+
   const handleRefresh = () => {
     setLastUpdated(Math.floor(Date.now() / 1000));
     // Add actual refresh logic here later
@@ -77,11 +174,15 @@ const StatusControls: React.FC = () => {
     try {
       const nextPage = currentPage + 1;
       const newGames = await fetchGamesPaginated(nextPage);
-      const filteredNewGames = newGames.filter((game) =>
-        game.gameName.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setGames((prevGames) => [...prevGames, ...filteredNewGames]);
-      setAllGames((prevGames) => [...prevGames, ...newGames]);
+      
+      // Add new games to allGames
+      const updatedAllGames = [...allGames, ...newGames];
+      setAllGames(updatedAllGames);
+      
+      // Apply filters to the combined games
+      const filteredGames = applyFiltersAndSorting(updatedAllGames);
+      setGames(filteredGames);
+      
       setCurrentPage(nextPage);
       setHasMore(await hasMoreGames(nextPage));
     } catch (error) {
@@ -97,9 +198,8 @@ const StatusControls: React.FC = () => {
       setIsFirstLoading(true);
       try {
         const initialGames = await fetchGamesPaginated(1);
-        setGames(initialGames);
         setAllGames(initialGames);
-        setHasMore(await hasMoreGames(1));
+        // Filters will be applied by the other useEffect
       } catch (error) {
         console.error("Error loading initial games:", error);
       } finally {
@@ -111,22 +211,15 @@ const StatusControls: React.FC = () => {
   }, [lastUpdated]);
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
-
-    if (query === "") {
-      // Reset to original paginated games
-      const loadFilteredGames = async () => {
-        const initialGames = await fetchGamesPaginated(1);
-        setGames(initialGames);
-      };
-      loadFilteredGames();
-    } else {
-      // Filter all loaded games
-      const filtered = allGames.filter((game) =>
-        game.gameName.toLowerCase().includes(query.toLowerCase())
-      );
-      setGames(filtered);
-    }
   };
+
+  // Effect to apply filters when any filter criteria changes
+  useEffect(() => {
+    if (allGames.length > 0) {
+      const filteredGames = applyFiltersAndSorting(allGames);
+      setGames(filteredGames);
+    }
+  }, [sortBy, timeRange, tokenRange, searchQuery, allGames]);
 
   return (
     <div className="w-full">
@@ -175,10 +268,11 @@ const StatusControls: React.FC = () => {
 
           {/* Token Range Dropdown */}
           <TokenRangeDropdown
-            onApply={(min, max) => {
-              console.log("Applying token range filter:", { min, max });
-              // Filter logic will be implemented here
-            }}
+            onApply={handleTokenRangeApply}
+            currentGames={allGames}
+            timeRange={timeRange}
+            sortBy={sortBy}
+            searchQuery={searchQuery}
           />
 
           {/* Time Range Dropdown */}

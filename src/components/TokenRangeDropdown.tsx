@@ -1,18 +1,89 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { fetchMaxStake, fetchTokenRangeData } from '../services/api';
+import { GameData } from '../services/gameData';
+import { parseISO, isAfter, subDays, startOfDay } from 'date-fns';
 
 interface TokenRangeDropdownProps {
   onApply: (min: number, max: number) => void;
+  currentGames: GameData[];
+  timeRange: string;
+  sortBy: string;
+  searchQuery: string;
 }
 
-const TokenRangeDropdown: React.FC<TokenRangeDropdownProps> = ({ onApply }) => {
+const TokenRangeDropdown: React.FC<TokenRangeDropdownProps> = ({
+  onApply,
+  currentGames,
+  timeRange,
+  sortBy,
+  searchQuery
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [minValue, setMinValue] = useState(0);
   const [maxValue, setMaxValue] = useState(5000);
   const [currentMax, setCurrentMax] = useState(5000);
   const [dragging, setDragging] = useState<'min' | 'max' | null>(null);
+  const [challengeCount, setChallengeCount] = useState(0);
   const sliderRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Utility function to filter games by time range
+  const filterGamesByTimeRange = (games: GameData[], range: string): GameData[] => {
+    const now = new Date();
+    let cutoffDate: Date;
+
+    switch (range) {
+      case "today":
+        cutoffDate = startOfDay(now);
+        break;
+      case "last-3-days":
+        cutoffDate = subDays(now, 3);
+        break;
+      case "last-7-days":
+        cutoffDate = subDays(now, 7);
+        break;
+      case "last-14-days":
+        cutoffDate = subDays(now, 14);
+        break;
+      case "last-30-days":
+        cutoffDate = subDays(now, 30);
+        break;
+      case "last-6-months":
+        cutoffDate = subDays(now, 180);
+        break;
+      case "all-time":
+        return games; // No filtering needed
+      default:
+        return games;
+    }
+
+    return games.filter(game => {
+      const gameDate = parseISO(game.date);
+      return isAfter(gameDate, cutoffDate);
+    });
+  };
+
+  // Calculate challenge count based on current filters
+  const calculateChallengeCount = (min: number, max: number): number => {
+    let filteredGames = [...currentGames];
+    
+    // Apply time range filter
+    filteredGames = filterGamesByTimeRange(filteredGames, timeRange);
+    
+    // Apply search filter
+    if (searchQuery) {
+      filteredGames = filteredGames.filter(game =>
+        game.gameName.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    // Apply token range filter
+    filteredGames = filteredGames.filter(game =>
+      game.stakeAmount >= min && game.stakeAmount <= max
+    );
+    
+    return filteredGames.length;
+  };
 
   useEffect(() => {
     const loadMaxStake = async () => {
@@ -27,6 +98,12 @@ const TokenRangeDropdown: React.FC<TokenRangeDropdownProps> = ({ onApply }) => {
 
     loadMaxStake();
   }, []);
+
+  // Update challenge count when filters change
+  useEffect(() => {
+    const count = calculateChallengeCount(minValue, maxValue);
+    setChallengeCount(count);
+  }, [minValue, maxValue, currentGames, timeRange, searchQuery]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -116,7 +193,7 @@ const TokenRangeDropdown: React.FC<TokenRangeDropdownProps> = ({ onApply }) => {
       
       {isOpen && (
         <div className="absolute top-full mt-1 right-0 border border-[#2a2a2a] rounded-[10px] p-[14px] 
-                      shadow-[0_4px_24px_0_rgba(255,255,255,0.06)] bg-[#020617] z-50">
+                      shadow-[0_4px_24px_0_rgba(255,255,255,0.06)] bg-[#020617] z-50 w-[300px]">
           {/* Title */}
           <h3 className="font-oswald font-semibold text-[16px] leading-[120%] text-white mb-1">
             Price range
@@ -215,7 +292,7 @@ const TokenRangeDropdown: React.FC<TokenRangeDropdownProps> = ({ onApply }) => {
                      font-inter font-medium text-[12px] text-[#141414] text-center
                      hover:opacity-90 transition-opacity"
           >
-            See {Math.round((maxValue - minValue) / 100)} challenges
+            See {challengeCount} challenges
           </button>
         </div>
       )}

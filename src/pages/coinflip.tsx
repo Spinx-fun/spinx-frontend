@@ -134,7 +134,7 @@ export default function Rooms() {
                                         className={`${sortOrder === 'asc' ? 'bg-[#F7B831] text-[#0D0C0F]' : 'bg-[#17161B] text-white'} hover:opacity-90 rounded-[4px] px-[8px] md:px-[35px] py-[8px] h-[31px] md:h-[42px] text-[8px] md:text-[12px] font-[600]`}
                                         onClick={() => setSortOrder('asc')}
                                     >
-                                        Low To Hight
+                                        Low To High
                                     </button>
                                     <button
                                         className={`${sortOrder === 'desc' ? 'bg-[#F7B831] text-[#0D0C0F]' : 'bg-[#17161B] text-white'} hover:opacity-90 rounded-[4px] px-[8px] md:px-[35px] py-[8px] h-[31px] md:h-[42px] text-[8px] md:text-[12px] font-[600]`}
