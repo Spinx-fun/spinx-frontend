@@ -137,9 +137,14 @@ const GameCard: React.FC<GameCardProps> = ({
             formatAddress(gameName)
             :
             gameName == winner ?
-              formatAddress(gameName) + " VS " + formatAddress(joinerPlayer)
+              <div className='flex'>
+                <h3 className='text-[#f9c752] font-oswald font-medium text-lg leading-[111%] mb-4'>{formatAddress(gameName)}</h3> &nbsp;VS&nbsp;<h3 className='font-oswald font-medium text-lg leading-[111%] text-white mb-4'>{formatAddress(joinerPlayer)}</h3>
+              </div>
               :
-              formatAddress(gameName) + " VS " + formatAddress(joinerPlayer)
+
+              <div className='flex'>
+                <h3 className='font-oswald font-medium text-lg leading-[111%] text-white mb-4'>{formatAddress(gameName)}</h3> &nbsp;VS&nbsp;<h3 className='font-oswald font-medium text-lg leading-[111%] mb-4 text-[#f9c752]'>{formatAddress(joinerPlayer)}</h3>
+              </div>
             // <p className='text-[#f9c752]'>{formatAddress(joinerPlayer)}</p>
           }
         </h3>
