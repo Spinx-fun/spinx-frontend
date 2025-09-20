@@ -516,14 +516,10 @@ export const createCoinflip = async (
         }
       );
       await solConnection.confirmTransaction(txId, "confirmed");
-      // await axios.post(`${API_URL}coinflip/`, {
-      //   txId: txId,
-      //   encodedTx: encodedTx
-      // });
       setTimeout(async () => {
         setLoading(false);
         successAlert('Bet successfully');
-      }, 4000);
+      }, 6000);
 
     }
   } catch (error) {

@@ -208,12 +208,6 @@ export default function CreateChallenge() {
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);
-        // Fallback to mock data
-        setUserData({
-          account: "dfkvclaedejq0f912321das312",
-          balance: 2000,
-          trend: 16.2,
-        });
         setActiveChallenges([]);
       } finally {
         setLoading(false);
