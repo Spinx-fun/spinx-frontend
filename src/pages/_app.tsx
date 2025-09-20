@@ -1,5 +1,4 @@
 import "../styles/globals.scss";
-import SocketProvider from "../context/SocketContext";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import Wallet from "../components/wallet/Wallet";
@@ -15,7 +14,6 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <Wallet>
-        <SocketProvider>
           <WalletModalProvider>
             {/* <Header /> */}
             <Component {...pageProps} />
@@ -25,7 +23,6 @@ export default function App({ Component, pageProps }: AppProps) {
               pauseOnFocusLoss={false}
             />
           </WalletModalProvider>
-        </SocketProvider>
       </Wallet>
     </QueryClientProvider>
   );

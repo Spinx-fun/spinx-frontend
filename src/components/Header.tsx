@@ -84,7 +84,7 @@ const Header: React.FC<HeaderProps> = ({
     <div className="w-full pt-4 pb-4">
       {/* Mobile Top Bar */}
       <div
-        className={`${mobileBreakpoint}:hidden flex items-center justify-between mb-4`}
+        className={`${mobileBreakpoint}:hidden flex items-center justify-between mb-4 `}
       >
         {/* Mobile Logo - Left Aligned */}
         <div className="flex items-center">

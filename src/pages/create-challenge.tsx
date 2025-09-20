@@ -258,11 +258,10 @@ export default function CreateChallenge() {
       let betAmount = Number(stakeAmount);
       amount = betAmount * 10 ** (activeAsset.decimals ?? 9);
       await createCoinflip(wallet, coinId, new PublicKey(activeAsset.address), amount, setIsLoading)
-      setIsLoading(false);
     } catch (error) {
+      setIsLoading(false);
       console.log(error);
     }
-
   };
 
   return (
@@ -287,7 +286,7 @@ export default function CreateChallenge() {
         <div className="flex flex-col flex-1 bg-[#0a101e] xl:ml-[248px] min-h-screen">
           {/* Header - Special rule: mobile header below xl resolution */}
           <div className="px-3 xl:px-12 pt-6">
-            <Header showSearch={false} useMobileLayoutBelowXl={true} />
+            <Header showSearch={false}  />
           </div>
 
           {/* Main Content Area */}
@@ -433,7 +432,6 @@ export default function CreateChallenge() {
                               /> :
                               "Create Flip Challenge"
                             }
-
                           </button>
                           {error && (
                             <p className="text-red-500 text-sm">{error}</p>

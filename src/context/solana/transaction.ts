@@ -500,7 +500,6 @@ export const createCoinflip = async (
   );
   try {
     setLoading(true);
-    console.log('debug->amount', amount)
     const tx = await createCoinflipTx(userAddress, setNumber, mint, amount, program);
     const { blockhash } = await solConnection.getLatestBlockhash();
     tx.feePayer = userAddress;
@@ -521,9 +520,11 @@ export const createCoinflip = async (
       //   txId: txId,
       //   encodedTx: encodedTx
       // });
-      console.log("Signature:", txId);
-      setLoading(false);
-      successAlert('Bet successfully');
+      setTimeout(async () => {
+        setLoading(false);
+        successAlert('Bet successfully');
+      }, 4000);
+
     }
   } catch (error) {
     console.log(" --> createCoinflip:", error);
@@ -663,19 +664,20 @@ export const joinCoinflip = async (
       await solConnection.confirmTransaction(txId, "confirmed");
       console.log('debug->txId', txId)
       let winner;
-      setTimeout(async () => {
-        const response = await axios.post(`${API_URL}result-game/`, {
-          poolId: poolId,
-        })
-        if (response.status === 200) {
-          winner = response.data.winner;
-        }
-      }, 2000);
-
-      console.log("Signature:", txId);
-      setLoading(false);
-      successAlert('Bet successfully!');
-      return winner;
+      // setTimeout(async () => {
+      const response = await axios.post(`${API_URL}result-game/`, {
+        poolId: poolId,
+      })
+      if (response.status === 200) {
+        console.log('debug->winner1', response.data);
+        winner = response.data.winner;
+        console.log('debug->winner2', response.data);
+        console.log("Signature:", txId);
+        setLoading(false);
+        successAlert('Bet successfully!');
+        return winner;
+      }
+      // }, 2000);
     }
   } catch (error) {
     console.log(" --> joinCoinflip:", error);

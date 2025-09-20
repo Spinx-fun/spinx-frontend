@@ -15,7 +15,7 @@ const StatusControls: React.FC = () => {
   const [lastUpdated, setLastUpdated] = useState(
     Math.floor(Date.now() / 1000) - 120
   ); // 2 minutes ago
-  const [sortBy, setSortBy] = useState("running-longest");
+  const [sortBy, setSortBy] = useState("newest-first");
   const [timeRange, setTimeRange] = useState("last-30-days");
   const [games, setGames] = useState<GameData[]>([]);
   const [allGames, setAllGames] = useState<GameData[]>([]);
@@ -26,9 +26,8 @@ const StatusControls: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const sortOptions: DropdownOption[] = [
-    { value: "running-longest", label: "Running Longest" },
-    { value: "oldest-first", label: "Oldest First" },
     { value: "newest-first", label: "Newest First" },
+    { value: "oldest-first", label: "Oldest First" },
     { value: "highest-tokens", label: "Highest Tokens" },
     { value: "lowest-tokens", label: "Lowest Tokens" },
   ];
@@ -109,7 +108,7 @@ const StatusControls: React.FC = () => {
     };
 
     loadInitialGames();
-  }, []);
+  }, [lastUpdated]);
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
 

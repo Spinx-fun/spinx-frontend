@@ -1,30 +1,50 @@
 import { useState, useEffect, SetStateAction } from 'react'
 import { Asset, assets } from '../utils/constants'
-import { useSocket } from "../context/SocketContext";
 import { joinCoinflip } from "../context/solana/transaction";
 import { useWallet, WalletContextState } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
+
+// Utility function to detect Safari browser
+const isSafari = (): boolean => {
+    if (typeof window === 'undefined') return false;
+    return !!(window.navigator.vendor &&
+        window.navigator.vendor.indexOf('Apple') > -1 &&
+        window.navigator.userAgent &&
+        window.navigator.userAgent.indexOf('CriOS') == -1 &&
+        window.navigator.userAgent.indexOf('FxiOS') == -1);
+};
 
 export default function JoinCoinflipModal(props: {
     coinId: number,
     amount: number,
     creatorAta: string,
     poolId: number,
+    pickValue: string | number,
     handleCloseModal: Function
 }) {
+    console.log('debug->pickValue', props.pickValue)
     const [activeAsset, setActiveAsset] = useState(assets[0])
     const wallet = useWallet();
     const [isTokenSelectModalOpened, setIsTokenSelectModalOpened] = useState(false);
     const [isBetLoading, setIsBetLoading] = useState(false);
-    let [winner, setWinner] = useState();
+    const [winner, setWinner] = useState<string | null>(null);
+    const [isSafariBrowser, setIsSafariBrowser] = useState<boolean>(false);
+
+    // Preload the appropriate coin animation based on browser
+    useEffect(() => {
+        const safari = isSafari();
+        setIsSafariBrowser(safari);
+
+        // Preload the animation for current platform
+        const preloadImage = new Image();
+        preloadImage.src = safari ? "/image/coin.gif" : "/image/coin.webm";
+    }, []);
 
     const handleDeposit = async () => {
         try {
-            winner = await joinCoinflip(wallet, props.coinId, new PublicKey(activeAsset.address), props.amount, new PublicKey(props.creatorAta), props.poolId, setIsBetLoading)
-            setWinner(winner);
-            console.log('debug->winner', winner);
-            // window.location.reload();
+            let result = await joinCoinflip(wallet, props.coinId, new PublicKey(activeAsset.address), props.amount, new PublicKey(props.creatorAta), props.poolId, setIsBetLoading)
+            setWinner(result);
         } catch (error) {
             setIsBetLoading(false)
             console.log(error);
@@ -35,6 +55,15 @@ export default function JoinCoinflipModal(props: {
         setActiveAsset(assets.find(asset => asset.symbol === symbol) as SetStateAction<Asset>)
         setIsTokenSelectModalOpened(false)
     }
+    // Determine which coin image to show based on winner
+    const getCoinImage = () => {
+        if (!winner && props.pickValue == "HEADS") return "/image/sfx-coin-tail.svg"; // Default to heads before transaction
+        if (!winner && props.pickValue == "TAILS") return "/image/sfx-coin.svg"; // Default to heads before transaction
+        return winner === wallet.publicKey?.toBase58() && props.pickValue == "HEADS"
+            ? "/image/sfx-coin-tail.svg"  // Heads if current user won
+            : "/image/sfx-coin.svg"; // Tails if current user lost
+    };
+
     return (
         <div
             className="fixed left-0 top-0 w-full h-[100vh] backdrop-blur-sm z-[40] flex-col bg-[#00000050] grid place-content-center"
@@ -48,16 +77,41 @@ export default function JoinCoinflipModal(props: {
                         </svg>
                     </button>
                 </div>
-                <div className='flex flex-row justify-between border-b border-[#ffffff10] '>
-                    <div className="px-6 py-12 flex flex-col gap-2 w-full">
-                        <div className='relative'>
-                        </div>
-                    </div>
+
+                {/* Coin Display Area - Fixed height to prevent layout shifts */}
+                <div className="flex justify-center items-center h-[168px] px-6 pt-4">
+                    {isBetLoading ? (
+                        // Show animation during transaction
+                        isSafariBrowser ? (
+                            <img
+                                src="/image/coin.gif"
+                                alt="Coin Animation"
+                                className="w-[168px] h-[168px]"
+                            />
+                        ) : (
+                            <video
+                                src="/image/coin.webm"
+                                autoPlay
+                                loop
+                                muted
+                                playsInline
+                                className="w-[168px] h-[168px]"
+                            />
+                        )
+                    ) : (
+                        // Show static coin image
+                        <img
+                            src={getCoinImage()}
+                            alt="Coin"
+                            className="w-[150px] h-[150px] mt-[18px]"
+                        />
+                    )}
                 </div>
+
                 {winner ?
                     winner == wallet.publicKey?.toBase58() ?
-                        <h3 className='class="font-oswald font-medium text-lg leading-[111%] text-white mb-4 mt-4 m-auto'>You are win!</h3> :
-                        <h3 className='class="font-oswald font-medium text-lg leading-[111%] text-white mb-4 mt-4 m-auto'>You are loss!</h3>
+                        <h3 className='font-oswald font-medium text-lg leading-[111%] text-white mb-4 mt-4 m-auto'>You win!</h3> :
+                        <h3 className='font-oswald font-medium text-lg leading-[111%] text-white mb-4 mt-4 m-auto'>You loss!</h3>
                     :
                     ''
                 }
@@ -66,7 +120,7 @@ export default function JoinCoinflipModal(props: {
                         <button
                             className="rounded-[2px_8px] py-2 px-4 w-[160px] h-[37px] mb-4 shadow-[0_4px_14px_0_rgba(27,224,136,0.45)] bg-[#1be088] flex items-center justify-center"
                             onClick={handleDeposit}
-                            disabled={isBetLoading || winner}
+                            disabled={isBetLoading || !!winner}
                         >
                             {isBetLoading ? (
                                 <>Waiting...</>

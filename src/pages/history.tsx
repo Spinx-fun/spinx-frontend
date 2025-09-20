@@ -71,9 +71,7 @@ export default function History() {
     if (wallet)
       loadGames();
   }, [wallet]);
-
-
-
+  console.log('debug->newDatas', newDatas)
   const publicAddress = publicKey?.toBase58().toString();
 
   const timeRangeOptions: DropdownOption[] = [

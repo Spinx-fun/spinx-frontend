@@ -187,7 +187,7 @@ const GameCard: React.FC<GameCardProps> = ({
           </div>
         </div>
       </div>
-      {isOpenJoinModal && <JoinCoinflipModal coinId={coinId} amount={amounts} creatorAta={creatorAta} poolId={poolId} handleCloseModal={handleCloseJoinModal} />}
+      {isOpenJoinModal && <JoinCoinflipModal coinId={coinId} amount={amounts} creatorAta={creatorAta} poolId={poolId} pickValue={pickValue} handleCloseModal={handleCloseJoinModal} />}
     </>
   );
 };
