@@ -23,7 +23,6 @@ export default function JoinCoinflipModal(props: {
     pickValue: string | number,
     handleCloseModal: Function
 }) {
-    console.log('debug->pickValue', props.pickValue)
     const [activeAsset, setActiveAsset] = useState(assets[0])
     const wallet = useWallet();
     const [isTokenSelectModalOpened, setIsTokenSelectModalOpened] = useState(false);

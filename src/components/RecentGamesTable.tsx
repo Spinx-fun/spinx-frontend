@@ -79,7 +79,6 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
     const formattedHour = hourNum % 12 || 12;
     return `${formattedHour}:${minutes}:${seconds} ${ampm}`;
   };
-  console.log('debug->paginatedGames', paginatedGames)
   return (
     <div className="w-full mt-8">
       {/* Table Title */}

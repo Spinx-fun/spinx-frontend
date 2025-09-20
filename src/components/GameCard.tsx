@@ -3,6 +3,9 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { assets } from '../utils/constants';
 import { errorAlert } from './ToastGroup';
 import JoinCoinflipModal from "../components/JoinCoinflipModal";
+import { fetchUserData, UserData } from '../services/api';
+import { solConnection } from '../context/solana/transaction';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 export interface GameCardProps {
   poolId: number;
@@ -35,10 +38,50 @@ const GameCard: React.FC<GameCardProps> = ({
   const [amounts, setAmounts] = useState(0);
   const wallet = useWallet();
   const [coinId, setCoinId] = useState(1);
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [solBalance, setSolBalance] = useState(0);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+
+        let balance;
+        if (wallet.publicKey) {
+          balance = await solConnection.getAccountInfo(wallet.publicKey);
+          if (balance)
+            setSolBalance(balance.lamports / LAMPORTS_PER_SOL)
+
+          const [userDataResponse] = await Promise.all([
+            fetchUserData(wallet)
+          ]);
+          setUserData(userDataResponse);
+        }
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      } finally {
+      }
+    };
+    if (wallet)
+      loadData();
+  }, [wallet]);
 
   const handleOpenJoinModal = () => {
     if (wallet.publicKey?.toBase58() == gameName) {
       errorAlert("You are creator of this pool already");
+      return;
+    }
+    if (!wallet?.connected) {
+      errorAlert("Please connect wallet first");
+      return;
+    }
+
+    if (Number(solBalance) == 0) {
+      errorAlert("You have no enough SOL on your wallet");
+      return;
+    }
+
+    if (Number(stakeAmount) > Number(userData?.balance) || Number.isNaN(userData?.balance)) {
+      errorAlert("You have no enough token on your wallet");
       return;
     }
 
@@ -58,27 +101,6 @@ const GameCard: React.FC<GameCardProps> = ({
   const handleCloseJoinModal = () => {
     setIsOpenJoinModal(false);
   };
-  // const handleJoin = async () => {
-  //   try {
-  //     const activeAsset = assets[0];
-  //     if (pickValue == "HEADS") {
-  //       setCoinId(1)
-  //     } else {
-  //       setCoinId(0)
-  //     }
-  //     if (wallet.publicKey?.toBase58() == gameName) {
-  //       errorAlert("You are creator of this pool already");
-  //       return;
-  //     }
-  //     let amount;
-  //     let betAmount = Number(stakeAmount);
-  //     amount = betAmount * 10 ** (activeAsset.decimals ?? 9);
-  //     console.log('debug->amount', amount)
-  //     // await joinCoinflip(wallet, coinId, new PublicKey(activeAsset.address), amount, new PublicKey(creatorAta), poolId, setIsLoading)
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
 
   const formatAddress = (address: string) => {
     return `${address.slice(0, 2)}...${address.slice(-4)}`;
@@ -118,7 +140,7 @@ const GameCard: React.FC<GameCardProps> = ({
               formatAddress(gameName) + " VS " + formatAddress(joinerPlayer)
               :
               formatAddress(gameName) + " VS " + formatAddress(joinerPlayer)
-              // <p className='text-[#f9c752]'>{formatAddress(joinerPlayer)}</p>
+            // <p className='text-[#f9c752]'>{formatAddress(joinerPlayer)}</p>
           }
         </h3>
 

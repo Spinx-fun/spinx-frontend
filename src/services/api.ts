@@ -58,9 +58,7 @@ export interface UserData {
 }
 
 export const fetchUserData = async (wallet: WalletContextState): Promise<UserData> => {
-  // Simulate network delay
   let activeAsset = assets[0];
-  await new Promise(resolve => setTimeout(resolve, 200));
   let balance;
   if (wallet.publicKey)
     balance = await getAccountTokenBlanace(activeAsset.address, wallet.publicKey.toString(), activeAsset.decimals ?? 9)

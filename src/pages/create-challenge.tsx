@@ -12,6 +12,8 @@ import { createCoinflip } from "../context/solana/transaction";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { Asset, assets } from '../utils/constants'
 import BeatLoader from 'react-spinners/BeatLoader';
+import { errorAlert } from "../components/ToastGroup";
+import { solConnection } from "../context/solana/transaction";
 
 interface AccountCardProps {
   title: string;
@@ -175,6 +177,7 @@ export default function CreateChallenge() {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
+  const [solBalance, setSolBalance] = useState(0);
 
   const amountOptions = [
     "500",
@@ -195,9 +198,14 @@ export default function CreateChallenge() {
           fetchUserData(wallet),
           fetchActiveChallenges(userData?.account || ""),
         ]);
-
         setUserData(userDataResponse);
         setActiveChallenges(challengesResponse);
+        let balance;
+        if (wallet.publicKey) {
+          balance = await solConnection.getAccountInfo(wallet.publicKey);
+          if (balance)
+            setSolBalance(balance.lamports / LAMPORTS_PER_SOL)
+        }
       } catch (error) {
         console.error("Failed to fetch data:", error);
         // Fallback to mock data
@@ -211,9 +219,9 @@ export default function CreateChallenge() {
         setLoading(false);
       }
     };
-
-    loadData();
-  }, [isLoading]);
+    if (wallet)
+      loadData();
+  }, [wallet, isLoading]);
 
   const handleAmountSelect = (amount: string) => {
     setSelectedAmount(amount);
@@ -244,6 +252,16 @@ export default function CreateChallenge() {
       setIsLoading(true);
       if (!stakeAmount || !selectedCoin || Number(stakeAmount) == 0) {
         setError("Please enter stake amount and make a pick Head or Tail");
+        return;
+      }
+      if (Number(stakeAmount) > Number(userData?.balance)) {
+        setIsLoading(false);
+        errorAlert("You have no enough token on your wallet");
+        return;
+      }
+      if(Number(solBalance) == 0){
+        setIsLoading(false);
+        errorAlert("You have no enough SOL on your wallet");
         return;
       }
       setError("");
@@ -286,7 +304,7 @@ export default function CreateChallenge() {
         <div className="flex flex-col flex-1 bg-[#0a101e] xl:ml-[248px] min-h-screen">
           {/* Header - Special rule: mobile header below xl resolution */}
           <div className="px-3 xl:px-12 pt-6">
-            <Header showSearch={false}  />
+            <Header showSearch={false} />
           </div>
 
           {/* Main Content Area */}

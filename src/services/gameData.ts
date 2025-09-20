@@ -89,7 +89,6 @@ export const fetchAllChallenges = async (): Promise<GameData[]> => {
   let datas = await getAllChallenges()
   let activeAsset = assets[0]
   let newDatas = [];
-  console.log('debug->datas', datas)
   if (datas && activeAsset.decimals) {
     for (let i = 0; i < (datas as any).length; i++) {
       let accountData = (datas as any)[i].account

@@ -586,8 +586,6 @@ export const createCoinflipTx = async (
     getPriceFeed(mint).toBase58(),
   );
 
-  console.log('debug->test', new anchor.BN(amount), amount)
-
   const tx = new Transaction();
   const computePriceIx = ComputeBudgetProgram.setComputeUnitPrice({
     microLamports: 2000000,
@@ -662,16 +660,13 @@ export const joinCoinflip = async (
         }
       );
       await solConnection.confirmTransaction(txId, "confirmed");
-      console.log('debug->txId', txId)
       let winner;
       // setTimeout(async () => {
       const response = await axios.post(`${API_URL}result-game/`, {
         poolId: poolId,
       })
       if (response.status === 200) {
-        console.log('debug->winner1', response.data);
         winner = response.data.winner;
-        console.log('debug->winner2', response.data);
         console.log("Signature:", txId);
         setLoading(false);
         successAlert('Bet successfully!');
@@ -955,7 +950,6 @@ const getGlobalStateByKey = async (
       continue;
     }
   }
-  console.log('debug->globalAccounts', Number(globalAccounts[0].account.nextPoolId),)
   let globalDataAccount = globalAccounts[0].account.nextPoolId
   return globalDataAccount as GlobalData;
 };
@@ -967,7 +961,7 @@ export const getAccountTokenBlanace = async (
 ) => {
   let tokenBalance
   tokenBalance = await solConnection.getParsedTokenAccountsByOwner(new PublicKey(userAddress), { mint: new PublicKey(tokenAddress) }, "processed")
-  const balance = tokenBalance.value[0].account.data.parsed.info.tokenAmount.amount / 10 ** (decimals);
+  const balance = tokenBalance.value[0]?.account.data.parsed.info.tokenAmount.amount / 10 ** (decimals);
   return balance;
 };
 
@@ -1000,7 +994,6 @@ export const getAllChallenges = async (
       continue;
     }
   }
-  console.log('debug->coinflipAccounts', coinflipAccounts)
   return coinflipAccounts as unknown as PoolData;
 };
 

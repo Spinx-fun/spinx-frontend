@@ -38,7 +38,6 @@ export default function History() {
         for (let i = 0; i < gameData.length; i++) {
           if (gameData[i].gameName == walletAddress || gameData[i].joinerPlayer == walletAddress) {
             counts++
-            console.log('debug->gameData', gameData)
             if (gameData[i].winner == walletAddress) {
               result = "Win";
             } else if (gameData[i].winner == "11111111111111111111111111111111") {
@@ -71,7 +70,6 @@ export default function History() {
     if (wallet)
       loadGames();
   }, [wallet]);
-  console.log('debug->newDatas', newDatas)
   const publicAddress = publicKey?.toBase58().toString();
 
   const timeRangeOptions: DropdownOption[] = [
