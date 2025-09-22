@@ -3,6 +3,7 @@ import MobileMenu from "./MobileMenu";
 import { useRouter } from "next/router";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { solacc } from "../utils/constants";
 
 interface HeaderProps {
   showSearch?: boolean;
@@ -123,9 +124,9 @@ const Header: React.FC<HeaderProps> = ({
                       Account:
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="font-inter font-medium italic text-[12px] leading-[133%] text-[#90a2b9]">
+                      <a href={`${solacc}/${publicKey?.toBase58()}?cluster=devnet`} target='blank' className="font-inter font-medium italic text-[12px] leading-[133%] text-[#90a2b9]">
                         {copied ? "Copied!" : formatAddress(publicKey?.toBase58() || "")}
-                      </span>
+                      </a>
                       <button
                         onClick={copyToClipboard}
                         className="flex-shrink-0"
@@ -248,14 +249,14 @@ const Header: React.FC<HeaderProps> = ({
                            shadow-[0_4px_24px_0_rgba(255,255,255,0.06)] bg-[#020617] z-50"
                 >
                   {/* Account Row */}
-                  <div className="border-b border-[#2a2a2a] p-3 bg-[#020617] hover:bg-[#1a1a2a] transition-colors">
+                  <div className="border-b border-[#2a2a2a] p-3 bg-[#020617] hover:bg-[#1a1a2a] transition-colors rounded-t-[10px]">
                     <div className="font-inter font-medium text-[14px] leading-[114%] text-white mb-2">
                       Account:
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="font-inter font-medium italic text-[12px] leading-[133%] text-[#90a2b9]">
+                      <a href={`${solacc}/${publicKey?.toBase58()}?cluster=devnet`} target='blank' className="font-inter font-medium italic text-[12px] leading-[133%] text-[#90a2b9]">
                         {copied ? "Copied!" : formatAddress(publicKey?.toBase58() || "")}
-                      </span>
+                      </a>
                       <button
                         onClick={copyToClipboard}
                         className="flex-shrink-0"
@@ -270,7 +271,7 @@ const Header: React.FC<HeaderProps> = ({
                   </div>
 
                   {/* Wallet Row */}
-                  <div className="border-b border-[#2a2a2a] p-3 bg-[#020617] hover:bg-[#1a1a2a] transition-colors">
+                  {/* <div className="border-b border-[#2a2a2a] p-3 bg-[#020617] hover:bg-[#1a1a2a] transition-colors">
                     <button
                       onClick={goToWallet}
                       className="flex items-center gap-2 w-full text-left"
@@ -284,10 +285,10 @@ const Header: React.FC<HeaderProps> = ({
                         Wallet
                       </span>
                     </button>
-                  </div>
+                  </div> */}
 
                   {/* Logout Row */}
-                  <div className="p-3 bg-[#020617] hover:bg-[#1a1a2a] transition-colors">
+                  <div className="p-3 bg-[#020617] hover:bg-[#1a1a2a] transition-colors rounded-b-[10px]">
                     <button
                       className="flex items-center gap-2 w-full text-left"
                       onClick={handleLogout}

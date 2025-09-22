@@ -1,6 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { GameData } from '../services/gameData';
 import { fetchRecentGames, getTotalGamesCount } from '../services/api';
+import { add } from 'date-fns';
+import { solTx } from '../utils/constants';
 
 interface RecentGamesTableProps {
 }
@@ -69,7 +71,7 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
   };
 
   const formatAddress = (address: string) => {
-    return `${address.slice(0, 2)}...${address.slice(-4)}`;
+    return `${address.slice(0, 3)}...${address.slice(-4)}`;
   };
 
   const formatTime = (time: string) => {
@@ -191,6 +193,22 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
             className="flex items-center flex-shrink-0"
             style={{
               borderBottom: '1px solid #324158',
+              borderTop: '1px solid #324158',
+              borderLeft: '1px solid #324158',
+              paddingBlock: '4px',
+              paddingInline: '16px',
+              width: '140px',
+              height: '48px',
+              background: 'transparent'
+            }}
+          >
+            <span className="font-inter font-bold text-[16px] leading-[100%] text-white">Result</span>
+          </div>
+
+          <div
+            className="flex items-center flex-shrink-0"
+            style={{
+              borderBottom: '1px solid #324158',
               borderRight: '1px solid #324158',
               borderTop: '1px solid #324158',
               borderLeft: '1px solid #324158',
@@ -202,7 +220,7 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
               background: 'transparent'
             }}
           >
-            <span className="font-inter font-bold text-[16px] leading-[100%] text-white">Result</span>
+            <span className="font-inter font-bold text-[16px] leading-[100%] text-white">Winner TX</span>
           </div>
         </div>
 
@@ -250,13 +268,13 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
                 background: 'transparent'
               }}
             >
-              <span className={(game.winner == game.gameName && game.winner != "11111111111111111111111111111111") ? "font-inter italic font-medium text-[14px] leading-[133%] text-[#f9c752]" : "font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap"}>
+              <span className={(game.winner == game.gameName && game.winner != null) ? "font-inter italic font-medium text-[14px] leading-[133%] text-[#f9c752]" : "font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap"}>
                 {formatAddress(game.gameName)}
               </span>
               <span className="text-[#545454]">&nbsp;Vs&nbsp;</span>
-              <span className={(game.winner == game.joinerPlayer && game.winner != "11111111111111111111111111111111") ? "font-inter italic font-medium text-[14px] leading-[133%] text-[#f9c752]" : "font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap"}>
+              <span className={(game.winner == game.joinerPlayer && game.winner != null) ? "font-inter italic font-medium text-[14px] leading-[133%] text-[#f9c752]" : "font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap"}>
                 {
-                  game.joinerPlayer != "11111111111111111111111111111111"
+                  game.joinerPlayer != null
                     ?
                     formatAddress(game.joinerPlayer)
                     : "Not joined"
@@ -287,7 +305,7 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
               className="flex items-center flex-shrink-0"
               style={{
                 borderBottom: '1px solid #324158',
-                borderRight: '1px solid #324158',
+
                 borderLeft: '1px solid #324158',
                 paddingBlock: '18px',
                 paddingInline: '16px',
@@ -300,23 +318,60 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
                 className="flex items-center justify-center"
                 style={{
                   border: '1px solid',
-                  borderColor: typeof game.pickValue === 'string' && game.pickValue.includes('HEAD') ? '#d45bf8' : '#117af7',
+                  borderColor: typeof game.pickValue === 'string' && game.pickValue.includes('HEAD') && game.gameName == game.winner
+                    ? '#d45bf8'
+                    : game.gameName != game.winner && game.pickValue.includes('HEAD')
+                      ? '#117af7'
+                      : game.gameName != game.winner && game.pickValue.includes('TAIL')
+                        ? '#d45bf8'
+                        : '#117af7',
                   borderRadius: '30px',
                   paddingBlock: '5px',
                   paddingInline: '10px',
                   width: '56px',
                   height: '26px',
-                  background: typeof game.pickValue === 'string' && game.pickValue.includes('HEAD') ? '#231829' : '#0f1c29'
+
+                  background: typeof game.pickValue === 'string' && game.pickValue.includes('HEAD') && game.gameName == game.winner
+                    ? '#231829'
+                    : game.gameName != game.winner && game.pickValue.includes('HEAD')
+                      ? '#0f1c29'
+                      : game.gameName != game.winner && game.pickValue.includes('TAIL')
+                        ? '#231829'
+                        : '#0f1c29',
                 }}
               >
                 <span className="font-inter font-normal text-[14px] leading-[114%]">
-                  {typeof game.pickValue === 'string' && game.pickValue.includes('HEAD') ? (
+                  {typeof game.pickValue === 'string' && game.pickValue.includes('HEAD') && game.gameName == game.winner ? (
+                    <span className="text-[#d45bf8]">Head</span>
+                  ) : game.gameName != game.winner && game.pickValue.includes('HEAD') ? (
+                    <span className="text-[#117af7]">Tail</span>
+                  ) : game.gameName != game.winner && game.pickValue.includes('TAIL') ? (
                     <span className="text-[#d45bf8]">Head</span>
                   ) : (
                     <span className="text-[#117af7]">Tail</span>
                   )}
                 </span>
               </div>
+            </div>
+            <div
+              className="flex items-center flex-shrink-0"
+              style={{
+                borderBottom: '1px solid #324158',
+                borderLeft: '1px solid #324158',
+                borderRight: '1px solid #324158',
+                paddingBlock: '18px',
+                paddingInline: '16px',
+                width: '140px',
+                height: '52px',
+                background: 'transparent'
+              }}
+            >
+              {game.winnerTx != null
+                ? <a href={`${solTx}/${game.winnerTx}?cluster=devnet`} target='blank' className="font-inter font-bold text-[14px] leading-[114%] text-[#f9c752] whitespace-nowrap">
+                  {formatAddress(game.winnerTx)}
+                </a >
+                : <span className="font-inter font-bold text-[14px] leading-[114%] text-[#fff] whitespace-nowrap">Not Joined</span>}
+
             </div>
           </div>
         ))
@@ -403,15 +458,22 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
               {/* Challenge */}
               <div className="mb-3">
                 <span className="font-inter font-normal text-[14px] leading-[114%] text-white">
-                  {formatAddress(game.gameName)} <span className="text-[#545454]">Vs</span> {formatAddress('Opponent1234')}
+                  {formatAddress(game.gameName)} <span className="text-[#545454]">Vs</span> {game.joinerPlayer != null ? formatAddress(game.joinerPlayer) : "Not Joined"}
                 </span>
               </div>
 
               {/* Stake */}
-              <div className="flex items-center justify-between">
-                <span className="font-inter font-bold text-[14px] leading-[114%] text-[#f9c752] whitespace-nowrap">
+              <div className="flex items-center justify-between mb-1">
+                <span className="font-inter font-bold text-[14px] leading-[114%] text-[#f9c752]">
                   {game.stakeAmount}
                 </span>
+              </div>
+              <div className="flex items-center justify-between">
+                {game.winnerTx != null
+                  ? <a href={`${solTx}/${game.winnerTx}?cluster=devnet`} target='blank' className="font-inter font-bold text-[14px] leading-[114%] text-[#f9c752] whitespace-nowrap">
+                    {formatAddress(game.winnerTx)}
+                  </a >
+                  : <span className="font-inter font-bold text-[14px] leading-[114%] text-[#fff] whitespace-nowrap">Not Joined</span>}
               </div>
             </div>
           ))

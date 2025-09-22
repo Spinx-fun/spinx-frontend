@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Head from "next/head";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import RecentGamesTable from "../components/RecentGamesTable";
 import ActiveChallengesPanel from "../components/ActiveChallengesPanel";
 import { fetchUserData, UserData } from "../services/api";
-import { fetchActiveChallenges, ActiveChallenge } from "../services/gameData";
+import { fetchActiveChallenges, ActiveChallenge, fetchAllChallenges, GameData, PlayerHistory } from "../services/gameData";
 import Footer from "../components/Footer";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { createCoinflip } from "../context/solana/transaction";
@@ -14,6 +14,8 @@ import { Asset, assets } from '../utils/constants'
 import BeatLoader from 'react-spinners/BeatLoader';
 import { errorAlert } from "../components/ToastGroup";
 import { solConnection } from "../context/solana/transaction";
+import PlayerHistoryTable from '../components/PlayerHistoryTable';
+import CustomDropdown, { DropdownOption } from "../components/CustomDropdown";
 
 interface AccountCardProps {
   title: string;
@@ -32,8 +34,8 @@ interface AmountButtonProps {
 interface AccountConnectedProps { }
 
 interface BalanceCardProps {
-  balance: number | null;
-  trend: number;
+  solBalance: number;
+  tokenBalance: number;
 }
 
 const AccountConnected: React.FC<AccountConnectedProps> = ({
@@ -99,15 +101,17 @@ const AccountConnected: React.FC<AccountConnectedProps> = ({
   );
 };
 
-const BalanceCard: React.FC<BalanceCardProps> = ({ balance, trend }) => {
-  const displayBalance =
-    balance !== null && balance !== undefined ? balance : 0;
-  const isPositive = trend >= 0;
-  const trendIcon = isPositive
-    ? "/image/upward-trend.svg"
-    : "/image/downward-trend.svg";
-  const trendColor = isPositive ? "text-[#1be088]" : "text-red-500";
+const BalanceCard: React.FC<BalanceCardProps> = ({ solBalance, tokenBalance }) => {
+  const solBalances =
+    solBalance !== null && solBalance !== undefined ? solBalance : 0;
 
+  const tokenBalances =
+    tokenBalance !== null && tokenBalance !== undefined ? tokenBalance : 0;
+  // const isPositive = trend >= 0;
+  // const trendIcon = isPositive
+  //   ? "/image/upward-trend.svg"
+  //   : "/image/downward-trend.svg";
+  // const trendColor = isPositive ? "text-[#1be088]" : "text-red-500";
   return (
     <div className="border border-[#2a2a2a] rounded-[10px] p-4 bg-[#020617] h-full flex flex-col">
       <h3 className="font-oswald font-bold text-[20px] leading-[160%] text-white mb-4">
@@ -119,27 +123,25 @@ const BalanceCard: React.FC<BalanceCardProps> = ({ balance, trend }) => {
           {/* Balance Amount with SPX Tokens */}
           <div className="flex items-end gap-2">
             <span className="font-oswald font-medium text-[36px] leading-[117%] text-[#f9c752]">
-              {displayBalance}
+              {solBalances.toFixed(3)}
             </span>
             <span className="font-inter font-medium text-[14px] leading-[186%] text-white self-end">
-              SPX Tokens
+              Sol Balance
             </span>
           </div>
 
           {/* Trend Info */}
           <div className="text-right">
-            {/* <div className="flex items-center justify-end gap-1">
-              <img src={trendIcon} alt="Trend" className="w-4 h-4" />
-              <span
-                className={`font-inter font-normal text-[20px] leading-[160%] ${trendColor}`}
-              >
-                {isPositive ? "+" : ""}
-                {trend.toFixed(1)}%
+            <div className="flex items-center justify-between w-full">
+              {/* <img src={trendIcon} alt="Trend" className="w-4 h-4" /> */}
+              <span className="font-oswald font-medium text-[36px] leading-[117%] text-[#f9c752]">
+                {tokenBalances}
+              </span>
+              &nbsp;
+              <span className="font-inter font-medium text-[14px] leading-[186%] text-white self-end">
+                SPX Tokens
               </span>
             </div>
-            <p className="font-inter font-medium italic text-[12px] leading-[133%] text-[#929294]">
-              From last month
-            </p> */}
           </div>
         </div>
       </div>
@@ -172,13 +174,14 @@ export default function CreateChallenge() {
   );
   const [stakeAmount, setStakeAmount] = useState<string>("");
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [activeChallenges, setActiveChallenges] = useState<ActiveChallenge[]>(
-    []
-  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [solBalance, setSolBalance] = useState(0);
-
+  const [historyLoading, setHistoryLoading] = useState(true);
+  const [playerHistory, setPlayerHistory] = useState<GameData[]>([]);
+  let [newDatas, setNewDatas] = useState<PlayerHistory[]>();
+  const [timeRange, setTimeRange] = useState('last-30-days');
+  const walletAddress = wallet.publicKey?.toBase58();
   const amountOptions = [
     "500",
     "1000",
@@ -190,16 +193,50 @@ export default function CreateChallenge() {
     "4000",
     "ALL IN",
   ];
+  const [activeChallenges, setActiveChallenges] = useState<ActiveChallenge[]>(
+    []
+  );
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [userDataResponse, challengesResponse] = await Promise.all([
+        const [userDataResponse, historyResponse, challengesResponse] = await Promise.all([
           fetchUserData(wallet),
-          fetchActiveChallenges(userData?.account || ""),
+          fetchAllChallenges(),
+          fetchActiveChallenges(wallet.publicKey?.toBase58() || ""),
         ]);
         setUserData(userDataResponse);
         setActiveChallenges(challengesResponse);
+        setPlayerHistory(historyResponse);
+
+        let counts = 0;
+        let result;
+        let newDataArray = [];
+        for (let i = 0; i < historyResponse.length; i++) {
+          if (historyResponse[i].gameName == walletAddress || historyResponse[i].joinerPlayer == walletAddress) {
+            counts++
+            if (historyResponse[i].winner == walletAddress) {
+              result = "Win";
+            } else if (historyResponse[i].winner == null) {
+              result = "Pending"
+            } else {
+              result = "Loss"
+            }
+            let newData = {
+              challenge: historyResponse[i].gameName,
+              joinerPlayer: historyResponse[i].joinerPlayer,
+              date: historyResponse[i].date,
+              game: 'Coin Flip',
+              id: historyResponse[i].id,
+              result: result,
+              stakeAmount: historyResponse[i].stakeAmount,
+              time: historyResponse[i].time,
+              winnerTx: historyResponse[i].winnerTx
+            }
+            newDataArray.push(newData);
+          }
+        }
+        setNewDatas(newDataArray);
         let balance;
         if (wallet.publicKey) {
           balance = await solConnection.getAccountInfo(wallet.publicKey);
@@ -208,19 +245,54 @@ export default function CreateChallenge() {
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);
+        setPlayerHistory([]);
         setActiveChallenges([]);
       } finally {
         setLoading(false);
+        setHistoryLoading(false);
       }
     };
-    if (wallet)
+    if (wallet.publicKey)
       loadData();
   }, [wallet, isLoading]);
+
+  // Filter player history based on selected time range
+  const filteredPlayerHistory = useMemo(() => {
+    if (newDatas) {
+      if (!newDatas.length) return [];
+
+      const now = new Date();
+      return newDatas.filter(item => {
+        const itemDate = new Date(`${item.date}T${item.time}`);
+        const diffTime = Math.abs(now.getTime() - itemDate.getTime());
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        switch (timeRange) {
+          case 'today':
+            return diffDays <= 1;
+          case 'last-3-days':
+            return diffDays <= 3;
+          case 'last-7-days':
+            return diffDays <= 7;
+          case 'last-14-days':
+            return diffDays <= 14;
+          case 'last-30-days':
+            return diffDays <= 30;
+          case 'last-6-months':
+            return diffDays <= 180;
+          case 'all-time':
+            return true;
+          default:
+            return diffDays <= 30;
+        }
+      });
+    }
+  }, [newDatas, timeRange]);
 
   const handleAmountSelect = (amount: string) => {
     setSelectedAmount(amount);
     if (amount === "ALL IN" && userData) {
-      setStakeAmount(userData.balance.toString());
+      setStakeAmount(userData.tokenBalance.toString());
     } else {
       setStakeAmount(amount);
     }
@@ -241,6 +313,16 @@ export default function CreateChallenge() {
     }
   };
 
+  const timeRangeOptions: DropdownOption[] = [
+    { value: 'today', label: 'Today', leftIcon: '/image/calendar.svg' },
+    { value: 'last-3-days', label: 'Last 3 Days', leftIcon: '/image/calendar.svg' },
+    { value: 'last-7-days', label: 'Last 7 Days', leftIcon: '/image/calendar.svg' },
+    { value: 'last-14-days', label: 'Last 14 Days', leftIcon: '/image/calendar.svg' },
+    { value: 'last-30-days', label: 'Last 30 Days', leftIcon: '/image/calendar.svg' },
+    { value: 'last-6-months', label: 'Last 6 Months', leftIcon: '/image/calendar.svg' },
+    { value: 'all-time', label: 'All Time', leftIcon: '/image/calendar.svg' },
+  ];
+
   const handleCreateChallenge = async () => {
     try {
       setIsLoading(true);
@@ -248,12 +330,12 @@ export default function CreateChallenge() {
         setError("Please enter stake amount and make a pick Head or Tail");
         return;
       }
-      if (Number(stakeAmount) > Number(userData?.balance)) {
+      if (Number(stakeAmount) > Number(userData?.tokenBalance)) {
         setIsLoading(false);
         errorAlert("You have no enough token on your wallet");
         return;
       }
-      if(Number(solBalance) == 0){
+      if (Number(solBalance) == 0) {
         setIsLoading(false);
         errorAlert("You have no enough SOL on your wallet");
         return;
@@ -302,23 +384,24 @@ export default function CreateChallenge() {
           </div>
 
           {/* Main Content Area */}
-          <div className="flex flex-col gap-6 px-3 lg:px-12 pb-12 pt-6 flex-1">
+          <div className="flex flex-col gap-6 px-3 lg:px-5 pb-12 pt-6 flex-1">
             {/* Account Connected and Balance Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <AccountConnected />
-
               <BalanceCard
-                balance={userData?.balance || 0}
-                trend={userData?.trend || 0}
+                solBalance={userData?.solBalance || 0}
+                tokenBalance={userData?.tokenBalance || 0}
               />
             </div>
+          </div>
 
-            {/* Main Content Grid - Challenge Creation and Active Challenges */}
-            <div className="flex flex-col lg:flex-row gap-6">
-              {/* Left Column - Challenge Creation and Recent Games */}
-              <div className="flex-1 space-y-6 order-1 lg:order-1">
-                {/* Challenge Creation Interface */}
-                <div className="border border-[#2a2a2a] rounded-[10px] p-4 bg-[#020617]">
+          {/* Main Content Grid - Challenge Creation and Active Challenges */}
+          <div className="flex flex-col lg:flex-row gap-6 px-3 lg:px-5 pb-12 pt-6 flex-1">
+            {/* Left Column - Challenge Creation and Recent Games */}
+            <div className="flex-1 space-y-6 order-1 lg:order-1">
+              {/* Challenge Creation Interface */}
+              <div className="lg:flex grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-4 my-6">
+                <div className="border border-[#2a2a2a] rounded-[10px] p-4 bg-[#020617] w-[100%] mb-2">
                   <h2 className="font-oswald font-bold text-[20px] leading-[160%] text-white mb-4">
                     Create Challenge
                   </h2>
@@ -461,22 +544,47 @@ export default function CreateChallenge() {
                     )}
                   </div>
                 </div>
-
-                {/* Active Challenges on mobile (comes after Create Challenge) */}
-                {/* <div className="lg:hidden">
+                <div className="hidden xl:block lg:w-[456px] order-2 lg:order-2">
                   <ActiveChallengesPanel challenges={activeChallenges} />
-                </div> */}
-
-                {/* Recent Games in the same column as Create Challenge */}
-                <div className="w-full">
-                  <RecentGamesTable />
+                </div>
+                {/* Active Challenges on mobile (comes after Create Challenge) */}
+                <div className="lg:hidden">
+                  <ActiveChallengesPanel challenges={activeChallenges} />
                 </div>
               </div>
+              {/* Recent Games in the same column as Create Challenge */}
+              <div className="w-full p-5">
+                <div className="flex justify-between pb-3">
+                  <h2 className="font-oswald font-bold text-[20px] leading-[160%] text-white">
+                    Player History
+                  </h2>
+                  {/* Refresh Button */}
+                  <div className="flex">
+                    {/* Time Range Dropdown */}
+                    <CustomDropdown
+                      options={timeRangeOptions}
+                      value={timeRange}
+                      onChange={setTimeRange}
+                      leftIcon="/image/calendar.svg"
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 justify-center">
 
-              {/* Right Column - Active Challenges Panel on desktop */}
-              {/* <div className="hidden xl:block lg:w-[366px] order-2 lg:order-2">
-                <ActiveChallengesPanel challenges={activeChallenges} />
-              </div> */}
+                  {historyLoading ? (
+                    <div className="text-center py-8 text-[#929294]">
+                      Loading player history...
+                    </div>
+                  ) : playerHistory.length === 0 ? (
+                    <div className="text-center py-8 text-[#929294]">
+                      No player history found
+                    </div>
+                  ) : (
+                    filteredPlayerHistory &&
+                    <PlayerHistoryTable data={filteredPlayerHistory} />
+                  )}
+                </div>
+              </div>
             </div>
           </div>
           <Footer />

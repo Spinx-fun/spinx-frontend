@@ -83,7 +83,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ useXlBreakpoint = false }) => {
           {/* Mobile Sidebar */}
           <div
             ref={menuRef}
-            className="absolute left-0 top-0 h-full w-80 bg-[#0e172b] z-50 overflow-y-auto"
+            className="absolute left-0 top-0 h-full bg-[#0e172b] z-50 overflow-y-auto"
           >
             {/* Close Button */}
             <div className="flex justify-end p-4">

@@ -40,7 +40,7 @@ export default function History() {
             counts++
             if (gameData[i].winner == walletAddress) {
               result = "Win";
-            } else if (gameData[i].winner == "11111111111111111111111111111111") {
+            } else if (gameData[i].winner == null) {
               result = "Pending"
             } else {
               result = "Loss"
@@ -221,8 +221,8 @@ export default function History() {
                   :
                   <WalletBalanceCard
                     walletAddress={publicAddress || ''}
-                    balance={userData?.balance || 0}
-                    trend={userData?.trend || 0}
+                    balance={userData?.solBalance || 0}
+                    trend={userData?.tokenBalance || 0}
                   />
                 }
               </div>

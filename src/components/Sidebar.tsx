@@ -1,11 +1,13 @@
 import React from 'react';
 import Link from 'next/link';
+import { useWallet } from '@solana/wallet-adapter-react';
 
 interface SidebarProps {
   activeItem?: string;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ activeItem = 'home' }) => {
+  const wallet = useWallet();
   const menuItems = [
     {
       id: 'home',
@@ -16,10 +18,34 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = 'home' }) => {
     },
     {
       id: 'create',
-      label: 'Create a challenge',
+      label: 'Profile',
       icon: activeItem === 'create' ? '/image/create-active.svg' : '/image/create.svg',
       activeIcon: '/image/create-active.svg',
       href: '/create-challenge'
+    },
+    {
+      id: 'documentation',
+      label: 'Documentation',
+      icon: '/image/documentation.svg',
+      href: '/',
+      external: true
+    },
+    {
+      id: 'support',
+      label: 'Support',
+      icon: '/image/support.svg',
+      href: '/',
+      external: true
+    }
+  ];
+
+  const menuItemsNotConnected = [
+    {
+      id: 'home',
+      label: 'Home',
+      icon: activeItem === 'home' ? '/image/home-active.svg' : '/image/home.svg',
+      activeIcon: '/image/home-active.svg',
+      href: '/'
     },
     {
       id: 'documentation',
@@ -59,33 +85,63 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = 'home' }) => {
 
       {/* Menu Items */}
       <div className="px-4 space-y-2">
-        {menuItems.map((item) => (
-          <Link
-            key={item.id}
-            href={item.href}
-          >
-            <a
-              className={`flex items-center gap-3 px-3 py-2 rounded-[5px] w-[216px] h-[36px] ${activeItem === item.id
+        {wallet.connected ?
+          menuItems.map((item) => (
+            <Link
+              key={item.id}
+              href={item.href}
+            >
+              <a
+                className={`flex items-center gap-3 px-3 py-2 rounded-[5px] w-[216px] h-[36px] ${activeItem === item.id
                   ? 'bg-gradient-to-r from-[rgba(61,153,112,0.2)] to-[rgba(14,23,43,0.2)]'
                   : 'hover:bg-[#1a2439]'
-                }`}
-              target={item.external ? '_blank' : undefined}
-              rel={item.external ? 'noopener noreferrer' : undefined}
-            >
-              <img
-                src={activeItem === item.id ? item.activeIcon : item.icon}
-                alt={item.label}
-                className="w-5 h-5"
-              />
-              <span
-                className={`font-inter text-[14px] leading-[114%] ${activeItem === item.id ? 'font-medium text-[#1be088]' : 'font-normal text-white'
                   }`}
+                target={item.external ? '_blank' : undefined}
+                rel={item.external ? 'noopener noreferrer' : undefined}
               >
-                {item.label}
-              </span>
-            </a>
-          </Link>
-        ))}
+                <img
+                  src={activeItem === item.id ? item.activeIcon : item.icon}
+                  alt={item.label}
+                  className="w-5 h-5"
+                />
+                <span
+                  className={`font-inter text-[14px] leading-[114%] ${activeItem === item.id ? 'font-medium text-[#1be088]' : 'font-normal text-white'
+                    }`}
+                >
+                  {item.label}
+                </span>
+              </a>
+            </Link>
+          ))
+          :
+          menuItemsNotConnected.map((item) => (
+            <Link
+              key={item.id}
+              href={item.href}
+            >
+              <a
+                className={`flex items-center gap-3 px-3 py-2 rounded-[5px] w-[216px] h-[36px] ${activeItem === item.id
+                  ? 'bg-gradient-to-r from-[rgba(61,153,112,0.2)] to-[rgba(14,23,43,0.2)]'
+                  : 'hover:bg-[#1a2439]'
+                  }`}
+                target={item.external ? '_blank' : undefined}
+                rel={item.external ? 'noopener noreferrer' : undefined}
+              >
+                <img
+                  src={activeItem === item.id ? item.activeIcon : item.icon}
+                  alt={item.label}
+                  className="w-5 h-5"
+                />
+                <span
+                  className={`font-inter text-[14px] leading-[114%] ${activeItem === item.id ? 'font-medium text-[#1be088]' : 'font-normal text-white'
+                    }`}
+                >
+                  {item.label}
+                </span>
+              </a>
+            </Link>
+          ))
+        }
       </div>
 
       {/* Footer Links */}

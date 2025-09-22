@@ -52,21 +52,18 @@ export const getTotalGamesCount = async () => {
 
 // User data API functions
 export interface UserData {
-  account: string;
-  balance: number;
-  trend: number;
+  solBalance: number;
+  tokenBalance: number;
 }
 
 export const fetchUserData = async (wallet: WalletContextState): Promise<UserData> => {
   let activeAsset = assets[0];
-  let balance;
+  let balance: any;
   if (wallet.publicKey)
     balance = await getAccountTokenBlanace(activeAsset.address, wallet.publicKey.toString(), activeAsset.decimals ?? 9)
-
   return {
-    account: 'DD320512345678',
-    balance: Number(balance),
-    trend: -2.5
+    solBalance: balance[0].solBalance,
+    tokenBalance: balance[0].tokenBalance,
   };
 };
 

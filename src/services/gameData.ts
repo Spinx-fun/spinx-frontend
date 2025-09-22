@@ -13,6 +13,8 @@ export interface GameData {
   joinerPlayer: string;
   creatorAta: string;
   winner: string;
+  winnerTx: string;
+  random: string;
 }
 
 // Player History interface
@@ -48,41 +50,60 @@ export const hasMoreGames = async (currentPage: number, pageSize: number = 6) =>
 // Active Challenge interface
 export interface ActiveChallenge {
   id: number;
-  gameType: 'coin-flip' | 'slot-machine';
+  gameType: string;
   stakeAmount: number;
   pickValue: string | number;
   date: string;
   time: string;
-  status: 'active' | 'completed' | 'withdrawn';
-}
+  creatorAta: any;
+  status: any;
 
-// Sample active challenges data
-export const sampleActiveChallenges: ActiveChallenge[] = [
-  {
-    id: 1,
-    gameType: 'coin-flip',
-    stakeAmount: 2000,
-    pickValue: 'HEADS',
-    date: '2025-09-14',
-    time: '14:30:34',
-    status: 'active'
-  },
-  {
-    id: 2,
-    gameType: 'coin-flip',
-    stakeAmount: 1500,
-    pickValue: 'TAILS',
-    date: '2025-09-14',
-    time: '15:45:22',
-    status: 'active'
-  },
-];
+}
 
 // Fetch active challenges for a user
 export const fetchActiveChallenges = async (walletAddress: string): Promise<ActiveChallenge[]> => {
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 300));
-  return sampleActiveChallenges;
+
+  let datas = await getAllChallenges()
+  let activeAsset = assets[0]
+  let newDatas = [];
+  if (datas && activeAsset.decimals) {
+    for (let i = 0; i < (datas as any).length; i++) {
+      let accountData = (datas as any)[i].account;
+      let pdaKey = (datas as any)[i].publicKey;
+      let pickValues;
+      if (Number(accountData.creatorNumber) == 0) {
+        pickValues = "HEADS"
+      } else {
+        pickValues = "TAILS"
+      }
+      let timestamp = Number(accountData.start_ts) * 1000;
+      let date = new Date(timestamp);
+      let formattedDate = ''
+      let formattedTimes = ''
+      if (date) {
+        formattedDate = format(date, 'yyyy-MM-dd')
+        formattedTimes = format(date, 'HH:mm:ss')
+      }
+      let gameData;
+      if (accountData.winner == null && walletAddress == accountData.creator) {
+        gameData = {
+          id: Number(accountData.poolId),
+          gameType: 'coin-flip',
+          stakeAmount: parseInt("0x" + accountData.poolAmount) / (10 ** activeAsset.decimals),
+          pickValue: pickValues,
+          date: formattedDate,
+          time: formattedTimes,
+          creatorAta: pdaKey,
+          status: 'active'
+        }
+        newDatas.push(gameData)
+      }
+    }
+    newDatas.sort((a, b) => b.id - a.id);
+  }
+  return newDatas;
 };
 
 export const fetchAllChallenges = async (): Promise<GameData[]> => {
@@ -92,13 +113,14 @@ export const fetchAllChallenges = async (): Promise<GameData[]> => {
   if (datas && activeAsset.decimals) {
     for (let i = 0; i < (datas as any).length; i++) {
       let accountData = (datas as any)[i].account
+      let pdaKey = (datas as any)[i].publicKey;
       let pickValues;
-      if (Number(accountData.creatorSetNumber) == 0) {
+      if (Number(accountData.creatorNumber) == 0) {
         pickValues = "HEADS"
       } else {
         pickValues = "TAILS"
       }
-      let timestamp = Number(accountData.startTs) * 1000;
+      let timestamp = Number(accountData.start_ts) * 1000;
       let date = new Date(timestamp);
       let formattedDate = ''
       let formattedTimes = ''
@@ -109,18 +131,20 @@ export const fetchAllChallenges = async (): Promise<GameData[]> => {
       const gameData = {
         id: Number(accountData.poolId),
         gameType: 'coin-flip',
-        gameName: accountData.creatorPlayer.toBase58(),
-        stakeAmount: Number(accountData.poolAmount) / (10 ** activeAsset.decimals),
+        gameName: accountData.creator,
+        stakeAmount: parseInt("0x" + accountData.poolAmount) / (10 ** activeAsset.decimals),
         pickValue: pickValues,
         date: formattedDate,
         time: formattedTimes,
-        joinerPlayer: accountData.joinerPlayer.toBase58(),
-        creatorAta: accountData.creatorAta.toBase58(),
-        winner: accountData.winner.toBase58()
+        joinerPlayer: accountData.joiner,
+        creatorAta: pdaKey,
+        winner: accountData.winner,
+        winnerTx: accountData.winner_tx,
+        random: accountData.joiner != null ? accountData.random : ''
       }
       newDatas.push(gameData)
     }
   }
-  newDatas.sort((a, b) => b.id - a.id)
+  newDatas.sort((a, b) => b.id - a.id);
   return newDatas;
 };

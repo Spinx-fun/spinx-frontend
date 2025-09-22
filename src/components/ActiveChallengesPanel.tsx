@@ -13,7 +13,7 @@ const ActiveChallengesPanel: React.FC<ActiveChallengesPanelProps> = ({ challenge
         Active Challenges
       </h2>
       
-      <div className="rounded-[10px] p-4 bg-[#0e172b]">
+      <div className="rounded-[10px] p-4 bg-[#0e172b] max-h-[580px] overflow-auto">
         {challenges.length === 0 ? (
           <p className="font-inter font-medium text-[14px] leading-[114%] text-[#929294] text-center py-8">
             No active challenges

@@ -59,7 +59,7 @@ const TokenRangeDropdown: React.FC<TokenRangeDropdownProps> = ({
 
     return games.filter(game => {
       const gameDate = parseISO(game.date);
-      return isAfter(gameDate, cutoffDate);
+      return gameDate >= cutoffDate; // Include games from the cutoff date onwards
     });
   };
 

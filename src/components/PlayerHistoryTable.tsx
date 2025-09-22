@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { PlayerHistory } from '../services/gameData';
+import { solTx } from '../utils/constants';
 
 interface PlayerHistoryTableProps {
   data: PlayerHistory[];
@@ -55,7 +56,7 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
   });
 
   const formatAddress = (address: string) => {
-    return `${address.slice(0, 2)}...${address.slice(-4)}`;
+    return `${address.slice(0, 3)}...${address.slice(-4)}`;
   };
 
   const formatTime = (time: string) => {
@@ -158,10 +159,8 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
             className="flex items-center flex-shrink-0 cursor-pointer"
             style={{
               borderBottom: '1px solid #324158',
-              borderRight: '1px solid #324158',
               borderTop: '1px solid #324158',
               borderLeft: '1px solid #324158',
-              borderRadius: '0 10px 0 0',
               paddingBlock: '4px',
               paddingInline: '16px',
               width: '140px',
@@ -177,6 +176,24 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
               className="w-4 h-4 ml-1"
               style={{ transform: sortBy === 'result' && sortAscending ? 'rotate(0deg)' : sortBy === 'result' ? 'rotate(180deg)' : 'rotate(0deg)', opacity: sortBy === 'result' ? 1 : 0.5 }}
             />
+          </div>
+
+          <div
+            className="flex items-center flex-shrink-0 cursor-pointer"
+            style={{
+              borderBottom: '1px solid #324158',
+              borderRight: '1px solid #324158',
+              borderTop: '1px solid #324158',
+              borderLeft: '1px solid #324158',
+              borderRadius: '0 10px 0 0',
+              paddingBlock: '4px',
+              paddingInline: '16px',
+              width: '140px',
+              height: '48px',
+              background: 'transparent'
+            }}
+          >
+            <span className="font-inter font-bold text-[16px] leading-[100%] text-white">Winner Result</span>
           </div>
         </div>
 
@@ -243,7 +260,7 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
               }}
             >
               <span className="font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap">
-              {formatAddress(item.challenge.split('Vs')[0]?.trim())} <span className="text-[#545454]">Vs</span> {item.joinerPlayer != "11111111111111111111111111111111" ? formatAddress(item.joinerPlayer) : "Not Joined"}
+                {formatAddress(item.challenge.split('Vs')[0]?.trim())} <span className="text-[#545454]">Vs</span> {item?.joinerPlayer != null ? formatAddress(item?.joinerPlayer) : "Not Joined"}
               </span>
             </div>
 
@@ -270,7 +287,6 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
               className="flex items-center flex-shrink-0"
               style={{
                 borderBottom: '1px solid #324158',
-                borderRight: '1px solid #324158',
                 borderLeft: '1px solid #324158',
                 paddingBlock: '18px',
                 paddingInline: '16px',
@@ -302,6 +318,27 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
                   )}
                 </span>
               </div>
+            </div>
+
+            <div
+              className="flex items-center flex-shrink-0"
+              style={{
+                borderBottom: '1px solid #324158',
+                borderRight: '1px solid #324158',
+                borderLeft: '1px solid #324158',
+                paddingBlock: '18px',
+                paddingInline: '16px',
+                width: '140px',
+                height: '52px',
+                background: 'transparent'
+              }}
+            >
+              {item.winnerTx != null
+                ?
+                <a href={`${solTx}/${item.winnerTx}?cluster=devnet`} target='blank' className="font-inter font-bold text-[14px] leading-[114%] text-[#f9c752] whitespace-nowrap">
+                  {formatAddress(item.winnerTx)}
+                </a >
+                : <span className="font-inter font-bold text-[14px] leading-[114%] text-[#fff] whitespace-nowrap">Not Joined</span>}
             </div>
           </div>
         ))}
@@ -360,22 +397,25 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
                   {item.date} {formatTime(item.time)}
                 </span>
               </div>
+
               <div
                 className="flex items-center justify-center"
                 style={{
                   border: '1px solid',
-                  borderColor: item.result === 'Win' ? '#1be088' : '#ff4757',
+                  borderColor: item.result === 'Win' ? '#1be088' : item.result === 'Pending' ? '#e0b415' : '#ff4757',
                   borderRadius: '30px',
                   paddingBlock: '5px',
                   paddingInline: '10px',
-                  width: '56px',
+                  width: '75px',
                   height: '26px',
-                  background: item.result === 'Win' ? '#112520' : '#281213'
+                  background: item.result === 'Win' ? '#112520' : item.result === 'Pending' ? '#b5970d24' : '#281213'
                 }}
               >
                 <span className="font-inter font-normal text-[14px] leading-[114%]">
                   {item.result === 'Win' ? (
                     <span className="text-[#1be088]">Win</span>
+                  ) : item.result === 'Pending' ? (
+                    <span className="text-[#fff347]">Pending</span>
                   ) : (
                     <span className="text-[#ff4757]">Loss</span>
                   )}
@@ -389,15 +429,22 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
                 {item.game}
               </div>
               <span className="font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap">
-                {formatAddress(item.challenge.split('Vs')[0]?.trim())} <span className="text-[#545454]">Vs</span> {formatAddress(item.joinerPlayer.split('Vs')[0]?.trim())}
+                {formatAddress(item.challenge.split('Vs')[0]?.trim())} <span className="text-[#545454]">Vs</span> {item.joinerPlayer != null ? formatAddress(item.joinerPlayer.split('Vs')[0]?.trim()) : 'Not Joined'}
               </span>
             </div>
 
             {/* Stake */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-2">
               <span className="font-inter font-bold text-[14px] leading-[114%] text-[#f9c752] whitespace-nowrap">
                 <b>Stake:</b> {item.stakeAmount}
               </span>
+            </div>
+            <div className="flex items-center justify-between">
+              {item.winnerTx != null
+                ? <a href={`${solTx}/${item.winnerTx}?cluster=devnet`} target='blank' className="font-inter font-bold text-[14px] leading-[114%] text-[#f9c752] whitespace-nowrap">
+                  {formatAddress(item.winnerTx)}
+                </a >
+                : <span className="font-inter font-bold text-[14px] leading-[114%] text-[#fff] whitespace-nowrap">Not Joined</span>}
             </div>
           </div>
         ))}

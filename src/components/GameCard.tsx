@@ -6,6 +6,7 @@ import JoinCoinflipModal from "../components/JoinCoinflipModal";
 import { fetchUserData, UserData } from '../services/api';
 import { solConnection } from '../context/solana/transaction';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { solacc } from '../utils/constants';
 
 export interface GameCardProps {
   poolId: number;
@@ -18,6 +19,7 @@ export interface GameCardProps {
   joinerPlayer: string;
   creatorAta: string;
   winner: string;
+  random: string;
 }
 
 const GameCard: React.FC<GameCardProps> = ({
@@ -30,7 +32,8 @@ const GameCard: React.FC<GameCardProps> = ({
   time,
   joinerPlayer,
   creatorAta,
-  winner
+  winner,
+  random
 }) => {
 
   const [isOpenJoinModal, setIsOpenJoinModal] = useState(false);
@@ -80,7 +83,7 @@ const GameCard: React.FC<GameCardProps> = ({
       return;
     }
 
-    if (Number(stakeAmount) > Number(userData?.balance) || Number.isNaN(userData?.balance)) {
+    if (Number(stakeAmount) > Number(userData?.tokenBalance) || Number.isNaN(userData?.tokenBalance)) {
       errorAlert("You have no enough token on your wallet");
       return;
     }
@@ -131,23 +134,22 @@ const GameCard: React.FC<GameCardProps> = ({
         </div>
 
         {/* Game Name */}
-        <h3 className="font-oswald font-medium text-lg leading-[111%] text-white mb-4">
-          {joinerPlayer == "11111111111111111111111111111111"
+        <div className="flex justify-between font-oswald font-medium text-lg leading-[111%] text-white mb-4">
+          {joinerPlayer == null
             ?
-            formatAddress(gameName)
+            <a href={`${solacc}/${gameName}?cluster=devnet`} target='blank' className='font-oswald font-medium text-lg leading-[111%]'>{formatAddress(gameName)}</a>
             :
             gameName == winner ?
               <div className='flex'>
-                <h3 className='text-[#f9c752] font-oswald font-medium text-lg leading-[111%] mb-4'>{formatAddress(gameName)}</h3> &nbsp;VS&nbsp;<h3 className='font-oswald font-medium text-lg leading-[111%] text-white mb-4'>{formatAddress(joinerPlayer)}</h3>
+                <a href={`${solacc}/${gameName}?cluster=devnet`} target='blank' className='text-[#f9c752] font-oswald font-medium text-lg leading-[111%]'>{formatAddress(gameName)}</a> &nbsp; &nbsp;<h3 className='font-oswald font-medium'>VS</h3>&nbsp; &nbsp;<a href={`${solacc}/${joinerPlayer}?cluster=devnet`} target='blank' className='font-oswald font-medium text-lg leading-[111%] text-white'>{formatAddress(joinerPlayer)}</a>
               </div>
               :
-
               <div className='flex'>
-                <h3 className='font-oswald font-medium text-lg leading-[111%] text-white mb-4'>{formatAddress(gameName)}</h3> &nbsp;VS&nbsp;<h3 className='font-oswald font-medium text-lg leading-[111%] mb-4 text-[#f9c752]'>{formatAddress(joinerPlayer)}</h3>
+                <a href={`${solacc}/${gameName}?cluster=devnet`} target='blank' className='font-oswald font-medium text-lg leading-[111%] text-white'>{formatAddress(gameName)}</a> &nbsp; &nbsp;<h3 className='font-oswald font-medium'>VS</h3>&nbsp; &nbsp;<a href={`${solacc}/${joinerPlayer}?cluster=devnet`} target='blank' className='font-oswald font-medium text-lg leading-[111%] text-[#f9c752]'>{formatAddress(joinerPlayer)}</a>
               </div>
-            // <p className='text-[#f9c752]'>{formatAddress(joinerPlayer)}</p>
           }
-        </h3>
+          <a href={`${solacc}/${creatorAta}?cluster=devnet`} target='blank' className='font-oswald font-medium text-lg leading-[111%]'>PDA : {formatAddress(creatorAta)}</a>
+        </div>
 
         {/* Stake and Pick Columns */}
         <div className="flex flex-col sm:flex-row sm:justify-between gap-4 sm:gap-0 mb-4">
@@ -170,10 +172,38 @@ const GameCard: React.FC<GameCardProps> = ({
               {pickValue}
             </div>
           </div>
+          {joinerPlayer != null &&
+            <>
+              <div className="flex-1">
+                <div className="font-inter font-normal text-sm leading-[114%] text-[#90a2b9] mb-1">
+                  Winner Pick
+                </div>
+                <div className="font-oswald font-medium text-[24px] leading-[133%] text-white">
+                  {joinerPlayer == null
+                    ? pickValue
+                    : gameName != winner && pickValue == "HEADS"
+                      ? "TAILS"
+                      : gameName != winner && pickValue == "TAILS"
+                        ? "HEADS" :
+                        gameName == winner && pickValue == "HEADS"
+                          ? "HEADS"
+                          : "TAILS"
+                  }
+                </div>
+              </div>
+
+              <div className="flex-1">
+                <div className="font-inter font-normal text-sm leading-[114%] text-[#90a2b9] mb-1">
+                  VRF
+                </div>
+                <a href={`${solacc}/${random}?cluster=devnet`} target='blank' className='font-oswald font-medium text-[24px] leading-[133%] text-white'>{formatAddress(random)}</a>
+              </div>
+            </>
+          }
         </div>
 
         {/* Action Button */}
-        {joinerPlayer == "11111111111111111111111111111111" ?
+        {joinerPlayer == null ?
           <button className={`
                   rounded-[2px_8px] py-2 px-4 w-[160px] h-[37px] mb-4
                   shadow-[0_4px_14px_0_rgba(27,224,136,0.45)] bg-[#1be088]

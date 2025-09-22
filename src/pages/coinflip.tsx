@@ -11,8 +11,6 @@ import {
     API_URL
 } from "../config";
 import { useRouter } from "next/router";
-import { LAMPORTS_PER_SOL } from "@solana/web3.js";
-import { claimCoinflip } from "../context/solana/transaction";
 import { Coinflip } from "../utils/type";
 
 export const getTokenLogo = (address: string) => {
@@ -87,11 +85,6 @@ export default function Rooms() {
     const handleCloseRoundModal = () => {
         setIsOpenRoundModal(false);
     };
-
-    const handleClaim = async (pda: string, mintA: string, mintB: string) => {
-        await claimCoinflip(wallet, new PublicKey(pda), new PublicKey(mintA), new PublicKey(mintB), setIsClaimingLoading);
-    }
-
     useEffect(() => {
         const intervalId = setInterval(async () => {
             setForce(!force);

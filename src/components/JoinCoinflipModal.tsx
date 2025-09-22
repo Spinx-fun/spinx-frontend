@@ -60,7 +60,11 @@ export default function JoinCoinflipModal(props: {
         if (!winner && props.pickValue == "TAILS") return "/image/sfx-coin.svg"; // Default to heads before transaction
         return winner === wallet.publicKey?.toBase58() && props.pickValue == "HEADS"
             ? "/image/sfx-coin-tail.svg"  // Heads if current user won
-            : winner === wallet.publicKey?.toBase58() && props.pickValue == "TAILS" ? "/image/sfx-coin.svg" : "/image/sfx-coin-tail.svg"; // Tails if current user lost
+            : winner === wallet.publicKey?.toBase58() && props.pickValue == "TAILS"
+                ? "/image/sfx-coin.svg"
+                : winner !== wallet.publicKey?.toBase58() && props.pickValue == "HEADS"
+                    ? "/image/sfx-coin.svg"
+                    : "/image/sfx-coin-tail.svg"; // Tails if current user lost
     };
 
     return (

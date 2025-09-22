@@ -25,3 +25,6 @@ export const getSymbol = (mint: string): string => {
     const asset = assets.find(asset => asset.address === mint);
     return asset ? asset.symbol : 'SOL';
 };
+
+export const solacc = 'https://solscan.io/account'
+export const solTx = 'https://solscan.io/tx'

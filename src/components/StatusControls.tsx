@@ -5,7 +5,7 @@ import GameCard from "./GameCard";
 import RecentGamesTable from "./RecentGamesTable";
 import Header from "./Header";
 import { formatTimeAgo } from "../utils/timeFormatter";
-import { fetchGamesPaginated, hasMoreGames } from "../services/api";
+import { fetchGamesPaginated, hasMoreGames, getTotalGamesCount } from "../services/api";
 import { GameData } from "../services/gameData";
 import Footer from "../components/Footer";
 import BeatLoader from 'react-spinners/BeatLoader';
@@ -17,22 +17,32 @@ const StatusControls: React.FC = () => {
     Math.floor(Date.now() / 1000) - 120
   ); // 2 minutes ago
   const [sortBy, setSortBy] = useState("newest-first");
+  const [activeBy, setActiveBy] = useState("active");
   const [timeRange, setTimeRange] = useState("last-30-days");
   const [games, setGames] = useState<GameData[]>([]);
   const [allGames, setAllGames] = useState<GameData[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [displayPage, setDisplayPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isFirstLoading, setIsFirstLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [tokenRange, setTokenRange] = useState({ min: 0, max: 5000 });
-
+  const [isLoadingAll, setIsLoadingAll] = useState(false);
+  const [displayGames, setDisplayGames] = useState<GameData[]>([]);
+  const DISPLAY_PAGE_SIZE = 6;
   const sortOptions: DropdownOption[] = [
     { value: "newest-first", label: "Newest First" },
     { value: "oldest-first", label: "Oldest First" },
+    { value: "running-longest", label: "Running Longest" },
     { value: "highest-tokens", label: "Highest Tokens" },
     { value: "lowest-tokens", label: "Lowest Tokens" },
   ];
+
+  const activeOptions: DropdownOption[] = [
+    { value: "active", label: "Active List" },
+    { value: "completed", label: "Completed List" },
+  ];
+
 
   const timeRangeOptions: DropdownOption[] = [
     { value: "today", label: "Today", leftIcon: "/image/calendar.svg" },
@@ -100,7 +110,7 @@ const StatusControls: React.FC = () => {
 
     return games.filter(game => {
       const gameDate = parseISO(game.date);
-      return isAfter(gameDate, cutoffDate);
+      return gameDate.getTime() >= cutoffDate.getTime(); // Include games from the cutoff date onwards
     });
   };
 
@@ -111,10 +121,26 @@ const StatusControls: React.FC = () => {
     );
   };
 
+  const sortByActivateGames = (games: GameData[], sortByActivate: string): GameData[] => {
+    switch (sortByActivate) {
+      case "active":
+        return games.filter(game =>
+          game.joinerPlayer === null
+        );
+      case "completed":
+        return games.filter(game =>
+          game.joinerPlayer !== null
+        );
+      default:
+        return games.filter(game =>
+          game.joinerPlayer === null
+        );;
+    }
+  };
   // Utility function to sort games
   const sortGames = (games: GameData[], sortBy: string): GameData[] => {
     const sortedGames = [...games];
-    
+
     switch (sortBy) {
       case "running-longest":
         // Sort by date (oldest first) to show games that have been running longest
@@ -124,9 +150,9 @@ const StatusControls: React.FC = () => {
           return dateA.getTime() - dateB.getTime();
         });
       case "oldest-first":
-        return sortedGames.sort((a, b) => b.id - a.id);
-      case "newest-first":
         return sortedGames.sort((a, b) => a.id - b.id);
+      case "newest-first":
+        return sortedGames.sort((a, b) => b.id - a.id);
       case "highest-tokens":
         return sortedGames.sort((a, b) => b.stakeAmount - a.stakeAmount);
       case "lowest-tokens":
@@ -139,75 +165,88 @@ const StatusControls: React.FC = () => {
   // Main filtering and sorting function
   const applyFiltersAndSorting = (gamesToFilter: GameData[]): GameData[] => {
     let filteredGames = [...gamesToFilter];
-    
+
     // Apply time range filter
     filteredGames = filterGamesByTimeRange(filteredGames, timeRange);
-    
     // Apply token range filter
     filteredGames = filterGamesByTokenRange(filteredGames, tokenRange.min, tokenRange.max);
-    
+
     // Apply search filter
     if (searchQuery) {
       filteredGames = filteredGames.filter(game =>
         game.gameName.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-    
+
     // Apply sorting
     filteredGames = sortGames(filteredGames, sortBy);
-    
+    filteredGames = sortByActivateGames(filteredGames, activeBy);
     return filteredGames;
+  };
+
+  // Function to get paginated display of filtered games (accumulates all pages)
+  const getDisplayGames = (filteredGames: GameData[], page: number): GameData[] => {
+    const endIndex = page * DISPLAY_PAGE_SIZE;
+    return filteredGames.slice(0, endIndex);
   };
 
   const handleTokenRangeApply = (min: number, max: number) => {
     setTokenRange({ min, max });
   };
 
-  const handleRefresh = () => {
-    setLastUpdated(Math.floor(Date.now() / 1000));
-    // Add actual refresh logic here later
-    console.log("Refresh clicked");
-  };
-
-  const handleLoadMore = async () => {
-    setIsLoading(true);
+  // Function to load all games for complete sorting
+  const loadAllGames = async () => {
+    setIsLoadingAll(true);
     try {
-      const nextPage = currentPage + 1;
-      const newGames = await fetchGamesPaginated(nextPage);
-      
-      // Add new games to allGames
-      const updatedAllGames = [...allGames, ...newGames];
-      setAllGames(updatedAllGames);
-      
-      // Apply filters to the combined games
-      const filteredGames = applyFiltersAndSorting(updatedAllGames);
-      setGames(filteredGames);
-      
-      setCurrentPage(nextPage);
-      setHasMore(await hasMoreGames(nextPage));
+      const pageSize = 50; // Load in batches to avoid overwhelming the system
+      let allLoadedGames: GameData[] = [];
+      let currentLoadPage = 1;
+      let hasMoreData = true;
+
+      while (hasMoreData) {
+        const batchGames = await fetchGamesPaginated(currentLoadPage, pageSize);
+        allLoadedGames = [...allLoadedGames, ...batchGames];
+
+        if (batchGames.length < pageSize) {
+          hasMoreData = false;
+        } else {
+          currentLoadPage++;
+        }
+
+        // Small delay to avoid overwhelming the system
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
+      setAllGames(allLoadedGames);
+      setHasMore(false); // No more loading needed since we have all data
+      setIsFirstLoading(false); // Set first loading to false after initial load
     } catch (error) {
-      console.error("Error loading more games:", error);
+      console.error("Error loading all games:", error);
     } finally {
-      setIsLoading(false);
+      setIsLoadingAll(false);
+      setIsFirstLoading(false);
     }
   };
 
-  // Load initial games on component mount
-  useEffect(() => {
-    const loadInitialGames = async () => {
-      setIsFirstLoading(true);
-      try {
-        const initialGames = await fetchGamesPaginated(1);
-        setAllGames(initialGames);
-        // Filters will be applied by the other useEffect
-      } catch (error) {
-        console.error("Error loading initial games:", error);
-      } finally {
-        setIsFirstLoading(false);
-      }
-    };
+  const handleRefresh = () => {
+    setLastUpdated(Math.floor(Date.now() / 1000));
+    // Load all games on refresh for complete sorting
+    loadAllGames();
+  };
 
-    loadInitialGames();
+  const handleLoadMore = () => {
+    // Increment display page to show more games
+    setDisplayPage(prevPage => prevPage + 1);
+  };
+
+  const handleResetPagination = () => {
+    // Reset to first page when filters change
+    setDisplayPage(1);
+  };
+
+  // Load all games on component mount for complete sorting
+  useEffect(() => {
+    loadAllGames();
   }, [lastUpdated]);
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
@@ -218,8 +257,20 @@ const StatusControls: React.FC = () => {
     if (allGames.length > 0) {
       const filteredGames = applyFiltersAndSorting(allGames);
       setGames(filteredGames);
+      // Reset pagination when filters change
+      handleResetPagination();
     }
-  }, [sortBy, timeRange, tokenRange, searchQuery, allGames]);
+  }, [sortBy, timeRange, tokenRange, searchQuery, allGames, activeBy]);
+
+  // Effect to update display games when filtered games or display page changes
+  useEffect(() => {
+    if (games.length > 0) {
+      const paginatedGames = getDisplayGames(games, displayPage);
+      setDisplayGames(paginatedGames);
+    } else {
+      setDisplayGames([])
+    }
+  }, [games, displayPage]);
 
   return (
     <div className="w-full">
@@ -260,6 +311,14 @@ const StatusControls: React.FC = () => {
 
           {/* Sort Dropdown */}
           <CustomDropdown
+            options={activeOptions}
+            value={activeBy}
+            onChange={setActiveBy}
+            className="lg:ml-2"
+          />
+
+          {/* Sort Dropdown */}
+          <CustomDropdown
             options={sortOptions}
             value={sortBy}
             onChange={setSortBy}
@@ -288,18 +347,18 @@ const StatusControls: React.FC = () => {
 
       {/* Game Cards Grid */}
       <div className="flex gap-4 my-6 m-auto mt-6 w-max">
-        {isFirstLoading == true &&
+        {(isFirstLoading || isLoadingAll) &&
           <BeatLoader
             color={'#fff'}
-            loading={isFirstLoading}
+            loading={isFirstLoading || isLoadingAll}
             size={30}
             aria-label="Loading Spinner"
             data-testid="loader"
           />
         }
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-4 my-6">
-        {games.map((game) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 gap-4 my-6">
+        {displayGames.map((game) => (
           <GameCard
             key={game.id}
             poolId={game.id}
@@ -312,12 +371,17 @@ const StatusControls: React.FC = () => {
             joinerPlayer={game.joinerPlayer}
             creatorAta={game.creatorAta}
             winner={game.winner}
+            random={game.random}
           />
         ))}
       </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-1 gap-4 my-6">
+        {displayGames.length == 0 &&
+          <span className="font-oswald font-bold text-xl leading-[160%] text-white m-auto">No Datas</span>}
+      </div>
 
-      {/* Show More Button */}
-      {hasMore && (
+      {/* Show More Button - Display when there are more games to show */}
+      {games.length > displayGames.length && !isFirstLoading && !isLoadingAll && (
         <div className="flex justify-center">
           <button
             onClick={handleLoadMore}

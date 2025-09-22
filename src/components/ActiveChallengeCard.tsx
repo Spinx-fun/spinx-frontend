@@ -1,24 +1,42 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ActiveChallenge } from '../services/gameData';
+import { useWallet } from "@solana/wallet-adapter-react";
+import { closeCoinflip } from "../context/solana/transaction";
+import { assets } from '../utils/constants';
+import { PublicKey } from '@solana/web3.js';
+import { BeatLoader } from 'react-spinners';
 
 interface ActiveChallengeCardProps {
   challenge: ActiveChallenge;
 }
 
 const ActiveChallengeCard: React.FC<ActiveChallengeCardProps> = ({ challenge }) => {
+  const wallet = useWallet();
+  const [activeAsset] = useState(assets[0])
+  const [isLoading, setIsLoading] = useState(false);
+  const handleWithdraw = async () => {
+    try {
+      setIsLoading(true);
+      await closeCoinflip(wallet, challenge.id, new PublicKey(activeAsset.address), setIsLoading)
+
+    } catch (error) {
+      setIsLoading(false)
+      console.log(error);
+    }
+  };
   return (
     <div className="border border-[#2a2a2a] rounded-xl p-4 bg-[#020617]">
       {/* Badge */}
       <div className={`
         border rounded-[50px] py-[5px] px-[10px] h-[26px] inline-flex items-center gap-2 mb-4
-        ${challenge.gameType === 'coin-flip' 
-          ? 'border-[rgba(249,199,82,0.3)] bg-[rgba(255,215,0,0.2)]' 
+        ${challenge.gameType === 'coin-flip'
+          ? 'border-[rgba(249,199,82,0.3)] bg-[rgba(255,215,0,0.2)]'
           : 'border-[rgba(255,100,100,0.3)] bg-[rgba(255,100,100,0.2)]'
         }
       `}>
-        <img 
-          src={challenge.gameType === 'coin-flip' ? "/image/coin.svg" : "/image/slotmachine.svg"} 
-          alt={challenge.gameType === 'coin-flip' ? "Coin" : "Slot Machine"} 
+        <img
+          src={challenge.gameType === 'coin-flip' ? "/image/coin.svg" : "/image/slotmachine.svg"}
+          alt={challenge.gameType === 'coin-flip' ? "Coin" : "Slot Machine"}
           className="w-4 h-4"
         />
         <span className={`
@@ -74,8 +92,18 @@ const ActiveChallengeCard: React.FC<ActiveChallengeCardProps> = ({ challenge }) 
         border border-[#ff1a00] rounded-[2px_8px] py-2 px-4 w-[140px] h-[37px]
         font-oswald font-medium text-sm leading-[150%] uppercase text-[#ff1a00]
         bg-transparent hover:bg-[#ff1a00] hover:text-white transition-colors
-      ">
-        Withdraw
+      "
+        onClick={handleWithdraw}>
+        {isLoading ?
+          <BeatLoader
+            color={'#fff'}
+            loading={isLoading}
+            size={10}
+            aria-label="Loading Spinner"
+            data-testid="loader"
+          /> :
+          "Withdraw"
+        }
       </button>
     </div>
   );
