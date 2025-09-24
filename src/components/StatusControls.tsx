@@ -291,7 +291,7 @@ const StatusControls: React.FC = () => {
             className="w-3.5 h-3.5"
           />
           <span className="font-oswald font-bold text-xl leading-[160%] text-white">
-            Live Listening
+            Live
           </span>
           <span className="font-inter font-normal text-xs leading-[200%] text-[#929294]">
             (Updated {formatTimeAgo(lastUpdated)})

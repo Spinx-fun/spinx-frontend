@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { PlayerHistory } from '../services/gameData';
-import { solTx } from '../utils/constants';
+import { solacc } from '../utils/constants';
 
 interface PlayerHistoryTableProps {
   data: PlayerHistory[];
@@ -193,7 +193,7 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
               background: 'transparent'
             }}
           >
-            <span className="font-inter font-bold text-[16px] leading-[100%] text-white">Winner Result</span>
+            <span className="font-inter font-bold text-[16px] leading-[100%] text-white">Game Link</span>
           </div>
         </div>
 
@@ -260,7 +260,7 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
               }}
             >
               <span className="font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap">
-                {formatAddress(item.challenge.split('Vs')[0]?.trim())} <span className="text-[#545454]">Vs</span> {item?.joinerPlayer != null ? formatAddress(item?.joinerPlayer) : "Not Joined"}
+                <a href={`${solacc}/${item.challenge}?cluster=devnet`} target='blank' >{formatAddress(item.challenge.split('Vs')[0]?.trim())} </a><span className="text-[#545454]">Vs</span> {item?.joinerPlayer != null ?  <a href={`${solacc}/${item.joinerPlayer}?cluster=devnet`} target='blank' >{formatAddress(item.joinerPlayer.split('Vs')[0]?.trim())} </a> : "Not Joined"}
               </span>
             </div>
 
@@ -333,10 +333,10 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
                 background: 'transparent'
               }}
             >
-              {item.winnerTx != null
+              {item.creatorAta != null
                 ?
-                <a href={`${solTx}/${item.winnerTx}?cluster=devnet`} target='blank' className="font-inter font-bold text-[14px] leading-[114%] text-[#f9c752] whitespace-nowrap">
-                  {formatAddress(item.winnerTx)}
+                <a href={`${solacc}/${item.creatorAta}?cluster=devnet`} target='blank' className="underline font-inter font-bold text-[14px] leading-[114%] text-[#a8d8f9] whitespace-nowrap">
+                  View
                 </a >
                 : <span className="font-inter font-bold text-[14px] leading-[114%] text-[#fff] whitespace-nowrap">Not Joined</span>}
             </div>
@@ -429,7 +429,7 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
                 {item.game}
               </div>
               <span className="font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap">
-                {formatAddress(item.challenge.split('Vs')[0]?.trim())} <span className="text-[#545454]">Vs</span> {item.joinerPlayer != null ? formatAddress(item.joinerPlayer.split('Vs')[0]?.trim()) : 'Not Joined'}
+              <a href={`${solacc}/${item.challenge}?cluster=devnet`} target='blank' >{formatAddress(item.challenge.split('Vs')[0]?.trim())} </a><span className="text-[#545454]">Vs</span> {item?.joinerPlayer != null ?  <a href={`${solacc}/${item.joinerPlayer}?cluster=devnet`} target='blank' >{formatAddress(item.joinerPlayer.split('Vs')[0]?.trim())} </a> : "Not Joined"}
               </span>
             </div>
 
@@ -440,9 +440,12 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
               </span>
             </div>
             <div className="flex items-center justify-between">
-              {item.winnerTx != null
-                ? <a href={`${solTx}/${item.winnerTx}?cluster=devnet`} target='blank' className="font-inter font-bold text-[14px] leading-[114%] text-[#f9c752] whitespace-nowrap">
-                  {formatAddress(item.winnerTx)}
+              <span className="font-inter font-bold text-[14px] leading-[114%] text-[#a8d8f9] whitespace-nowrap">
+                Game Link:
+              </span>
+              {item.creatorAta != null
+                ? <a href={`${solacc}/${item.creatorAta}?cluster=devnet`} target='blank' className="underline font-inter font-bold text-[14px] leading-[114%] text-[#a8d8f9] whitespace-nowrap">
+                  View
                 </a >
                 : <span className="font-inter font-bold text-[14px] leading-[114%] text-[#fff] whitespace-nowrap">Not Joined</span>}
             </div>

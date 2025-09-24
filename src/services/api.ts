@@ -33,7 +33,7 @@ export const fetchRecentGames = async (page: number, pageSize: number = 10): Pro
   const endIndex = startIndex + pageSize;
   let datas = await fetchAllChallenges()
   // Filter to only coin-flip games for consistency
-  const coinFlipGames = datas.filter((game: GameData) => game.gameType === 'coin-flip');
+  const coinFlipGames = datas.filter((game: GameData) => game.joinerPlayer !== null);
   return coinFlipGames.slice(startIndex, endIndex);
 };
 

@@ -231,7 +231,8 @@ export default function CreateChallenge() {
               result: result,
               stakeAmount: historyResponse[i].stakeAmount,
               time: historyResponse[i].time,
-              winnerTx: historyResponse[i].winnerTx
+              winnerTx: historyResponse[i].winnerTx,
+              creatorAta : historyResponse[i].creatorAta
             }
             newDataArray.push(newData);
           }
@@ -327,6 +328,7 @@ export default function CreateChallenge() {
     try {
       setIsLoading(true);
       if (!stakeAmount || !selectedCoin || Number(stakeAmount) == 0) {
+        setIsLoading(false);
         setError("Please enter stake amount and make a pick Head or Tail");
         return;
       }
@@ -553,7 +555,7 @@ export default function CreateChallenge() {
                 </div>
               </div>
               {/* Recent Games in the same column as Create Challenge */}
-              <div className="w-full p-5">
+              <div className="w-full p-2">
                 <div className="flex justify-between pb-3">
                   <h2 className="font-oswald font-bold text-[20px] leading-[160%] text-white">
                     Player History

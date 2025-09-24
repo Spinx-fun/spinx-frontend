@@ -4,6 +4,7 @@ import { joinCoinflip } from "../context/solana/transaction";
 import { useWallet, WalletContextState } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
+import AnimatedResultText from "./AnimatedResultText";
 
 // Utility function to detect Safari browser
 const isSafari = (): boolean => {
@@ -69,9 +70,9 @@ export default function JoinCoinflipModal(props: {
 
     return (
         <div
-            className="fixed left-0 top-0 w-full h-[100vh] backdrop-blur-sm z-[40] flex-col bg-[#00000050] grid place-content-center"
+            className="fixed left-0 top-0 w-full h-[100vh] backdrop-blur-sm z-[40] flex-col bg-[#00000050] grid place-content-center overflow-visible"
         >
-            <div className="flex flex-col m-6 bg-[#10152b] w-[380px] rounded-[5px]">
+            <div className="flex flex-col m-6 bg-[#10152b] w-[380px] rounded-[5px] relative overflow-visible">
                 <div className="flex flex-row items-center justify-between py-4 px-6 border-b border-[#ffffff10]">
                     <span className="text-[12px] text-[#8B8A8D] font-[500]">Join Coinflip</span>
                     <button onClick={() => props.handleCloseModal()}>
@@ -111,13 +112,13 @@ export default function JoinCoinflipModal(props: {
                     )}
                 </div>
 
-                {winner ?
-                    winner == wallet.publicKey?.toBase58() ?
-                        <h3 className='font-oswald font-medium text-lg leading-[111%] text-white mb-4 mt-4 m-auto'>You win!</h3> :
-                        <h3 className='font-oswald font-medium text-lg leading-[111%] text-white mb-4 mt-4 m-auto'>You loss!</h3>
-                    :
-                    ''
-                }
+                {/* Enhanced Win/Loss Animation */}
+                <div className="result-animation-container">
+                    <AnimatedResultText
+                        isWin={winner === wallet.publicKey?.toBase58()}
+                        show={!!winner}
+                    />
+                </div>
                 <div className="flex justify-center p-6 gap-4">
                     {wallet.publicKey ? (
                         <button

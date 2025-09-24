@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { GameData } from '../services/gameData';
 import { fetchRecentGames, getTotalGamesCount } from '../services/api';
 import { add } from 'date-fns';
-import { solTx } from '../utils/constants';
+import { solacc } from '../utils/constants';
 
 interface RecentGamesTableProps {
 }
@@ -220,7 +220,7 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
               background: 'transparent'
             }}
           >
-            <span className="font-inter font-bold text-[16px] leading-[100%] text-white">Winner TX</span>
+            <span className="font-inter font-bold text-[16px] leading-[100%] text-white">Randomness PRoof</span>
           </div>
         </div>
 
@@ -268,18 +268,18 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
                 background: 'transparent'
               }}
             >
-              <span className={(game.winner == game.gameName && game.winner != null) ? "font-inter italic font-medium text-[14px] leading-[133%] text-[#f9c752]" : "font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap"}>
+              <a href={`${solacc}/${game.gameName}?cluster=devnet`} target='blank' className={(game.winner == game.gameName && game.winner != null) ? "font-inter italic font-medium text-[14px] leading-[133%] text-[#f9c752]" : "font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap"}>
                 {formatAddress(game.gameName)}
-              </span>
+              </a>
               <span className="text-[#545454]">&nbsp;Vs&nbsp;</span>
-              <span className={(game.winner == game.joinerPlayer && game.winner != null) ? "font-inter italic font-medium text-[14px] leading-[133%] text-[#f9c752]" : "font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap"}>
+              <a href={`${solacc}/${game.joinerPlayer}?cluster=devnet`} target='blank' className={(game.winner == game.joinerPlayer && game.winner != null) ? "font-inter italic font-medium text-[14px] leading-[133%] text-[#f9c752]" : "font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap"}>
                 {
                   game.joinerPlayer != null
                     ?
                     formatAddress(game.joinerPlayer)
                     : "Not joined"
                 }
-              </span>
+              </a>
             </div>
 
             {/* Stake Cell */}
@@ -366,9 +366,9 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
                 background: 'transparent'
               }}
             >
-              {game.winnerTx != null
-                ? <a href={`${solTx}/${game.winnerTx}?cluster=devnet`} target='blank' className="font-inter font-bold text-[14px] leading-[114%] text-[#f9c752] whitespace-nowrap">
-                  {formatAddress(game.winnerTx)}
+              {game.random != null
+                ? <a href={`${solacc}/${game.random}?cluster=devnet`} target='blank' className="underline font-inter font-bold text-[14px] leading-[114%] text-[#a8d8f9] whitespace-nowrap">
+                  View
                 </a >
                 : <span className="font-inter font-bold text-[14px] leading-[114%] text-[#fff] whitespace-nowrap">Not Joined</span>}
 
@@ -457,21 +457,31 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
 
               {/* Challenge */}
               <div className="mb-3">
-                <span className="font-inter font-normal text-[14px] leading-[114%] text-white">
-                  {formatAddress(game.gameName)} <span className="text-[#545454]">Vs</span> {game.joinerPlayer != null ? formatAddress(game.joinerPlayer) : "Not Joined"}
-                </span>
+                <a href={`${solacc}/${game.gameName}?cluster=devnet`} target='blank' className={(game.winner == game.gameName && game.winner != null) ? "font-inter italic font-medium text-[14px] leading-[133%] text-[#f9c752]" : "font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap"}>
+                  {formatAddress(game.gameName)}
+                </a>
+                <span className="text-[#545454]">&nbsp;Vs&nbsp;</span>
+                <a href={`${solacc}/${game.joinerPlayer}?cluster=devnet`} target='blank' className={(game.winner == game.joinerPlayer && game.winner != null) ? "font-inter italic font-medium text-[14px] leading-[133%] text-[#f9c752]" : "font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap"}>
+                  {
+                    game.joinerPlayer != null
+                      ?
+                      formatAddress(game.joinerPlayer)
+                      : "Not joined"
+                  }
+                </a>
               </div>
 
               {/* Stake */}
               <div className="flex items-center justify-between mb-1">
                 <span className="font-inter font-bold text-[14px] leading-[114%] text-[#f9c752]">
-                  {game.stakeAmount}
+                  Stake: {game.stakeAmount}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                {game.winnerTx != null
-                  ? <a href={`${solTx}/${game.winnerTx}?cluster=devnet`} target='blank' className="font-inter font-bold text-[14px] leading-[114%] text-[#f9c752] whitespace-nowrap">
-                    {formatAddress(game.winnerTx)}
+                <span className="font-inter font-normal text-[14px] leading-[114%] text-white">Randomness Proof</span>
+                {game.random != null
+                  ? <a href={`${solacc}/${game.random}?cluster=devnet`} target='blank' className="underline font-inter font-bold text-[14px] leading-[114%] text-[#a8d8f9] whitespace-nowrap">
+                    View
                   </a >
                   : <span className="font-inter font-bold text-[14px] leading-[114%] text-[#fff] whitespace-nowrap">Not Joined</span>}
               </div>

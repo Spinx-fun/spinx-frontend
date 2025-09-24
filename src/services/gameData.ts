@@ -87,6 +87,7 @@ export const fetchActiveChallenges = async (walletAddress: string): Promise<Acti
         formattedTimes = format(date, 'HH:mm:ss')
       }
       let gameData;
+      console.log('debug->data', accountData)
       if (accountData.winner == null && walletAddress == accountData.creator) {
         gameData = {
           id: Number(accountData.poolId),
@@ -101,6 +102,7 @@ export const fetchActiveChallenges = async (walletAddress: string): Promise<Acti
         newDatas.push(gameData)
       }
     }
+    console.log('debug->newDatas', newDatas)
     newDatas.sort((a, b) => b.id - a.id);
   }
   return newDatas;

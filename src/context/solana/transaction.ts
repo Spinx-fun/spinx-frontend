@@ -677,7 +677,7 @@ export const joinCoinflip = async (
       })
 
       if (joinResponse.status === 200) {
-        console.log('debug->joinResponse', joinResponse)
+        console.log('joinResponse', joinResponse)
       }
 
       let winner;
