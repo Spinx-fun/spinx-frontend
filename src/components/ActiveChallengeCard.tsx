@@ -8,16 +8,17 @@ import { BeatLoader } from 'react-spinners';
 
 interface ActiveChallengeCardProps {
   challenge: ActiveChallenge;
+  setLoading: Function;
 }
 
-const ActiveChallengeCard: React.FC<ActiveChallengeCardProps> = ({ challenge }) => {
+const ActiveChallengeCard: React.FC<ActiveChallengeCardProps> = ({ challenge, setLoading }) => {
   const wallet = useWallet();
   const [activeAsset] = useState(assets[0])
   const [isLoading, setIsLoading] = useState(false);
   const handleWithdraw = async () => {
     try {
       setIsLoading(true);
-      await closeCoinflip(wallet, challenge.id, new PublicKey(activeAsset.address), setIsLoading)
+      await closeCoinflip(wallet, challenge.id, new PublicKey(activeAsset.address), setLoading)
 
     } catch (error) {
       setIsLoading(false)

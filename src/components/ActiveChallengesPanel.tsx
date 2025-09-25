@@ -4,9 +4,10 @@ import { ActiveChallenge } from '../services/gameData';
 
 interface ActiveChallengesPanelProps {
   challenges: ActiveChallenge[];
+  setIsLoading: Function;
 }
 
-const ActiveChallengesPanel: React.FC<ActiveChallengesPanelProps> = ({ challenges }) => {
+const ActiveChallengesPanel: React.FC<ActiveChallengesPanelProps> = ({ challenges, setIsLoading }) => {
   return (
     <div className="border border-[#2a2a2a] rounded-[10px] p-4 bg-[#020617] h-fit">
       <h2 className="font-oswald font-bold text-[20px] leading-[160%] text-white mb-4">
@@ -21,7 +22,7 @@ const ActiveChallengesPanel: React.FC<ActiveChallengesPanelProps> = ({ challenge
         ) : (
           <div className="space-y-3">
             {challenges.map((challenge) => (
-              <ActiveChallengeCard key={challenge.id} challenge={challenge} />
+              <ActiveChallengeCard key={challenge.id} challenge={challenge} setLoading={setIsLoading}/>
             ))}
           </div>
         )}

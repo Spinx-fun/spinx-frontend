@@ -256,7 +256,6 @@ export default function CreateChallenge() {
     if (wallet.publicKey)
       loadData();
   }, [wallet, isLoading]);
-  console.log('debug->isLoading', isLoading)
 
   // Filter player history based on selected time range
   const filteredPlayerHistory = useMemo(() => {
@@ -548,11 +547,11 @@ export default function CreateChallenge() {
                   </div>
                 </div>
                 <div className="hidden xl:block lg:w-[456px] order-2 lg:order-2">
-                  <ActiveChallengesPanel challenges={activeChallenges} />
+                  <ActiveChallengesPanel challenges={activeChallenges} setIsLoading={setIsLoading}/>
                 </div>
                 {/* Active Challenges on mobile (comes after Create Challenge) */}
                 <div className="lg:hidden">
-                  <ActiveChallengesPanel challenges={activeChallenges} />
+                  <ActiveChallengesPanel challenges={activeChallenges} setIsLoading={setIsLoading}/>
                 </div>
               </div>
               {/* Recent Games in the same column as Create Challenge */}

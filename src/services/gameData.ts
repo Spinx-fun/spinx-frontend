@@ -148,7 +148,6 @@ export const fetchAllChallenges = async (): Promise<GameData[]> => {
       }
     }
   }
-  console.log('debug->newDatas', newDatas)
   newDatas.sort((a, b) => b.id - a.id);
   return newDatas;
 };
