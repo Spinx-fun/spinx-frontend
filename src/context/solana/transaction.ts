@@ -817,13 +817,18 @@ export const closeCoinflip = async (
         }
       );
       await solConnection.confirmTransaction(txId, "confirmed");
-      // await axios.post(`${API_URL}coinflip/`, {
-      //   txId: txId,
-      //   encodedTx: encodedTx
-      // });
-      console.log("Signature:", txId);
-      setLoading(false);
-      successAlert('Closed successfully!')
+      const response = await axios.post(`${API_URL}close-coinflip/`, {
+        poolId: Number(poolId),
+      })
+
+      if (response.status === 200) {
+        setTimeout(() => {
+          console.log("Signature:", txId);
+          setLoading(false);
+          successAlert('Closed successfully!')
+        }, 3000)
+      }
+
     }
   } catch (error) {
     console.log(" --> claimCoinflip:", error);

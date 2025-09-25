@@ -256,6 +256,7 @@ export default function CreateChallenge() {
     if (wallet.publicKey)
       loadData();
   }, [wallet, isLoading]);
+  console.log('debug->isLoading', isLoading)
 
   // Filter player history based on selected time range
   const filteredPlayerHistory = useMemo(() => {

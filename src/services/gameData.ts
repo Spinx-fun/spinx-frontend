@@ -87,8 +87,7 @@ export const fetchActiveChallenges = async (walletAddress: string): Promise<Acti
         formattedTimes = format(date, 'HH:mm:ss')
       }
       let gameData;
-      console.log('debug->data', accountData)
-      if (accountData.winner == null && walletAddress == accountData.creator) {
+      if (accountData.winner == null && walletAddress == accountData.creator && !accountData.status.closed) {
         gameData = {
           id: Number(accountData.poolId),
           gameType: 'coin-flip',
@@ -102,7 +101,7 @@ export const fetchActiveChallenges = async (walletAddress: string): Promise<Acti
         newDatas.push(gameData)
       }
     }
-    console.log('debug->newDatas', newDatas)
+
     newDatas.sort((a, b) => b.id - a.id);
   }
   return newDatas;
@@ -130,23 +129,26 @@ export const fetchAllChallenges = async (): Promise<GameData[]> => {
         formattedDate = format(date, 'yyyy-MM-dd')
         formattedTimes = format(date, 'HH:mm:ss')
       }
-      const gameData = {
-        id: Number(accountData.poolId),
-        gameType: 'coin-flip',
-        gameName: accountData.creator,
-        stakeAmount: parseInt("0x" + accountData.poolAmount) / (10 ** activeAsset.decimals),
-        pickValue: pickValues,
-        date: formattedDate,
-        time: formattedTimes,
-        joinerPlayer: accountData.joiner,
-        creatorAta: pdaKey,
-        winner: accountData.winner,
-        winnerTx: accountData.winner_tx,
-        random: accountData.joiner != null ? accountData.random : ''
+      if (!accountData.status.closed) {
+        const gameData = {
+          id: Number(accountData.poolId),
+          gameType: 'coin-flip',
+          gameName: accountData.creator,
+          stakeAmount: parseInt("0x" + accountData.poolAmount) / (10 ** activeAsset.decimals),
+          pickValue: pickValues,
+          date: formattedDate,
+          time: formattedTimes,
+          joinerPlayer: accountData.joiner,
+          creatorAta: pdaKey,
+          winner: accountData.winner,
+          winnerTx: accountData.winner_tx,
+          random: accountData.joiner != null ? accountData.random : ''
+        }
+        newDatas.push(gameData)
       }
-      newDatas.push(gameData)
     }
   }
+  console.log('debug->newDatas', newDatas)
   newDatas.sort((a, b) => b.id - a.id);
   return newDatas;
 };
