@@ -30,6 +30,29 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = 'home' }) => {
       href: '/spinx_technical_whitepaper.pdf',
       external: true
     },
+
+    {
+      id: 'about',
+      label: 'About ',
+      icon: '/image/gamepad.svg',
+      href: '/About_Spinx.pdf',
+      external: true
+    },
+    {
+      id: 'roadmap',
+      label: 'Roadmap ',
+      icon: '/image/calendar.svg',
+      href: '/roadmap.pdf',
+      external: true
+    },
+    {
+      id: 'tokenomics',
+      label: 'Tokenomics ',
+      icon: '/image/sort.svg',
+      href: '/tokenomics.pdf',
+      external: true
+    },
+
     {
       id: 'support',
       label: 'Support',
@@ -52,6 +75,28 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = 'home' }) => {
       label: 'Whitepaper ',
       icon: '/image/documentation.svg',
       href: '/spinx_technical_whitepaper.pdf',
+      external: true
+    },
+
+    {
+      id: 'about',
+      label: 'About ',
+      icon: '/image/gamepad.svg',
+      href: '/About_Spinx.pdf',
+      external: true
+    },
+    {
+      id: 'roadmap',
+      label: 'Roadmap ',
+      icon: '/image/calendar.svg',
+      href: '/roadmap.pdf',
+      external: true
+    },
+    {
+      id: 'tokenomics',
+      label: 'Tokenomics ',
+      icon: '/image/sort.svg',
+      href: '/tokenomics.pdf',
       external: true
     },
     {
