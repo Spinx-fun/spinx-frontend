@@ -272,6 +272,14 @@ const StatusControls: React.FC = () => {
     }
   }, [games, displayPage]);
 
+  const formatTime = (time: string) => {
+    const [hours, minutes, seconds] = time.split(':');
+    const hourNum = parseInt(hours);
+    const ampm = hourNum >= 12 ? 'PM' : 'AM';
+    const formattedHour = hourNum % 12 || 12;
+    return `${formattedHour}:${minutes}:${seconds} ${ampm}`;
+  };
+
   return (
     <div className="w-full">
       {/* Header with Search and User Info */}
@@ -367,7 +375,7 @@ const StatusControls: React.FC = () => {
             stakeAmount={game.stakeAmount}
             pickValue={game.pickValue}
             date={game.date}
-            time={game.time}
+            time={formatTime(game.time)}
             joinerPlayer={game.joinerPlayer}
             creatorAta={game.creatorAta}
             winner={game.winner}

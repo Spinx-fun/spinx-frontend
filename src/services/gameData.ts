@@ -104,7 +104,12 @@ export const fetchActiveChallenges = async (walletAddress: string): Promise<Acti
 
     newDatas.sort((a, b) => b.id - a.id);
   }
-  return newDatas;
+  const uniqueObjects = newDatas.filter((value, index, self) =>
+    index === self.findIndex((t) => (
+      t.id === value.id // Compare based on the 'id' property
+    ))
+  );
+  return uniqueObjects;
 };
 
 export const fetchAllChallenges = async (): Promise<GameData[]> => {
@@ -149,5 +154,11 @@ export const fetchAllChallenges = async (): Promise<GameData[]> => {
     }
   }
   newDatas.sort((a, b) => b.id - a.id);
-  return newDatas;
+  const uniqueObjects = newDatas.filter((value, index, self) =>
+    index === self.findIndex((t) => (
+      t.id === value.id // Compare based on the 'id' property
+    ))
+  );
+  
+  return uniqueObjects;
 };

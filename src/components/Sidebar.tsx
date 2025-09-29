@@ -25,9 +25,9 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = 'home' }) => {
     },
     {
       id: 'documentation',
-      label: 'Documentation',
+      label: 'Whitepaper ',
       icon: '/image/documentation.svg',
-      href: '/',
+      href: '/whitepaper.pdf',
       external: true
     },
     {
@@ -49,9 +49,9 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = 'home' }) => {
     },
     {
       id: 'documentation',
-      label: 'Documentation',
+      label: 'Whitepaper ',
       icon: '/image/documentation.svg',
-      href: '/',
+      href: '/whitepaper.pdf',
       external: true
     },
     {
