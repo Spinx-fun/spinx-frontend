@@ -398,7 +398,7 @@ export default function CreateChallenge() {
           </div>
 
           {/* Main Content Grid - Challenge Creation and Active Challenges */}
-          <div className="flex flex-col lg:flex-row gap-6 px-3 lg:px-5 pb-12 pt-6 flex-1">
+          <div className="flex flex-col lg:flex-row gap-6 px-3 lg:px-5 pb-8 pt-6 flex-1">
             {/* Left Column - Challenge Creation and Recent Games */}
             <div className="flex-1 space-y-6 order-1 lg:order-1">
               {/* Challenge Creation Interface */}

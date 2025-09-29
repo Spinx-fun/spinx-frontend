@@ -147,14 +147,14 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = 'home' }) => {
       {/* Footer Links */}
       <div className="absolute bottom-4 left-4 right-4">
         {/* Banner */}
-        <div className="px-4 mt-8 mb-4">
+        <a className="px-4 mt-8 mb-4" href="https://pump.fun" target='_blank'>
           <img
             src="/image/banner-216x90.svg"
             alt="Banner"
             className="w-[216px] h-[90px] rounded-md"
           />
-        </div>
-        <div className="flex justify-center gap-4">
+        </a>
+        {/* <div className="flex justify-center gap-4">
           <Link href="/#">
             <a className="font-inter font-normal text-[12px] leading-[133%] text-[rgba(255,255,255,0.4)] hover:text-[rgba(255,255,255,0.6)]">
               Terms
@@ -166,7 +166,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = 'home' }) => {
               Privacy Policy
             </a>
           </Link>
-        </div>
+        </div> */}
       </div>
     </div>
   );
