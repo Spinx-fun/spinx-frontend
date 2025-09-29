@@ -27,7 +27,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = 'home' }) => {
       id: 'documentation',
       label: 'Whitepaper ',
       icon: '/image/documentation.svg',
-      href: '/whitepaper.pdf',
+      href: '/spinx_technical_whitepaper.pdf',
       external: true
     },
     {
@@ -51,7 +51,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = 'home' }) => {
       id: 'documentation',
       label: 'Whitepaper ',
       icon: '/image/documentation.svg',
-      href: '/whitepaper.pdf',
+      href: '/spinx_technical_whitepaper.pdf',
       external: true
     },
     {
