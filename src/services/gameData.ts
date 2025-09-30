@@ -78,8 +78,9 @@ export const fetchActiveChallenges = async (walletAddress: string): Promise<Acti
       } else {
         pickValues = "TAILS"
       }
-      let timestamp = Number(accountData.start_ts) * 1000;
-      let date = new Date(timestamp);
+      // let timestamp = Number(accountData.update_ts) * 1000;
+      // let date = new Date(timestamp);
+      let date = accountData.update_ts;
       let formattedDate = ''
       let formattedTimes = ''
       if (date) {
