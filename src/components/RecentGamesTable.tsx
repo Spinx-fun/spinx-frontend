@@ -220,7 +220,7 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
               background: 'transparent'
             }}
           >
-            <span className="font-inter font-bold text-[16px] leading-[100%] text-white">Randomness PRoof</span>
+            <span className="font-inter font-bold text-[16px] leading-[100%] text-white">Game Link</span>
           </div>
         </div>
 
@@ -478,7 +478,7 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="font-inter font-normal text-[14px] leading-[114%] text-white">Randomness Proof</span>
+                <span className="font-inter font-normal text-[14px] leading-[114%] text-white">Game Link</span>
                 {game.random != null
                   ? <a href={`${solacc}/${game.random}?cluster=devnet`} target='blank' className="underline font-inter font-bold text-[14px] leading-[114%] text-[#a8d8f9] whitespace-nowrap">
                     View

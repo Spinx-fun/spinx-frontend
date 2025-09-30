@@ -39,7 +39,10 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ useXlBreakpoint = false }) => {
       document.body.style.overflow = 'unset';
     };
   }, [isMenuOpen]);
-
+  let currentUrl: string;
+  if (typeof window !== 'undefined') {
+    currentUrl = window.location.pathname;
+  }
   return (
     <>
       {/* Hamburger Menu Button */}
@@ -79,7 +82,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ useXlBreakpoint = false }) => {
         <div className={`fixed inset-0 z-50 ${mobileBreakpoint}:hidden`}>
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black bg-opacity-50" onClick={closeMenu} />
-          
+
           {/* Mobile Sidebar */}
           <div
             ref={menuRef}
@@ -109,7 +112,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ useXlBreakpoint = false }) => {
             </div>
 
             {/* Sidebar Content */}
-            <Sidebar activeItem="home" />
+            <Sidebar activeItem={currentUrl === '/coinflip' ? "home" : "create"} />
           </div>
         </div>
       )}

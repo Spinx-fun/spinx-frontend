@@ -56,6 +56,11 @@ const Header: React.FC<HeaderProps> = ({
     closeUserMenu();
   };
 
+  const goToProfile = () => {
+    router.push("/create-challenge");
+    closeUserMenu();
+  };
+
   const handleLogout = async () => {
     await disconnect();
     closeUserMenu();
@@ -143,7 +148,7 @@ const Header: React.FC<HeaderProps> = ({
                   {/* Wallet Row */}
                   <div className="border-b border-[#2a2a2a] p-3 bg-[#020617] hover:bg-[#1a1a2a] transition-colors">
                     <button
-                      onClick={goToWallet}
+                      onClick={goToProfile}
                       className="flex items-center gap-2 w-full text-left"
                     >
                       <img
@@ -271,9 +276,9 @@ const Header: React.FC<HeaderProps> = ({
                   </div>
 
                   {/* Wallet Row */}
-                  {/* <div className="border-b border-[#2a2a2a] p-3 bg-[#020617] hover:bg-[#1a1a2a] transition-colors">
+                  <div className="border-b border-[#2a2a2a] p-3 bg-[#020617] hover:bg-[#1a1a2a] transition-colors">
                     <button
-                      onClick={goToWallet}
+                      onClick={goToProfile}
                       className="flex items-center gap-2 w-full text-left"
                     >
                       <img
@@ -282,10 +287,10 @@ const Header: React.FC<HeaderProps> = ({
                         className="w-5 h-5"
                       />
                       <span className="font-inter font-medium text-[14px] leading-[114%] text-white">
-                        Wallet
+                        Profile
                       </span>
                     </button>
-                  </div> */}
+                  </div>
 
                   {/* Logout Row */}
                   <div className="p-3 bg-[#020617] hover:bg-[#1a1a2a] transition-colors rounded-b-[10px]">

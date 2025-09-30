@@ -119,11 +119,11 @@ const BalanceCard: React.FC<BalanceCardProps> = ({ solBalance, tokenBalance }) =
       </h3>
 
       <div className="rounded-[10px] p-3 bg-[#0e172b] flex-1 flex items-center justify-center">
-        <div className="flex items-center justify-between w-full">
+        <div className="flex items-center justify-between w-full lg:flex-row">
           {/* Balance Amount with SPX Tokens */}
           <div className="flex items-end gap-2">
             <span className="font-oswald font-medium text-[36px] leading-[117%] text-[#f9c752]">
-              {solBalances.toFixed(3)}
+              {solBalances > 0 ? solBalances.toFixed(3) : '0'}
             </span>
             <span className="font-inter font-medium text-[14px] leading-[186%] text-white self-end">
               Sol Balance
@@ -183,14 +183,14 @@ export default function CreateChallenge() {
   const [timeRange, setTimeRange] = useState('last-30-days');
   const walletAddress = wallet.publicKey?.toBase58();
   const amountOptions = [
-    "500",
-    "1000",
-    "1500",
-    "2000",
-    "2500",
-    "3000",
-    "3500",
-    "4000",
+    "10000",
+    "50000",
+    "100000",
+    "200000",
+    "500000",
+    "1000000",
+    "2000000",
+    "5000000",
     "ALL IN",
   ];
   const [activeChallenges, setActiveChallenges] = useState<ActiveChallenge[]>(
@@ -232,7 +232,7 @@ export default function CreateChallenge() {
               stakeAmount: historyResponse[i].stakeAmount,
               time: historyResponse[i].time,
               winnerTx: historyResponse[i].winnerTx,
-              creatorAta : historyResponse[i].creatorAta
+              creatorAta: historyResponse[i].creatorAta
             }
             newDataArray.push(newData);
           }
@@ -372,7 +372,7 @@ export default function CreateChallenge() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="flex">
+      <div className="flex-col">
         {/* Sidebar - Hidden on mobile and tablet (below xl) - Special rule for create-challenge */}
         <div className="hidden xl:block">
           <Sidebar activeItem="create" />
@@ -547,11 +547,11 @@ export default function CreateChallenge() {
                   </div>
                 </div>
                 <div className="hidden xl:block lg:w-[456px] order-2 lg:order-2">
-                  <ActiveChallengesPanel challenges={activeChallenges} setIsLoading={setIsLoading}/>
+                  <ActiveChallengesPanel challenges={activeChallenges} setIsLoading={setIsLoading} />
                 </div>
                 {/* Active Challenges on mobile (comes after Create Challenge) */}
                 <div className="lg:hidden">
-                  <ActiveChallengesPanel challenges={activeChallenges} setIsLoading={setIsLoading}/>
+                  <ActiveChallengesPanel challenges={activeChallenges} setIsLoading={setIsLoading} />
                 </div>
               </div>
               {/* Recent Games in the same column as Create Challenge */}
@@ -589,9 +589,14 @@ export default function CreateChallenge() {
               </div>
             </div>
           </div>
-          <Footer />
+          <div className="px-2">
+            <Footer />
+          </div>
         </div>
+
       </div>
+
+
     </>
   );
 }

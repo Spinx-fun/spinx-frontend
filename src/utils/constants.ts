@@ -9,7 +9,7 @@ export interface Asset {
 export const assets = [
     {
         symbol: 'SpinX',
-        src: '/img/jto.png',
+        src: '/image/sfx-coin.svg',
         name: 'SpinX',
         address: 'EY4wsByMUEudm4FRC2nTFfmiWFCMdhJx5j69ZTfQ8mz6',
         decimals: 9,

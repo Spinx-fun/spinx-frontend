@@ -126,8 +126,7 @@ export const fetchAllChallenges = async (): Promise<GameData[]> => {
       } else {
         pickValues = "TAILS"
       }
-      let timestamp = Number(accountData.start_ts) * 1000;
-      let date = new Date(timestamp);
+      let date = accountData.update_ts;
       let formattedDate = ''
       let formattedTimes = ''
       if (date) {

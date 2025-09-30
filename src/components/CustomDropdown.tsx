@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 export interface DropdownOption {
   value: string;
@@ -25,18 +25,35 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
   leftIcon,
   className = ''
 }) => {
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const selectedOption = options.find(opt => opt.value === value);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
+
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative ${className}`} ref={dropdownRef}>
       <button
         className={`
           w-[166px] border border-opacity-50 border-[#90A2B9] rounded-md 
           py-2 px-3 flex items-center justify-between transition-all duration-200
           ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-opacity-70'}
-          ${isOpen ? 
-            'border-3 border-opacity-50 border-[#90A2B9] bg-white text-black' : 
+          ${isOpen ?
+            'border-3 border-opacity-50 border-[#90A2B9] bg-white text-black' :
             'bg-transparent text-white'
           }
         `}
@@ -47,13 +64,13 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
           {leftIcon && <img src={leftIcon} alt="" className="w-4 h-4" />}
           {selectedOption?.label || placeholder}
         </div>
-        <img 
-          src="/image/shevron.svg" 
-          alt="Dropdown arrow" 
+        <img
+          src="/image/shevron.svg"
+          alt="Dropdown arrow"
           className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180 invert' : ''}`}
         />
       </button>
-      
+
       {isOpen && (
         <div className="absolute top-full mt-1  border border-[#2a2a2a] rounded-xl p-3.5 shadow-[0_4px_24px_0_rgba(255,255,255,0.06)] bg-[#020617] z-50">
           {options.map((option) => (

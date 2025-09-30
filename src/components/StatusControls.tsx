@@ -414,7 +414,6 @@ const StatusControls: React.FC = () => {
 
       {/* Recent Games Table */}
       <RecentGamesTable />
-      <Footer />
     </div>
   );
 };

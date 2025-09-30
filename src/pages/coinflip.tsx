@@ -12,6 +12,7 @@ import {
 } from "../config";
 import { useRouter } from "next/router";
 import { Coinflip } from "../utils/type";
+import Footer from "../components/Footer";
 
 export const getTokenLogo = (address: string) => {
     switch (address) {
@@ -114,10 +115,11 @@ export default function Rooms() {
                 <div
                     className={`flex flex-row justify-end gap-2 xl:gap-6 px-3 lg:px-12 pb-6 pt-6 bg-cover bg-no-repeat flex-1 flex-wrap bg-[#0a101e] lg:ml-[248px] min-h-screen`}
                 >
-                    <div className="overflow-y-auto grow mx-auto">
+                    <div className="overflow-y-auto grow mx-auto p-1">
                         <StatusControls />
+                        
                     </div>
-
+                    <Footer />
                     <div className="overflow-y-auto grow mx-auto hidden">
                         <div className="flex flex-col-reverse lg:flex-row justify-between items-center gap-4">
                             <div className="flex flex-row w-full lg:w-fit grow justify-between">
@@ -166,8 +168,11 @@ export default function Rooms() {
 
                         </div>
                     </div>
+                    
                 </div>
+                
             </div>
+            
         </>
     );
 }
