@@ -1,5 +1,5 @@
 // export const API_URL = "http://localhost:3002/";
-export const API_URL = "http://82.29.190.47:3004/";
+export const API_URL = "https://api.spinx.fun/";
 // export const SOCKET_URL = "http://localhost:3002/";
 export const SOCKET_URL = "https://ws.valhalla.fun/";
 
