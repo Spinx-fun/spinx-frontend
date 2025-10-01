@@ -183,14 +183,14 @@ export default function CreateChallenge() {
   const [timeRange, setTimeRange] = useState('last-30-days');
   const walletAddress = wallet.publicKey?.toBase58();
   const amountOptions = [
-    "10000",
-    "50000",
-    "100000",
-    "200000",
-    "500000",
-    "1000000",
-    "2000000",
-    "5000000",
+    "10'000",
+    "50'000",
+    "100'000",
+    "200'000",
+    "500'000",
+    "1'000'000",
+    "2'000'000",
+    "5'000'000",
     "ALL IN",
   ];
   const [activeChallenges, setActiveChallenges] = useState<ActiveChallenge[]>(
@@ -295,6 +295,7 @@ export default function CreateChallenge() {
     if (amount === "ALL IN" && userData) {
       setStakeAmount(userData.tokenBalance.toString());
     } else {
+      amount = amount.replace(/[^a-zA-Z0-9\s]/g, '');
       setStakeAmount(amount);
     }
   };

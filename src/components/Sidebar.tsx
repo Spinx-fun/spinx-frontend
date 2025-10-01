@@ -26,37 +26,42 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = 'home' }) => {
     {
       id: 'documentation',
       label: 'Whitepaper ',
-      icon: '/image/documentation.svg',
-      href: '/spinx_technical_whitepaper.pdf',
-      external: true
+      icon: activeItem === 'documentation' ? '/image/whitepaper-active.svg' : '/image/whitepaper.svg',
+      activeIcon: '/image/whitepaper-active.svg',
+      href: '/whitepaper',
+      external: false
     },
 
     {
       id: 'about',
       label: 'About ',
-      icon: '/image/gamepad.svg',
-      href: '/About_Spinx.pdf',
-      external: true
+      icon: activeItem === 'about' ? '/image/about-active.svg' : '/image/about.svg',
+      activeIcon: '/image/about-active.svg',
+      href: '/about',
+      external: false
     },
     {
       id: 'roadmap',
       label: 'Roadmap ',
-      icon: '/image/calendar.svg',
-      href: '/roadmap.pdf',
-      external: true
+      icon: activeItem === 'roadmap' ? '/image/roadmap-active.svg' : '/image/roadmap.svg',
+      activeIcon: '/image/roadmap-active.svg',
+      href: '/roadmap',
+      external: false
     },
     {
       id: 'tokenomics',
       label: 'Tokenomics ',
-      icon: '/image/sort.svg',
-      href: '/tokenomics.pdf',
-      external: true
+      icon: activeItem === 'tokenomics' ? '/image/tokenomics-active.svg' : '/image/tokenomics.svg',
+      activeIcon: '/image/tokenomics-active.svg',
+      href: '/tokenomics',
+      external: false
     },
 
     {
       id: 'support',
       label: 'Support',
-      icon: '/image/support.svg',
+      icon: activeItem === 'support' ? '/image/support-active.svg' : '/image/support.svg',
+      activeIcon: '/image/support-active.svg',
       href: '/',
       external: true
     }
@@ -73,36 +78,41 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = 'home' }) => {
     {
       id: 'documentation',
       label: 'Whitepaper ',
-      icon: '/image/documentation.svg',
-      href: '/spinx_technical_whitepaper.pdf',
-      external: true
+      icon: activeItem === 'documentation' ? '/image/whitepaper-active.svg' : '/image/whitepaper.svg',
+      activeIcon: '/image/whitepaper-active.svg',
+      href: '/whitepaper',
+      external: false
     },
 
     {
       id: 'about',
       label: 'About ',
-      icon: '/image/gamepad.svg',
-      href: '/About_Spinx.pdf',
-      external: true
+      icon: activeItem === 'about' ? '/image/about-active.svg' : '/image/about.svg',
+      activeIcon: '/image/about-active.svg',
+      href: '/about',
+      external: false
     },
     {
       id: 'roadmap',
       label: 'Roadmap ',
-      icon: '/image/calendar.svg',
-      href: '/roadmap.pdf',
-      external: true
+      icon: activeItem === 'roadmap' ? '/image/roadmap-active.svg' : '/image/roadmap.svg',
+      activeIcon: '/image/roadmap-active.svg',
+      href: '/roadmap',
+      external: false
     },
     {
       id: 'tokenomics',
       label: 'Tokenomics ',
-      icon: '/image/sort.svg',
-      href: '/tokenomics.pdf',
-      external: true
+      icon: activeItem === 'tokenomics' ? '/image/tokenomics-active.svg' : '/image/tokenomics.svg',
+      activeIcon: '/image/tokenomics-active.svg',
+      href: '/tokenomics',
+      external: false
     },
     {
       id: 'support',
       label: 'Support',
-      icon: '/image/support.svg',
+      icon: activeItem === 'support' ? '/image/support-active.svg' : '/image/support.svg',
+      activeIcon: '/image/support-active.svg',
       href: '/',
       external: true
     }

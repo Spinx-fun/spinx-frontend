@@ -9,18 +9,18 @@ const Footer: React.FC = () => {
         <div className="lg:m-auto">
           <div className="mb-2">Platform:</div>
           <div className="flex flex-col">
-            <a href="/how_it_works_spinx.pdf" target="_blank" rel="noreferrer">How it Works</a>
-            <a href="/spinx_faq.pdf" target="_blank" rel="noreferrer">FAQ</a>
-            <a href="/spinx_technical_whitepaper.pdf" target="_blank" rel="noreferrer">Whitepaper</a>
+            <Link href="/how-it-works">How it Works</Link>
+            <Link href="/faq">FAQ</Link>
+            <Link href="/whitepaper">Whitepaper</Link>
           </div>
         </div>
 
         <div className="lg:m-auto">
           <div className="mb-2">Legal:</div>
           <div className="flex flex-col">
-            <a href="/spinx_privacy_policy.pdf" target="_blank" rel="noreferrer">Privacy Policy</a>
-            <a href="/spinx_terms_of_service.pdf" target="_blank" rel="noreferrer">Terms of Service</a>
-            <a href="/spinx_responsible_gaming.pdf" target="_blank" rel="noreferrer">Responsible Gambling</a>
+            <Link href="/privacy-policy">Privacy Policy</Link>
+            <Link href="/terms-of-service">Terms of Service</Link>
+            <Link href="/responsible-gaming">Responsible Gambling</Link>
           </div>
         </div>
 

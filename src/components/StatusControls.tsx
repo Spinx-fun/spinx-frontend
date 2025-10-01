@@ -16,6 +16,7 @@ const StatusControls: React.FC = () => {
   const [lastUpdated, setLastUpdated] = useState(
     Math.floor(Date.now() / 1000) - 120
   ); // 2 minutes ago
+  const [completed, setCompleted] = useState(false);
   const [sortBy, setSortBy] = useState("newest-first");
   const [activeBy, setActiveBy] = useState("active");
   const [timeRange, setTimeRange] = useState("last-30-days");
@@ -247,7 +248,9 @@ const StatusControls: React.FC = () => {
   // Load all games on component mount for complete sorting
   useEffect(() => {
     loadAllGames();
-  }, [lastUpdated]);
+    setCompleted(false);
+  }, [lastUpdated, completed]);
+
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
   };
@@ -380,6 +383,7 @@ const StatusControls: React.FC = () => {
             creatorAta={game.creatorAta}
             winner={game.winner}
             random={game.random}
+            setCompleted={setCompleted}
           />
         ))}
       </div>

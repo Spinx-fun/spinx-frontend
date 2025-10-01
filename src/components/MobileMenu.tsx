@@ -39,10 +39,27 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ useXlBreakpoint = false }) => {
       document.body.style.overflow = 'unset';
     };
   }, [isMenuOpen]);
-  let currentUrl: string;
+  let currentUrl: string = '';
   if (typeof window !== 'undefined') {
     currentUrl = window.location.pathname;
   }
+  
+  // Determine active item based on current URL
+  const getActiveItem = () => {
+    if (currentUrl === '/coinflip' || currentUrl === '/') return 'home';
+    if (currentUrl === '/create-challenge') return 'create';
+    if (currentUrl === '/whitepaper') return 'documentation';
+    if (currentUrl === '/about') return 'about';
+    if (currentUrl === '/roadmap') return 'roadmap';
+    if (currentUrl === '/tokenomics') return 'tokenomics';
+    if (currentUrl === '/how-it-works') return 'how-it-works';
+    if (currentUrl === '/faq') return 'faq';
+    if (currentUrl === '/responsible-gaming') return 'responsible-gaming';
+    if (currentUrl === '/terms-of-service') return 'terms-of-service';
+    if (currentUrl === '/privacy-policy') return 'privacy-policy';
+    return 'home'; // default
+  };
+  
   return (
     <>
       {/* Hamburger Menu Button */}
@@ -112,7 +129,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ useXlBreakpoint = false }) => {
             </div>
 
             {/* Sidebar Content */}
-            <Sidebar activeItem={currentUrl === '/coinflip' ? "home" : "create"} />
+            <Sidebar activeItem={getActiveItem()} />
           </div>
         </div>
       )}

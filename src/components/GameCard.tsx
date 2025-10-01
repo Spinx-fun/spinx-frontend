@@ -20,6 +20,7 @@ export interface GameCardProps {
   creatorAta: string;
   winner: string;
   random: string;
+  setCompleted: Function;
 }
 
 const GameCard: React.FC<GameCardProps> = ({
@@ -33,7 +34,8 @@ const GameCard: React.FC<GameCardProps> = ({
   joinerPlayer,
   creatorAta,
   winner,
-  random
+  random,
+  setCompleted
 }) => {
 
   const [isOpenJoinModal, setIsOpenJoinModal] = useState(false);
@@ -103,6 +105,7 @@ const GameCard: React.FC<GameCardProps> = ({
 
   const handleCloseJoinModal = () => {
     setIsOpenJoinModal(false);
+    setCompleted(true);
   };
 
   const formatAddress = (address: string) => {

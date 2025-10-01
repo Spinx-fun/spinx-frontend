@@ -74,12 +74,16 @@ export default function JoinCoinflipModal(props: {
         >
             <div className="flex flex-col m-6 bg-[#10152b] w-[380px] rounded-[5px] relative overflow-visible">
                 <div className="flex flex-row items-center justify-between py-4 px-6 border-b border-[#ffffff10]">
-                    <span className="text-[12px] text-[#8B8A8D] font-[500]">Join Coinflip</span>
+                    <span className="text-[14px] text-[#8B8A8D] font-[500]">Join Coinflip</span>
                     <button onClick={() => props.handleCloseModal()}>
                         <svg width="12" height="12" viewBox="0 0 7 7" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M0.382578 7L2.67458 3.688L0.502578 0.64H1.99058L3.53858 2.776L5.06258 0.64H6.50258L4.35458 3.64L6.62258 7H5.11058L3.49058 4.528L1.84658 7H0.382578Z" fill="#8B8A8D" />
                         </svg>
                     </button>
+                </div>
+                <div className="flex flex-row items-center justify-between py-4 px-6 border-b border-[#ffffff10]">
+                    <span className="text-[16] text-[#8B8A8D] font-[500]">You : {props.pickValue == "HEADS" ? "Tails" : "Heads"}</span>
+                    <span className="text-[16] text-[#8B8A8D] font-[500]">Oponent : {props.pickValue == "HEADS" ? "Heads" : "Tails"}</span>
                 </div>
 
                 {/* Coin Display Area - Fixed height to prevent layout shifts */}

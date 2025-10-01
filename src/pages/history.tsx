@@ -159,7 +159,7 @@ export default function History() {
       <div className="flex overflow-x-hidden">
         {/* Sidebar - Hidden on mobile and tablet (below lg) */}
         <div className="hidden lg:block">
-          <Sidebar activeItem="history" />
+          <Sidebar activeItem="create" />
         </div>
 
         {/* Main Content */}
