@@ -375,14 +375,14 @@ export default function CreateChallenge() {
 
       <div className="flex-col">
         {/* Sidebar - Hidden on mobile and tablet (below xl) - Special rule for create-challenge */}
-        <div className="hidden xl:block">
+        <div className="hidden lg:block">
           <Sidebar activeItem="create" />
         </div>
 
         {/* Main Content */}
-        <div className="flex flex-col flex-1 bg-[#0a101e] xl:ml-[248px] min-h-screen">
+        <div className="flex flex-col flex-1 bg-[#0a101e] lg:ml-[248px] min-h-screen">
           {/* Header - Special rule: mobile header below xl resolution */}
-          <div className="px-3 xl:px-12 pt-6">
+          <div className="px-3 lg:px-12 pt-6">
             <Header showSearch={false} />
           </div>
 
