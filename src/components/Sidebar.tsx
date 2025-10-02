@@ -62,8 +62,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = 'home' }) => {
       label: 'Support',
       icon: activeItem === 'support' ? '/image/support-active.svg' : '/image/support.svg',
       activeIcon: '/image/support-active.svg',
-      href: '/',
-      external: true
+      href: '/support',
+      external: false
     }
   ];
 

@@ -31,6 +31,7 @@ const Footer: React.FC = () => {
             <a href="https://x.com/SpinX_fun?t=lipYq20FQLdkgyvtcpWyDw&s=09" target="_blank" rel="noreferrer">X</a>
             <a href="https://t.me/spinxfun" target="_blank" rel="noreferrer">Telegram</a>
             <a href="https://pump.fun/" target="_blank" rel="noreferrer">Buy SPX</a>
+            <a href="https://github.com/Spinx-fun/spinx-contract" target="_blank" rel="noreferrer">Github</a>
           </div>
         </div>
       </div>

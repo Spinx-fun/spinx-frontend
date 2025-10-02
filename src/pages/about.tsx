@@ -364,7 +364,7 @@ export default function About() {
                 Open Source & Verification
               </h2>
               <p className="font-inter font-normal text-sm leading-[114%] text-[#90a2b9] mb-4">
-                SpinX smart contracts are open-sourced. The GitHub repository contains source code,
+                SpinX smart contracts are open-sourced. The <a href="https://github.com/Spinx-fun/spinx-contract" target="_blank" rel="noreferrer" className="underline text-[#fff]">Github</a> repository contains source code,
                 documentation, and build artifacts.
               </p>
               <p className="font-inter font-normal text-sm leading-[114%] text-[#90a2b9]">

@@ -333,11 +333,17 @@ export default function CreateChallenge() {
         setError("Please enter stake amount and make a pick Head or Tail");
         return;
       }
+      if (Number(stakeAmount) < 10000 * 10 ** (activeAsset.decimals ?? 9)) {
+        setIsLoading(false);
+        errorAlert("You need 10,000 SPX tokens at least");
+        return;
+      }
       if (Number(stakeAmount) > Number(userData?.tokenBalance)) {
         setIsLoading(false);
         errorAlert("You have no enough token on your wallet");
         return;
       }
+
       if (Number(solBalance) == 0) {
         setIsLoading(false);
         errorAlert("You have no enough SOL on your wallet");
