@@ -4,8 +4,9 @@ export const API_URL = "https://api.spinx.fun/";
 export const SOCKET_URL = "https://ws.valhalla.fun/";
 
 export const RPC_URL =
-  // "https://mainnet.helius-rpc.com/?api-key=64861875-6c37-417c-86b8-32eb2a01e938";
-  "https://devnet.helius-rpc.com/?api-key=64861875-6c37-417c-86b8-32eb2a01e938"
+"https://seka-yz7kcm-fast-devnet.helius-rpc.com"
+// "https://ronalda-n4khnh-fast-mainnet.helius-rpc.com"
+
 export const SOL_PRICE_API =
   "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd";
 
