@@ -21,6 +21,7 @@ export interface GameCardProps {
   winner: string;
   random: string;
   setCompleted: Function;
+  tokenPrice: number;
 }
 
 const GameCard: React.FC<GameCardProps> = ({
@@ -35,7 +36,8 @@ const GameCard: React.FC<GameCardProps> = ({
   creatorAta,
   winner,
   random,
-  setCompleted
+  setCompleted,
+  tokenPrice
 }) => {
 
   const [isOpenJoinModal, setIsOpenJoinModal] = useState(false);
@@ -98,7 +100,7 @@ const GameCard: React.FC<GameCardProps> = ({
     }
     let amount;
     let betAmount = Number(stakeAmount);
-    amount = betAmount * 10 ** (activeAsset.decimals ?? 9);
+    amount = betAmount * 10 ** (activeAsset.decimals ?? 6);
     setAmounts(amount);
     setIsOpenJoinModal(true);
   };
@@ -140,18 +142,18 @@ const GameCard: React.FC<GameCardProps> = ({
         <div className="flex justify-between font-oswald font-medium text-lg leading-[111%] text-white mb-4">
           {joinerPlayer == null
             ?
-            <a href={`${solacc}/${gameName}?cluster=devnet`} target='blank' className='font-oswald font-medium text-lg leading-[111%]'>{formatAddress(gameName)}</a>
+            <a href={`${solacc}/${gameName}`} target='blank' className='font-oswald font-medium text-lg leading-[111%]'>{formatAddress(gameName)}</a>
             :
             gameName == winner ?
               <div className='flex'>
-                <a href={`${solacc}/${gameName}?cluster=devnet`} target='blank' className='text-[#f9c752] font-oswald font-medium text-lg leading-[111%]'>{formatAddress(gameName)}</a> &nbsp; &nbsp;<h3 className='font-oswald font-medium'>VS</h3>&nbsp; &nbsp;<a href={`${solacc}/${joinerPlayer}?cluster=devnet`} target='blank' className='font-oswald font-medium text-lg leading-[111%] text-white'>{formatAddress(joinerPlayer)}</a>
+                <a href={`${solacc}/${gameName}`} target='blank' className='text-[#f9c752] font-oswald font-medium text-lg leading-[111%]'>{formatAddress(gameName)}</a> &nbsp; &nbsp;<h3 className='font-oswald font-medium'>VS</h3>&nbsp; &nbsp;<a href={`${solacc}/${joinerPlayer}`} target='blank' className='font-oswald font-medium text-lg leading-[111%] text-white'>{formatAddress(joinerPlayer)}</a>
               </div>
               :
               <div className='flex'>
-                <a href={`${solacc}/${gameName}?cluster=devnet`} target='blank' className='font-oswald font-medium text-lg leading-[111%] text-white'>{formatAddress(gameName)}</a> &nbsp; &nbsp;<h3 className='font-oswald font-medium'>VS</h3>&nbsp; &nbsp;<a href={`${solacc}/${joinerPlayer}?cluster=devnet`} target='blank' className='font-oswald font-medium text-lg leading-[111%] text-[#f9c752]'>{formatAddress(joinerPlayer)}</a>
+                <a href={`${solacc}/${gameName}`} target='blank' className='font-oswald font-medium text-lg leading-[111%] text-white'>{formatAddress(gameName)}</a> &nbsp; &nbsp;<h3 className='font-oswald font-medium'>VS</h3>&nbsp; &nbsp;<a href={`${solacc}/${joinerPlayer}`} target='blank' className='font-oswald font-medium text-lg leading-[111%] text-[#f9c752]'>{formatAddress(joinerPlayer)}</a>
               </div>
           }
-          <a href={`${solacc}/${creatorAta}?cluster=devnet`} target='blank' className='font-oswald font-medium text-lg leading-[111%]'>PDA : {formatAddress(creatorAta)}</a>
+          <a href={`${solacc}/${creatorAta}`} target='blank' className='font-oswald font-medium text-lg leading-[111%]'>PDA : {formatAddress(creatorAta)}</a>
         </div>
 
         {/* Stake and Pick Columns */}
@@ -161,9 +163,13 @@ const GameCard: React.FC<GameCardProps> = ({
             <div className="font-inter font-normal text-sm leading-[114%] text-[#90a2b9] mb-1">
               Stake
             </div>
-            <div className="font-oswald font-medium text-[24px] leading-[133%] text-[#f9c752]">
-              {stakeAmount} SPX
+            <div className="font-oswald font-medium text-[22px] leading-[133%] text-[#f9c752]">
+              {stakeAmount.toLocaleString()} SPX
             </div>
+            <div className="font-oswald font-medium text-[18px] leading-[133%] text-[#977e42]">
+              ($ {(stakeAmount * tokenPrice).toFixed(2)})
+            </div>
+
           </div>
 
           {/* Pick Column */}
@@ -175,7 +181,7 @@ const GameCard: React.FC<GameCardProps> = ({
               {pickValue}
             </div>
           </div>
-          {joinerPlayer != null &&
+          {(joinerPlayer != null && joinerPlayer !== "11111111111111111111111111111111")&&
             <>
               <div className="flex-1">
                 <div className="font-inter font-normal text-sm leading-[114%] text-[#90a2b9] mb-1">
@@ -199,14 +205,14 @@ const GameCard: React.FC<GameCardProps> = ({
                 <div className="font-inter font-normal text-sm leading-[114%] text-[#90a2b9] mb-1">
                   VRF
                 </div>
-                <a href={`${solacc}/${random}?cluster=devnet`} target='blank' className='font-oswald font-medium text-[24px] leading-[133%] text-white'>{formatAddress(random)}</a>
+                <a href={`${solacc}/${random}`} target='blank' className='font-oswald font-medium text-[24px] leading-[133%] text-white'>{formatAddress(random)}</a>
               </div>
             </>
           }
         </div>
 
         {/* Action Button */}
-        {joinerPlayer == null ?
+        {joinerPlayer == null || joinerPlayer == "11111111111111111111111111111111" ?
           <button className={`
                   rounded-[2px_8px] py-2 px-4 w-[160px] h-[37px] mb-4
                   shadow-[0_4px_14px_0_rgba(27,224,136,0.45)] bg-[#1be088]

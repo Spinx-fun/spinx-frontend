@@ -6,7 +6,7 @@ interface MobileMenuProps {
 }
 
 const MobileMenu: React.FC<MobileMenuProps> = ({ useXlBreakpoint = false }) => {
-  const mobileBreakpoint = useXlBreakpoint ? 'xl' : 'sm';
+  const mobileBreakpoint = useXlBreakpoint ? 'xl' : 'lg';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 

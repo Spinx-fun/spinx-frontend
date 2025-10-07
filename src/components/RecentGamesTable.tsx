@@ -268,11 +268,11 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
                 background: 'transparent'
               }}
             >
-              <a href={`${solacc}/${game.gameName}?cluster=devnet`} target='blank' className={(game.winner == game.gameName && game.winner != null) ? "font-inter italic font-medium text-[14px] leading-[133%] text-[#f9c752]" : "font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap"}>
+              <a href={`${solacc}/${game.gameName}`} target='blank' className={(game.winner == game.gameName && game.winner != null) ? "font-inter italic font-medium text-[14px] leading-[133%] text-[#f9c752]" : "font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap"}>
                 {formatAddress(game.gameName)}
               </a>
               <span className="text-[#545454]">&nbsp;Vs&nbsp;</span>
-              <a href={`${solacc}/${game.joinerPlayer}?cluster=devnet`} target='blank' className={(game.winner == game.joinerPlayer && game.winner != null) ? "font-inter italic font-medium text-[14px] leading-[133%] text-[#f9c752]" : "font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap"}>
+              <a href={`${solacc}/${game.joinerPlayer}`} target='blank' className={(game.winner == game.joinerPlayer && game.winner != null) ? "font-inter italic font-medium text-[14px] leading-[133%] text-[#f9c752]" : "font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap"}>
                 {
                   game.joinerPlayer != null
                     ?
@@ -296,7 +296,7 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
               }}
             >
               <span className="font-inter font-bold text-[14px] leading-[114%] text-[#f9c752] whitespace-nowrap">
-                {game.stakeAmount}
+                {game.stakeAmount.toLocaleString()}
               </span>
             </div>
 
@@ -367,7 +367,7 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
               }}
             >
               {game.random != null
-                ? <a href={`${solacc}/${game.random}?cluster=devnet`} target='blank' className="underline font-inter font-bold text-[14px] leading-[114%] text-[#a8d8f9] whitespace-nowrap">
+                ? <a href={`${solacc}/${game.random}`} target='blank' className="underline font-inter font-bold text-[14px] leading-[114%] text-[#a8d8f9] whitespace-nowrap">
                   View
                 </a >
                 : <span className="font-inter font-bold text-[14px] leading-[114%] text-[#fff] whitespace-nowrap">Not Joined</span>}
@@ -457,11 +457,11 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
 
               {/* Challenge */}
               <div className="mb-3">
-                <a href={`${solacc}/${game.gameName}?cluster=devnet`} target='blank' className={(game.winner == game.gameName && game.winner != null) ? "font-inter italic font-medium text-[14px] leading-[133%] text-[#f9c752]" : "font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap"}>
+                <a href={`${solacc}/${game.gameName}`} target='blank' className={(game.winner == game.gameName && game.winner != null) ? "font-inter italic font-medium text-[14px] leading-[133%] text-[#f9c752]" : "font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap"}>
                   {formatAddress(game.gameName)}
                 </a>
                 <span className="text-[#545454]">&nbsp;Vs&nbsp;</span>
-                <a href={`${solacc}/${game.joinerPlayer}?cluster=devnet`} target='blank' className={(game.winner == game.joinerPlayer && game.winner != null) ? "font-inter italic font-medium text-[14px] leading-[133%] text-[#f9c752]" : "font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap"}>
+                <a href={`${solacc}/${game.joinerPlayer}`} target='blank' className={(game.winner == game.joinerPlayer && game.winner != null) ? "font-inter italic font-medium text-[14px] leading-[133%] text-[#f9c752]" : "font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap"}>
                   {
                     game.joinerPlayer != null
                       ?
@@ -474,13 +474,13 @@ const RecentGamesTable: React.FC<RecentGamesTableProps> = () => {
               {/* Stake */}
               <div className="flex items-center justify-between mb-1">
                 <span className="font-inter font-bold text-[14px] leading-[114%] text-[#f9c752]">
-                  Stake: {game.stakeAmount}
+                  Stake: {game.stakeAmount.toLocaleString()}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="font-inter font-normal text-[14px] leading-[114%] text-white">Game Link</span>
                 {game.random != null
-                  ? <a href={`${solacc}/${game.random}?cluster=devnet`} target='blank' className="underline font-inter font-bold text-[14px] leading-[114%] text-[#a8d8f9] whitespace-nowrap">
+                  ? <a href={`${solacc}/${game.random}`} target='blank' className="underline font-inter font-bold text-[14px] leading-[114%] text-[#a8d8f9] whitespace-nowrap">
                     View
                   </a >
                   : <span className="font-inter font-bold text-[14px] leading-[114%] text-[#fff] whitespace-nowrap">Not Joined</span>}

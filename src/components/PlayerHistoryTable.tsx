@@ -69,7 +69,7 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
   return (
     <div className="w-full">
       {/* Desktop Table */}
-      <div className="hidden md:block w-full border-collapse">
+      <div className="hidden xl:block w-full border-collapse">
         {/* Table Header */}
         <div className="flex w-full">
           {/* Date Header Cell */}
@@ -107,7 +107,7 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
               borderRight: '1px solid #324158',
               paddingBlock: '4px',
               paddingInline: '16px',
-              width: '140px',
+              width: '90px',
               height: '48px',
               background: 'transparent'
             }}
@@ -130,6 +130,21 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
             <span className="font-inter font-bold text-[16px] leading-[100%] text-white">Challenger</span>
           </div>
 
+          <div
+            className="flex items-center flex-shrink-0 cursor-pointer"
+            style={{
+              borderBottom: '1px solid #324158',
+              borderTop: '1px solid #324158',
+              borderLeft: '1px solid #324158',
+              paddingBlock: '4px',
+              paddingInline: '16px',
+              width: '320px',
+              height: '48px',
+              background: 'transparent'
+            }}
+          >
+            <span className="font-inter font-bold text-[16px] leading-[100%] text-white mr-auto">Details</span>
+          </div>
           {/* Stake Header Cell */}
           <div
             className="flex items-center flex-shrink-0 cursor-pointer"
@@ -139,7 +154,7 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
               borderLeft: '1px solid #324158',
               paddingBlock: '4px',
               paddingInline: '16px',
-              width: '140px',
+              width: '110px',
               height: '48px',
               background: 'transparent'
             }}
@@ -163,7 +178,7 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
               borderLeft: '1px solid #324158',
               paddingBlock: '4px',
               paddingInline: '16px',
-              width: '140px',
+              width: '110px',
               height: '48px',
               background: 'transparent'
             }}
@@ -188,7 +203,7 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
               borderRadius: '0 10px 0 0',
               paddingBlock: '4px',
               paddingInline: '16px',
-              width: '140px',
+              width: '120px',
               height: '48px',
               background: 'transparent'
             }}
@@ -238,7 +253,7 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
                 borderRight: '1px solid #324158',
                 paddingBlock: '18px',
                 paddingInline: '16px',
-                width: '140px',
+                width: '90px',
                 height: '52px',
                 background: 'transparent'
               }}
@@ -260,8 +275,33 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
               }}
             >
               <span className="font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap">
-                <a href={`${solacc}/${item.challenge}?cluster=devnet`} target='blank' >{formatAddress(item.challenge.split('Vs')[0]?.trim())} </a><span className="text-[#545454]">Vs</span> {item?.joinerPlayer != null ?  <a href={`${solacc}/${item.joinerPlayer}?cluster=devnet`} target='blank' >{formatAddress(item.joinerPlayer.split('Vs')[0]?.trim())} </a> : "Not Joined"}
+                <a href={`${solacc}/${item.challenge}`} target='blank' >{formatAddress(item.challenge.split('Vs')[0]?.trim())} </a><span className="text-[#545454]">Vs</span> {item?.joinerPlayer != null ? <a href={`${solacc}/${item.joinerPlayer}`} target='blank' >{formatAddress(item.joinerPlayer.split('Vs')[0]?.trim())} </a> : "Not Joined"}
               </span>
+            </div>
+
+            <div
+              className="flex items-center flex-shrink-0"
+              style={{
+                borderBottom: '1px solid #324158',
+                borderRight: '1px solid #324158',
+                borderLeft: '1px solid #324158',
+                paddingBlock: '18px',
+                paddingInline: '16px',
+                width: '320px',
+                height: '52px',
+                background: 'transparent',
+                display: "flex",
+                justifyContent: "space-between"
+              }}
+            >
+              <span className="font-inter font-bold text-[14px] leading-[114%] text-[#fff] whitespace-nowrap">Game Result: {item.result == "Win" ? item.pickValue == "HEADS" ? "TAILS" : "HEADS" : item.pickValue}</span>
+              {
+                item.result !== "Pending" ?
+                <span className="font-inter font-bold text-[14px] leading-[114%] text-[#fff] whitespace-nowrap">Your Value: {item.result == "Win" ? item.pickValue : item.pickValue == "HEADS" ? "TAILS" : "HEADS"}</span>
+                :
+                <></>
+              }
+
             </div>
 
             {/* Stake Cell */}
@@ -272,13 +312,13 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
                 borderLeft: '1px solid #324158',
                 paddingBlock: '18px',
                 paddingInline: '16px',
-                width: '140px',
+                width: '110px',
                 height: '52px',
                 background: 'transparent'
               }}
             >
               <span className="font-inter font-bold text-[14px] leading-[114%] text-[#f9c752] whitespace-nowrap">
-                {item.stakeAmount}
+                {item.stakeAmount.toLocaleString()}
               </span>
             </div>
 
@@ -290,7 +330,7 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
                 borderLeft: '1px solid #324158',
                 paddingBlock: '18px',
                 paddingInline: '16px',
-                width: '140px',
+                width: '110px',
                 height: '52px',
                 background: 'transparent'
               }}
@@ -328,14 +368,14 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
                 borderLeft: '1px solid #324158',
                 paddingBlock: '18px',
                 paddingInline: '16px',
-                width: '140px',
+                width: '120px',
                 height: '52px',
                 background: 'transparent'
               }}
             >
               {item.creatorAta != null
                 ?
-                <a href={`${solacc}/${item.creatorAta}?cluster=devnet`} target='blank' className="underline font-inter font-bold text-[14px] leading-[114%] text-[#a8d8f9] whitespace-nowrap">
+                <a href={`${solacc}/${item.creatorAta}`} target='blank' className="underline font-inter font-bold text-[14px] leading-[114%] text-[#a8d8f9] whitespace-nowrap">
                   View
                 </a >
                 : <span className="font-inter font-bold text-[14px] leading-[114%] text-[#fff] whitespace-nowrap">Not Joined</span>}
@@ -380,7 +420,7 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
       </div>
 
       {/* Mobile Card View */}
-      <div className="md:hidden space-y-2">
+      <div className="xl:hidden space-y-2">
         {paginatedData.slice(startIndex, startIndex + itemsPerPage).map((item, index) => (
           <div
             key={item.id}
@@ -429,14 +469,27 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
                 {item.game}
               </div>
               <span className="font-inter font-normal text-[14px] leading-[114%] text-white whitespace-nowrap">
-              <a href={`${solacc}/${item.challenge}?cluster=devnet`} target='blank' >{formatAddress(item.challenge.split('Vs')[0]?.trim())} </a><span className="text-[#545454]">Vs</span> {item?.joinerPlayer != null ?  <a href={`${solacc}/${item.joinerPlayer}?cluster=devnet`} target='blank' >{formatAddress(item.joinerPlayer.split('Vs')[0]?.trim())} </a> : "Not Joined"}
+                <a href={`${solacc}/${item.challenge}`} target='blank' >{formatAddress(item.challenge.split('Vs')[0]?.trim())} </a><span className="text-[#545454]">Vs</span> {item?.joinerPlayer != null ? <a href={`${solacc}/${item.joinerPlayer}`} target='blank' >{formatAddress(item.joinerPlayer.split('Vs')[0]?.trim())} </a> : "Not Joined"}
               </span>
             </div>
 
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-inter font-bold text-[14px] leading-[114%] text-[#f9c752] whitespace-nowrap">
+                <b>Details: &nbsp; &nbsp;</b> 
+                <span className="font-inter font-bold text-[14px] leading-[114%] text-[#fff] whitespace-nowrap">Game Result: {item.result == "Win" ? item.pickValue == "HEADS" ? "TAILS" : "HEADS" : item.pickValue}</span>
+                &nbsp; &nbsp; &nbsp;
+              {
+                item.result !== "Pending" ?
+                <span className="font-inter font-bold text-[14px] leading-[114%] text-[#fff] whitespace-nowrap">Your Value: {item.result == "Win" ? item.pickValue : item.pickValue == "HEADS" ? "TAILS" : "HEADS"}</span>
+                :
+                <></>
+              }
+              </span>
+            </div>
             {/* Stake */}
             <div className="flex items-center justify-between mb-2">
               <span className="font-inter font-bold text-[14px] leading-[114%] text-[#f9c752] whitespace-nowrap">
-                <b>Stake:</b> {item.stakeAmount}
+                <b>Stake:</b> {item.stakeAmount.toLocaleString()}
               </span>
             </div>
             <div className="flex items-center justify-between">
@@ -444,7 +497,7 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
                 Game Link:
               </span>
               {item.creatorAta != null
-                ? <a href={`${solacc}/${item.creatorAta}?cluster=devnet`} target='blank' className="underline font-inter font-bold text-[14px] leading-[114%] text-[#a8d8f9] whitespace-nowrap">
+                ? <a href={`${solacc}/${item.creatorAta}`} target='blank' className="underline font-inter font-bold text-[14px] leading-[114%] text-[#a8d8f9] whitespace-nowrap">
                   View
                 </a >
                 : <span className="font-inter font-bold text-[14px] leading-[114%] text-[#fff] whitespace-nowrap">Not Joined</span>}

@@ -97,7 +97,7 @@ export default function Rooms() {
     return (
         <>
             <Head>
-                <title>Coinflip | SpinX</title>
+                <title>SpinX | Coinflip</title>
                 <meta
                     name="description"
                     content="SpinX | Best Crypto PvP Gambling Website"

@@ -16,6 +16,7 @@ import { errorAlert } from "../components/ToastGroup";
 import { solConnection } from "../context/solana/transaction";
 import PlayerHistoryTable from '../components/PlayerHistoryTable';
 import CustomDropdown, { DropdownOption } from "../components/CustomDropdown";
+import { getTokenPrice } from "../utils/util";
 
 interface AccountCardProps {
   title: string;
@@ -36,6 +37,8 @@ interface AccountConnectedProps { }
 interface BalanceCardProps {
   solBalance: number;
   tokenBalance: number;
+  tokenPrice: number;
+  solPrice: number;
 }
 
 const AccountConnected: React.FC<AccountConnectedProps> = ({
@@ -51,6 +54,7 @@ const AccountConnected: React.FC<AccountConnectedProps> = ({
       setTimeout(() => setCopied(false), 2000);
     }
   };
+
 
   if (!connected) {
     return (
@@ -101,7 +105,7 @@ const AccountConnected: React.FC<AccountConnectedProps> = ({
   );
 };
 
-const BalanceCard: React.FC<BalanceCardProps> = ({ solBalance, tokenBalance }) => {
+const BalanceCard: React.FC<BalanceCardProps> = ({ solBalance, tokenBalance, tokenPrice, solPrice }) => {
   const solBalances =
     solBalance !== null && solBalance !== undefined ? solBalance : 0;
 
@@ -121,13 +125,20 @@ const BalanceCard: React.FC<BalanceCardProps> = ({ solBalance, tokenBalance }) =
       <div className="rounded-[10px] p-3 bg-[#0e172b] flex-1 flex items-center justify-center">
         <div className="flex items-center justify-between w-full lg:flex-row">
           {/* Balance Amount with SPX Tokens */}
-          <div className="flex items-end gap-2">
-            <span className="font-oswald font-medium text-[36px] leading-[117%] text-[#f9c752]">
-              {solBalances > 0 ? solBalances.toFixed(3) : '0'}
-            </span>
-            <span className="font-inter font-medium text-[14px] leading-[186%] text-white self-end">
-              Sol Balance
-            </span>
+          <div className="flex flex-col">
+            <div className="flex items-end gap-2">
+              <span className="font-oswald font-medium text-[36px] leading-[117%] text-[#f9c752]">
+                {solBalances > 0 ? solBalances.toFixed(3) : '0'}
+              </span>
+              <span className="font-inter font-medium text-[14px] leading-[186%] text-white self-end">
+                Sol Balance
+              </span>
+            </div>
+            <div className="flex items-end gap-2">
+              <span className="font-oswald font-medium text-[20px] text-[#b19249]">
+                ($ {(solBalances * solPrice).toFixed(2)})
+              </span>
+            </div>
           </div>
 
           {/* Trend Info */}
@@ -135,11 +146,16 @@ const BalanceCard: React.FC<BalanceCardProps> = ({ solBalance, tokenBalance }) =
             <div className="flex items-center justify-between w-full">
               {/* <img src={trendIcon} alt="Trend" className="w-4 h-4" /> */}
               <span className="font-oswald font-medium text-[36px] leading-[117%] text-[#f9c752]">
-                {tokenBalances}
+                {tokenBalances.toLocaleString()}
               </span>
               &nbsp;
               <span className="font-inter font-medium text-[14px] leading-[186%] text-white self-end">
                 SPX Tokens
+              </span>
+            </div>
+            <div className="flex items-center justify-end w-full">
+              <span className="font-oswald font-medium text-[20px] text-[#b19249]">
+                ($ {(tokenBalances * tokenPrice).toFixed(2)})
               </span>
             </div>
           </div>
@@ -197,6 +213,9 @@ export default function CreateChallenge() {
     []
   );
 
+  let [tokenPrice, setTokenPrice] = useState(0);
+  let [solPrice, setSolPrice] = useState(0);
+
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -208,7 +227,10 @@ export default function CreateChallenge() {
         setUserData(userDataResponse);
         setActiveChallenges(challengesResponse);
         setPlayerHistory(historyResponse);
-
+        const price = await getTokenPrice(activeAsset.address);
+        setTokenPrice(price);
+        const solPrice = await getTokenPrice('So11111111111111111111111111111111111111112');
+        setSolPrice(solPrice);
         let counts = 0;
         let result;
         let newDataArray = [];
@@ -232,7 +254,8 @@ export default function CreateChallenge() {
               stakeAmount: historyResponse[i].stakeAmount,
               time: historyResponse[i].time,
               winnerTx: historyResponse[i].winnerTx,
-              creatorAta: historyResponse[i].creatorAta
+              creatorAta: historyResponse[i].creatorAta,
+              pickValue : historyResponse[i].pickValue
             }
             newDataArray.push(newData);
           }
@@ -333,7 +356,7 @@ export default function CreateChallenge() {
         setError("Please enter stake amount and make a pick Head or Tail");
         return;
       }
-      if (Number(stakeAmount) < 10000 * 10 ** (activeAsset.decimals ?? 9)) {
+      if (Number(stakeAmount) < 10000) {
         setIsLoading(false);
         errorAlert("You need 10,000 SPX tokens at least");
         return;
@@ -359,7 +382,7 @@ export default function CreateChallenge() {
       // Handle challenge creation logic here
       let amount;
       let betAmount = Number(stakeAmount);
-      amount = betAmount * 10 ** (activeAsset.decimals ?? 9);
+      amount = betAmount * 10 ** (activeAsset.decimals ?? 6);
       await createCoinflip(wallet, coinId, new PublicKey(activeAsset.address), amount, setIsLoading)
     } catch (error) {
       setIsLoading(false);
@@ -400,6 +423,8 @@ export default function CreateChallenge() {
               <BalanceCard
                 solBalance={userData?.solBalance || 0}
                 tokenBalance={userData?.tokenBalance || 0}
+                tokenPrice={tokenPrice || 0}
+                solPrice={solPrice || 0}
               />
             </div>
           </div>
@@ -409,7 +434,7 @@ export default function CreateChallenge() {
             {/* Left Column - Challenge Creation and Recent Games */}
             <div className="flex-1 space-y-6 order-1 lg:order-1">
               {/* Challenge Creation Interface */}
-              <div className="lg:flex grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-4 my-6">
+              <div className="lg:flex lg:flex-col xl:flex-row grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-4 my-6">
                 <div className="border border-[#2a2a2a] rounded-[10px] p-4 bg-[#020617] w-[100%] mb-2">
                   <h2 className="font-oswald font-bold text-[20px] leading-[160%] text-white mb-4">
                     Create Challenge
@@ -558,6 +583,9 @@ export default function CreateChallenge() {
                 </div>
                 {/* Active Challenges on mobile (comes after Create Challenge) */}
                 <div className="lg:hidden">
+                  <ActiveChallengesPanel challenges={activeChallenges} setIsLoading={setIsLoading} />
+                </div>
+                <div className="lg:block md:hidden xl:hidden sm:hidden">
                   <ActiveChallengesPanel challenges={activeChallenges} setIsLoading={setIsLoading} />
                 </div>
               </div>

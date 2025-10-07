@@ -11,8 +11,8 @@ export const assets = [
         symbol: 'SpinX',
         src: '/image/sfx-coin.svg',
         name: 'SpinX',
-        address: 'EY4wsByMUEudm4FRC2nTFfmiWFCMdhJx5j69ZTfQ8mz6',
-        decimals: 9,
+        address: '4QAuuGj2mMjEPwsX61Sx9gwfNLcKVPotSWV3vUZfv28g',
+        decimals: 6,
     },
 ] as Asset[]
 

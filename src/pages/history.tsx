@@ -53,7 +53,8 @@ export default function History() {
               id: gameData[i].id,
               result: result,
               stakeAmount: gameData[i].stakeAmount,
-              time: gameData[i].time
+              time: gameData[i].time,
+              pickValue : gameData[i].pickValue
             }
             newDataArray.push(newData);
           }

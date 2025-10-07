@@ -131,7 +131,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = 'home' }) => {
         <img
           src="/logo.png"
           alt="SpinX Logo"
-          className="w-[78px] h-[32px]"
+          className="w-[96px] h-[96px] m-auto"
         />
       </div>
 
@@ -202,7 +202,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = 'home' }) => {
       {/* Footer Links */}
       <div className="absolute bottom-4 left-4 right-4">
         {/* Banner */}
-        <a className="px-4 mt-8 mb-4" href="https://pump.fun" target='_blank' rel="noreferrer">
+        <a className="px-4 mt-8 mb-4" href="https://pump.fun/coin/4QAuuGj2mMjEPwsX61Sx9gwfNLcKVPotSWV3vUZfv28g" target='_blank' rel="noreferrer">
           <img
             src="/image/banner-216x90.svg"
             alt="Banner"

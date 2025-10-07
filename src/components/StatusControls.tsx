@@ -10,6 +10,8 @@ import { GameData } from "../services/gameData";
 import Footer from "../components/Footer";
 import BeatLoader from 'react-spinners/BeatLoader';
 import { parseISO, isAfter, subDays, startOfDay } from "date-fns";
+import { getTokenPrice } from "../utils/util";
+import { assets } from "../utils/constants";
 
 const StatusControls: React.FC = () => {
   const [isOnline, setIsOnline] = useState(false);
@@ -27,7 +29,7 @@ const StatusControls: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isFirstLoading, setIsFirstLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [tokenRange, setTokenRange] = useState({ min: 0, max: 5000 });
+  const [tokenRange, setTokenRange] = useState({ min: 0, max: 50000000 });
   const [isLoadingAll, setIsLoadingAll] = useState(false);
   const [displayGames, setDisplayGames] = useState<GameData[]>([]);
   const DISPLAY_PAGE_SIZE = 6;
@@ -43,6 +45,9 @@ const StatusControls: React.FC = () => {
     { value: "active", label: "Active List" },
     { value: "completed", label: "Completed List" },
   ];
+
+  const [activeAsset] = useState(assets[0])
+  let [tokenPrice, setTokenPrice] = useState(0);
 
 
   const timeRangeOptions: DropdownOption[] = [
@@ -126,15 +131,15 @@ const StatusControls: React.FC = () => {
     switch (sortByActivate) {
       case "active":
         return games.filter(game =>
-          game.joinerPlayer === null
+          game.joinerPlayer === null || game.joinerPlayer === "11111111111111111111111111111111"
         );
       case "completed":
         return games.filter(game =>
-          game.joinerPlayer !== null
+          game.joinerPlayer !== null && game.joinerPlayer !== "11111111111111111111111111111111"
         );
       default:
         return games.filter(game =>
-          game.joinerPlayer === null
+          game.joinerPlayer === null || game.joinerPlayer === "11111111111111111111111111111111"
         );;
     }
   };
@@ -166,7 +171,6 @@ const StatusControls: React.FC = () => {
   // Main filtering and sorting function
   const applyFiltersAndSorting = (gamesToFilter: GameData[]): GameData[] => {
     let filteredGames = [...gamesToFilter];
-
     // Apply time range filter
     filteredGames = filterGamesByTimeRange(filteredGames, timeRange);
     // Apply token range filter
@@ -217,7 +221,8 @@ const StatusControls: React.FC = () => {
         // Small delay to avoid overwhelming the system
         await new Promise(resolve => setTimeout(resolve, 100));
       }
-
+      const price = await getTokenPrice(activeAsset.address);
+      setTokenPrice(price);
       setAllGames(allLoadedGames);
       setHasMore(false); // No more loading needed since we have all data
       setIsFirstLoading(false); // Set first loading to false after initial load
@@ -384,6 +389,7 @@ const StatusControls: React.FC = () => {
             winner={game.winner}
             random={game.random}
             setCompleted={setCompleted}
+            tokenPrice={tokenPrice}
           />
         ))}
       </div>

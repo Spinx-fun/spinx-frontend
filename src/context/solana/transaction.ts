@@ -519,17 +519,18 @@ export const createCoinflip = async (
         }
       );
       await solConnection.confirmTransaction(txId, "confirmed");
+      if (txId) {
+        const response = await axios.post(`${API_URL}create-coinflip/`, {
+          poolId: Number(next_pool_id),
+          creatorTx: txId
+        })
 
-      const response = await axios.post(`${API_URL}create-coinflip/`, {
-        poolId: Number(next_pool_id),
-        creatorTx: txId
-      })
-
-      if (response.status === 200) {
-        setTimeout(() => {
-          setLoading(false);
-          successAlert('Bet successfully');
-        }, 3000)
+        if (response.status === 200) {
+          setTimeout(() => {
+            setLoading(false);
+            successAlert('Bet successfully');
+          }, 10000)
+        }
       }
     }
   } catch (error) {
@@ -592,6 +593,7 @@ export const createCoinflipTx = async (
     getPriceFeed(mint).toBase58(),
   );
 
+  const TREASURY_WALLET = new PublicKey("69QQYnDRZ386bbuMV7srfgh4D5dAR51SdyZ1wWtC3CKs");
   const tx = new Transaction();
   const computePriceIx = ComputeBudgetProgram.setComputeUnitPrice({
     microLamports: 2000000,
@@ -608,8 +610,8 @@ export const createCoinflipTx = async (
           creatorAta: tokenAccount,
           spinxMint: mint,
           coinflipPool,
-          solVault,
-          tokenAccount,
+          treasuryWallet: new PublicKey(TREASURY_WALLET),
+          // tokenAccount,
           splEscrow,
           associatedTokenProgram: anchor.utils.token.ASSOCIATED_PROGRAM_ID,
           systemProgram: SystemProgram.programId,
@@ -669,28 +671,29 @@ export const joinCoinflip = async (
         }
       );
       await solConnection.confirmTransaction(txId, "confirmed");
-
-      const joinResponse = await axios.post(`${API_URL}join-coinflip/`, {
-        poolId: poolId,
-        joinerTx: txId,
-        random: random.toBase58()
-      })
-
-      if (joinResponse.status === 200) {
-        console.log('joinResponse', joinResponse)
+      if (txId) {
+        const joinResponse = await axios.post(`${API_URL}join-coinflip/`, {
+          poolId: poolId,
+          joinerTx: txId,
+          random: random.toBase58()
+        })
+        if (joinResponse.status === 200) {
+          console.log('joinResponse', joinResponse)
+        }
+        let winner;
+        const response = await axios.post(`${API_URL}result-game/`, {
+          poolId: poolId,
+        })
+        if (response.status === 200) {
+          winner = response.data.winner;
+          console.log("Signature:", txId);
+          setLoading(false);
+          successAlert('Bet successfully!');
+          return winner;
+        }
       }
 
-      let winner;
-      const response = await axios.post(`${API_URL}result-game/`, {
-        poolId: poolId,
-      })
-      if (response.status === 200) {
-        winner = response.data.winner;
-        console.log("Signature:", txId);
-        setLoading(false);
-        successAlert('Bet successfully!');
-        return winner;
-      }
+
     }
   } catch (error) {
     console.log(" --> joinCoinflip:", error);
@@ -744,7 +747,7 @@ export const joinCoinflipTx = async (
   const computePriceIx = ComputeBudgetProgram.setComputeUnitPrice({
     microLamports: 2000000,
   });
-
+  const TREASURY_WALLET = new PublicKey("69QQYnDRZ386bbuMV7srfgh4D5dAR51SdyZ1wWtC3CKs");
 
   tx.add(computePriceIx);
   tx.add(
@@ -760,8 +763,7 @@ export const joinCoinflipTx = async (
           joinerAta: tokenAccount,
           spinxMint: mint,
           coinflipPool,
-          creator: creatorAta,
-          solVault,
+          treasuryWallet: new PublicKey(TREASURY_WALLET),
           splEscrow,
           vrf: vrf.programId,
           config: networkStateAccountAddress(),
@@ -817,17 +819,20 @@ export const closeCoinflip = async (
         }
       );
       await solConnection.confirmTransaction(txId, "confirmed");
-      const response = await axios.post(`${API_URL}close-coinflip/`, {
-        poolId: Number(poolId),
-      })
+      if (txId) {
+        const response = await axios.post(`${API_URL}close-coinflip/`, {
+          poolId: Number(poolId),
+        })
 
-      if (response.status === 200) {
-        setTimeout(() => {
-          console.log("Signature:", txId);
-          setLoading(false);
-          successAlert('Closed successfully!')
-        }, 3000)
+        if (response.status === 200) {
+          setTimeout(() => {
+            console.log("Signature:", txId);
+            setLoading(false);
+            successAlert('Closed successfully!')
+          }, 3000)
+        }
       }
+
 
     }
   } catch (error) {
@@ -941,12 +946,13 @@ export const getAccountTokenBlanace = async (
   userAddress: string,
   decimals: number
 ): Promise<AccountBalance> => {
+  const creatorBalance = await solConnection.getBalance(new PublicKey(userAddress));
+  const solBalance = creatorBalance / LAMPORTS_PER_SOL;
   let tokenBalances
   tokenBalances = await solConnection.getParsedTokenAccountsByOwner(new PublicKey(userAddress), { mint: new PublicKey(tokenAddress) }, "processed")
   const tokenBalance = tokenBalances.value[0]?.account.data.parsed.info.tokenAmount.amount / 10 ** (decimals);
 
-  const creatorBalance = await solConnection.getBalance(new PublicKey(userAddress));
-  const solBalance = creatorBalance / LAMPORTS_PER_SOL;
+
   let balances = [];
   balances.push({
     solBalance,
@@ -987,7 +993,7 @@ export const getAllChallenges = async (
 
   const response = await fetch(`${API_URL}getCoinflipData`);
   const data = await response.json();
-  let coinflipData= data.data
+  let coinflipData = data.data
   return coinflipData as unknown as PoolData;
 };
 

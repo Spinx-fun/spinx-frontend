@@ -19,6 +19,7 @@ const ActiveChallengeCard: React.FC<ActiveChallengeCardProps> = ({ challenge, se
     try {
       setIsLoading(true);
       await closeCoinflip(wallet, challenge.id, new PublicKey(activeAsset.address), setLoading)
+      setIsLoading(false);
 
     } catch (error) {
       setIsLoading(false)

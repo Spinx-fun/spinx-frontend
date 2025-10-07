@@ -27,6 +27,7 @@ export interface PlayerHistory {
   challenge: any;
   stakeAmount: number;
   result: string;
+  pickValue: string;
 }
 
 // Simulate API call to fetch games with pagination

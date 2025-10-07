@@ -97,7 +97,7 @@ const Header: React.FC<HeaderProps> = ({
           <img
             src="/logo.png"
             alt="SpinX Logo"
-            className="w-[78px] h-[32px]"
+            className="w-[96px] h-[96px] m-auto"
           />
         </div>
 
@@ -129,7 +129,7 @@ const Header: React.FC<HeaderProps> = ({
                       Account:
                     </div>
                     <div className="flex items-center justify-between">
-                      <a href={`${solacc}/${publicKey?.toBase58()}?cluster=devnet`} target='blank' className="font-inter font-medium italic text-[12px] leading-[133%] text-[#90a2b9]">
+                      <a href={`${solacc}/${publicKey?.toBase58()}`} target='blank' className="font-inter font-medium italic text-[12px] leading-[133%] text-[#90a2b9]">
                         {copied ? "Copied!" : formatAddress(publicKey?.toBase58() || "")}
                       </a>
                       <button
@@ -259,7 +259,7 @@ const Header: React.FC<HeaderProps> = ({
                       Account:
                     </div>
                     <div className="flex items-center justify-between">
-                      <a href={`${solacc}/${publicKey?.toBase58()}?cluster=devnet`} target='blank' className="font-inter font-medium italic text-[12px] leading-[133%] text-[#90a2b9]">
+                      <a href={`${solacc}/${publicKey?.toBase58()}`} target='blank' className="font-inter font-medium italic text-[12px] leading-[133%] text-[#90a2b9]">
                         {copied ? "Copied!" : formatAddress(publicKey?.toBase58() || "")}
                       </a>
                       <button
