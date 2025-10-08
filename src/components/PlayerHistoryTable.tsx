@@ -68,7 +68,6 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
     const formattedHour = hourNum % 12 || 12;
     return `${formattedHour}:${minutes}:${seconds} ${ampm}`;
   };
-  console.log('debug->paginatedData', paginatedData, publicKey?.toBase58())
   return (
     <div className="w-full">
       {/* Desktop Table */}

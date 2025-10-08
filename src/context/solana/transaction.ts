@@ -503,17 +503,27 @@ export const createCoinflip = async (
     setLoading(true);
     const globalState = await getGlobalStateByKey(program);
     let next_pool_id = new anchor.BN(Number(globalState));
+    // let next_pool_id = new anchor.BN(Number(2));
     const tx = await createCoinflipTx(userAddress, setNumber, mint, amount, next_pool_id, program);
     const { blockhash } = await solConnection.getLatestBlockhash();
     tx.feePayer = userAddress;
     tx.recentBlockhash = blockhash;
+
+    const simulationResult = await solConnection.simulateTransaction(tx);
+    console.log("Simulation logs:", simulationResult.value.logs);
+    if (simulationResult.value.err) {
+      console.error("Simulation error:", simulationResult.value.err);
+      errorAlert("Simulation failed. Please try again later.");
+      setLoading(false);
+      return;
+    }
+
     if (wallet.signTransaction) {
       const signedTx = await wallet.signTransaction(tx);
-      // const encodedTx = Buffer.from(signedTx.serialize()).toString("base64");
       const txId = await provider.connection.sendRawTransaction(
         signedTx.serialize(),
         {
-          skipPreflight: true,
+          skipPreflight: false,
           maxRetries: 3,
           preflightCommitment: "confirmed",
         }
@@ -529,7 +539,7 @@ export const createCoinflip = async (
           setTimeout(() => {
             setLoading(false);
             successAlert('Bet successfully');
-          }, 10000)
+          }, 1000)
         }
       }
     }
