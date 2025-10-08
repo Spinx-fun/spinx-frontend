@@ -82,8 +82,8 @@ export default function JoinCoinflipModal(props: {
                     </button>
                 </div>
                 <div className="flex flex-row items-center justify-between py-4 px-6 border-b border-[#ffffff10]">
-                    <span className="text-[16] text-[#8B8A8D] font-[500]">You : {props.pickValue == "HEADS" ? "Tails" : "Heads"}</span>
-                    <span className="text-[16] text-[#8B8A8D] font-[500]">Oponent : {props.pickValue == "HEADS" ? "Heads" : "Tails"}</span>
+                    <span className="text-[16] text-[#8B8A8D] font-[500]">You : {props.pickValue == "HEADS" ? "Tail" : "Head"}</span>
+                    <span className="text-[16] text-[#8B8A8D] font-[500]">Oponent : {props.pickValue == "HEADS" ? "Head" : "Tail"}</span>
                 </div>
 
                 {/* Coin Display Area - Fixed height to prevent layout shifts */}

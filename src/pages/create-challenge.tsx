@@ -17,6 +17,7 @@ import { solConnection } from "../context/solana/transaction";
 import PlayerHistoryTable from '../components/PlayerHistoryTable';
 import CustomDropdown, { DropdownOption } from "../components/CustomDropdown";
 import { getTokenPrice } from "../utils/util";
+import { publicKey } from "@project-serum/anchor/dist/cjs/utils";
 
 interface AccountCardProps {
   title: string;
@@ -233,6 +234,8 @@ export default function CreateChallenge() {
         setSolPrice(solPrice);
         let counts = 0;
         let result;
+        let winnerPick = "";
+        let yourPick = "";
         let newDataArray = [];
         for (let i = 0; i < historyResponse.length; i++) {
           if (historyResponse[i].gameName == walletAddress || historyResponse[i].joinerPlayer == walletAddress) {
@@ -243,6 +246,30 @@ export default function CreateChallenge() {
               result = "Pending"
             } else {
               result = "Loss"
+            }
+
+            if (result !== "Pending") {
+              if (historyResponse[i].gameName != historyResponse[i].winner && historyResponse[i].pickValue == "HEADS") {
+                winnerPick = "TAILS"
+              } else if (historyResponse[i].gameName != historyResponse[i].winner && historyResponse[i].pickValue == "TAILS") {
+                winnerPick = "HEADS"
+              } else if (historyResponse[i].gameName == historyResponse[i].winner && historyResponse[i].pickValue == "HEADS") {
+                winnerPick = "HEADS"
+              } else {
+                winnerPick = "TAILS"
+              }
+            }
+
+            if (walletAddress) {
+              if (result == "Win") {
+                yourPick = winnerPick;
+              } else if (historyResponse[i].joinerPlayer != walletAddress) {
+                yourPick = historyResponse[i].pickValue
+              } else if (historyResponse[i].pickValue == "HEADS") {
+                yourPick = "TAILS"
+              } else {
+                yourPick = "HEADS"
+              }
             }
             let newData = {
               challenge: historyResponse[i].gameName,
@@ -255,7 +282,9 @@ export default function CreateChallenge() {
               time: historyResponse[i].time,
               winnerTx: historyResponse[i].winnerTx,
               creatorAta: historyResponse[i].creatorAta,
-              pickValue : historyResponse[i].pickValue
+              pickValue: historyResponse[i].pickValue,
+              winnerPick: winnerPick,
+              yourPick: yourPick
             }
             newDataArray.push(newData);
           }

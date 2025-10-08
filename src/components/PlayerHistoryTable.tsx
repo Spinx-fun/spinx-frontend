@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { PlayerHistory } from '../services/gameData';
 import { solacc } from '../utils/constants';
+import { useWallet } from '@solana/wallet-adapter-react';
 
 interface PlayerHistoryTableProps {
   data: PlayerHistory[];
@@ -11,6 +12,7 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
   const [sortAscending, setSortAscending] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const { publicKey } = useWallet();
 
   const handleDateSortToggle = () => {
     if (sortBy === 'date') {
@@ -66,6 +68,7 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
     const formattedHour = hourNum % 12 || 12;
     return `${formattedHour}:${minutes}:${seconds} ${ampm}`;
   };
+  console.log('debug->paginatedData', paginatedData, publicKey?.toBase58())
   return (
     <div className="w-full">
       {/* Desktop Table */}
@@ -138,12 +141,28 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
               borderLeft: '1px solid #324158',
               paddingBlock: '4px',
               paddingInline: '16px',
-              width: '320px',
+              width: '140px',
               height: '48px',
               background: 'transparent'
             }}
           >
-            <span className="font-inter font-bold text-[16px] leading-[100%] text-white mr-auto">Details</span>
+            <span className="font-inter font-bold text-[16px] leading-[100%] text-white mr-auto">Your pick</span>
+          </div>
+
+          <div
+            className="flex items-center flex-shrink-0 cursor-pointer"
+            style={{
+              borderBottom: '1px solid #324158',
+              borderTop: '1px solid #324158',
+              borderLeft: '1px solid #324158',
+              paddingBlock: '4px',
+              paddingInline: '16px',
+              width: '140px',
+              height: '48px',
+              background: 'transparent'
+            }}
+          >
+            <span className="font-inter font-bold text-[16px] leading-[100%] text-white mr-auto">Game Result</span>
           </div>
           {/* Stake Header Cell */}
           <div
@@ -287,22 +306,107 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
                 borderLeft: '1px solid #324158',
                 paddingBlock: '18px',
                 paddingInline: '16px',
-                width: '320px',
+                width: '140px',
                 height: '52px',
                 background: 'transparent',
                 display: "flex",
                 justifyContent: "space-between"
               }}
             >
-              <span className="font-inter font-bold text-[14px] leading-[114%] text-[#fff] whitespace-nowrap">Game Result: {item.result == "Win" ? item.pickValue == "HEADS" ? "TAILS" : "HEADS" : item.pickValue}</span>
-              {
-                item.result !== "Pending" ?
-                <span className="font-inter font-bold text-[14px] leading-[114%] text-[#fff] whitespace-nowrap">Your Value: {item.result == "Win" ? item.pickValue : item.pickValue == "HEADS" ? "TAILS" : "HEADS"}</span>
-                :
-                <></>
-              }
-
+              {item.yourPick == "HEADS" ?
+                <div
+                  className="flex items-center justify-center"
+                  style={{
+                    border: '1px solid',
+                    borderColor: '#d45bf8',
+                    borderRadius: '30px',
+                    paddingBlock: '5px',
+                    paddingInline: '10px',
+                    width: '56px',
+                    height: '26px',
+                    background: '#231829'
+                  }}
+                >
+                  <span className="font-inter font-normal text-[14px] leading-[114%]">
+                    <span className="text-[#d45bf8]">Head</span>
+                  </span>
+                </div> :
+                item.yourPick == "TAILS" ?
+                  <div
+                    className="flex items-center justify-center"
+                    style={{
+                      border: '1px solid',
+                      borderColor: '#117af7',
+                      borderRadius: '30px',
+                      paddingBlock: '5px',
+                      paddingInline: '10px',
+                      width: '56px',
+                      height: '26px',
+                      background: '#0f1c29'
+                    }}
+                  >
+                    <span className="font-inter font-normal text-[14px] leading-[114%]">
+                      <span className="text-[#117af7]">Tail</span>
+                    </span>
+                  </div>
+                  :
+                  <></>}
             </div>
+            <div
+              className="flex items-center flex-shrink-0"
+              style={{
+                borderBottom: '1px solid #324158',
+                borderRight: '1px solid #324158',
+                borderLeft: '1px solid #324158',
+                paddingBlock: '18px',
+                paddingInline: '16px',
+                width: '140px',
+                height: '52px',
+                background: 'transparent',
+                display: "flex",
+                justifyContent: "space-between"
+              }}
+            >
+              {item.winnerPick == "HEADS" ?
+                <div
+                  className="flex items-center justify-center"
+                  style={{
+                    border: '1px solid',
+                    borderColor: '#d45bf8',
+                    borderRadius: '30px',
+                    paddingBlock: '5px',
+                    paddingInline: '10px',
+                    width: '56px',
+                    height: '26px',
+                    background: '#231829'
+                  }}
+                >
+                  <span className="font-inter font-normal text-[14px] leading-[114%]">
+                    <span className="text-[#d45bf8]">Head</span>
+                  </span>
+                </div> :
+                item.winnerPick == "TAILS" ?
+                  <div
+                    className="flex items-center justify-center"
+                    style={{
+                      border: '1px solid',
+                      borderColor: '#117af7',
+                      borderRadius: '30px',
+                      paddingBlock: '5px',
+                      paddingInline: '10px',
+                      width: '56px',
+                      height: '26px',
+                      background: '#0f1c29'
+                    }}
+                  >
+                    <span className="font-inter font-normal text-[14px] leading-[114%]">
+                      <span className="text-[#117af7]">Tail</span>
+                    </span>
+                  </div> :
+                  <></>}
+            </div>
+
+
 
             {/* Stake Cell */}
             <div
@@ -475,15 +579,13 @@ const PlayerHistoryTable: React.FC<PlayerHistoryTableProps> = ({ data }) => {
 
             <div className="flex items-center justify-between mb-2">
               <span className="font-inter font-bold text-[14px] leading-[114%] text-[#f9c752] whitespace-nowrap">
-                <b>Details: &nbsp; &nbsp;</b> 
-                <span className="font-inter font-bold text-[14px] leading-[114%] text-[#fff] whitespace-nowrap">Game Result: {item.result == "Win" ? item.pickValue == "HEADS" ? "TAILS" : "HEADS" : item.pickValue}</span>
-                &nbsp; &nbsp; &nbsp;
-              {
-                item.result !== "Pending" ?
-                <span className="font-inter font-bold text-[14px] leading-[114%] text-[#fff] whitespace-nowrap">Your Value: {item.result == "Win" ? item.pickValue : item.pickValue == "HEADS" ? "TAILS" : "HEADS"}</span>
-                :
-                <></>
-              }
+                <b>Your pick: &nbsp; &nbsp;{item.yourPick}</b>
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-inter font-bold text-[14px] leading-[114%] text-[#f9c752] whitespace-nowrap">
+                <b>Game Result: &nbsp; &nbsp;{item.winnerPick}</b>
               </span>
             </div>
             {/* Stake */}

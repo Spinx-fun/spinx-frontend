@@ -28,6 +28,8 @@ export interface PlayerHistory {
   stakeAmount: number;
   result: string;
   pickValue: string;
+  winnerPick: string;
+  yourPick: string;
 }
 
 // Simulate API call to fetch games with pagination
